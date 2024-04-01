@@ -1,9 +1,10 @@
 using API.Configurations;
 using API.Data;
+using NLog.Web;
 try
 {
     var builder = WebApplication.CreateBuilder(args);
-
+    builder.Host.UseNLog();
     // Add services to the container.
     builder.Services.AddControllers();
     // Setting DBContexts

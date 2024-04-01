@@ -28,4 +28,8 @@
     <Folder Include="Data\" />
   </ItemGroup>
 
+    <ItemGroup>
+    <ProjectReference Include="..\ViewModels\ViewModels.csproj" />
+  </ItemGroup>
+
 </Project>
