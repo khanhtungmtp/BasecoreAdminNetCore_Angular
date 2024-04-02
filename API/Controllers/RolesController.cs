@@ -1,3 +1,4 @@
+using API.Helpers.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ViewModels.UserManager;
@@ -29,6 +30,16 @@ public class RolesController(RoleManager<IdentityRole> rolesManager) : Controlle
             return BadRequest(result.Errors);
     }
 
+    // url: GET : http:localhost:6001/api/roles
+    [HttpGet]
+    public async Task<IActionResult> GetAll([FromQuery] PaginationParam pagination)
+    {
+        var role = _rolesManager.Roles.Select(x => new RoleVM() { Id = x.Id, Name = x.Name ?? string.Empty });
+        if (role is null)
+            return NotFound();
+        return Ok(await PaginationUtility<RoleVM>.CreateAsync(role, pagination.PageNumber, pagination.PageSize));
+    }
+
     // url: GET : http:localhost:6001/api/roles/{id}
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(string id)
@@ -48,6 +59,8 @@ public class RolesController(RoleManager<IdentityRole> rolesManager) : Controlle
     [HttpPut("{id}")]
     public async Task<IActionResult> PutRole(string id, [FromBody] RoleVM roleVM)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
         if (id != roleVM.Id)
             return BadRequest();
         var role = await _rolesManager.FindByIdAsync(id);

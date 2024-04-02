@@ -1,12 +1,20 @@
 using API.Configurations;
 using API.Data;
+using API.Helpers.Base;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using NLog.Web;
+using ViewModels.UserManager.Validator;
 try
 {
     var builder = WebApplication.CreateBuilder(args);
     builder.Host.UseNLog();
+
     // Add services to the container.
     builder.Services.AddControllers();
+    builder.Services.AddFluentValidationAutoValidation();
+    builder.Services.AddFluentValidationClientsideAdapters();
+    builder.Services.AddValidatorsFromAssemblyContaining<RoleVmValidator>();
     // Setting DBContexts
     builder.Services.AddDatabaseConfiguration(builder.Configuration);
 
@@ -21,7 +29,8 @@ try
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
-
+    builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+    builder.Services.AddProblemDetails();
     var app = builder.Build();
 
     // Configure the HTTP request pipeline.
@@ -33,10 +42,11 @@ try
 
     app.UseHttpsRedirection();
     app.UseRouting();
+    app.UseStaticFiles();
     app.UseAuthentication();
     app.UseAuthorization();
-
     app.MapControllers();
+    app.UseExceptionHandler();
     // Tùy chỉnh seeding ở đây
     using (var scope = app.Services.CreateScope())
     {
