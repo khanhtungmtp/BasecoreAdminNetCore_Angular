@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{68FFCB41-F715-49F6-A28E-9634779E172F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "src\API\API.csproj", "{68FFCB41-F715-49F6-A28E-9634779E172F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortalMVC", "PortalMVC\PortalMVC.csproj", "{E4D13D5B-0E27-4DF5-B0BB-DEDE5DE46387}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortalMVC", "src\PortalMVC\PortalMVC.csproj", "{E4D13D5B-0E27-4DF5-B0BB-DEDE5DE46387}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewModels", "ViewModels\ViewModels.csproj", "{9F9B5AD7-1F2F-4280-84A3-52A9A02F07CC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewModels", "src\ViewModels\ViewModels.csproj", "{9F9B5AD7-1F2F-4280-84A3-52A9A02F07CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

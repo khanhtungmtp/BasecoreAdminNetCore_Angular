@@ -27,7 +27,7 @@ public class PaginationUtility<T> where T : class
     {
         var count = source.Count;
         var skip = (pageNumber - 1) * pageSize;
-        var items = isPaging ? source.Skip(skip).Take(pageSize).ToList() : source.ToList();
+        var items = isPaging ? source.Skip(skip).Take(pageSize).ToList() : [.. source];
 
         return new PaginationUtility<T>(items, count, pageNumber, pageSize, skip);
     }

@@ -3,15 +3,10 @@ using NLog;
 
 namespace API.Helpers.Base;
 
-public class ExceptionHandlingMiddleware : IMiddleware
+public class ExceptionHandlingMiddleware(IHostEnvironment env) : IMiddleware
 {
-    private readonly IHostEnvironment _env;
-    private readonly ILogger<ExceptionHandlingMiddleware> _logger;
-    public ExceptionHandlingMiddleware(IHostEnvironment env, ILogger<ExceptionHandlingMiddleware> logger)
-    {
-        _env = env;
-        _logger = logger;
-    }
+    private readonly IHostEnvironment _env = env;
+
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         try
