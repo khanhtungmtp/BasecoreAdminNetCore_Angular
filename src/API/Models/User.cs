@@ -16,4 +16,7 @@ public class User : IdentityUser
     public int? NumberOfVotes { get; set; }
 
     public int? NumberOfReports { get; set; }
+    public DateTime CreateDate { get; set; }
+
+    public DateTime? UpdateDate { get; set; }
 }

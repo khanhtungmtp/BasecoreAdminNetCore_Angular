@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace ViewModels.UserManager.Validator;
 
-public class RoleVmValidator : AbstractValidator<RoleVM>
+public class RoleVmValidator : AbstractValidator<RoleCreateRequest>
 {
     public RoleVmValidator()
     {

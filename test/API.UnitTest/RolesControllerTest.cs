@@ -1,13 +1,11 @@
-using API.Controllers;
 using Moq;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using ViewModels.UserManager;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using API.Helpers.Utilities;
 using MockQueryable.Moq;
-using Microsoft.EntityFrameworkCore;
+using API.Controllers.UserManager;
 
 namespace API.UnitTest
 {
@@ -38,7 +36,7 @@ namespace API.UnitTest
             _roleManager.Setup(x => x.CreateAsync(It.IsAny<IdentityRole>())).ReturnsAsync(IdentityResult.Success);
             //Act
             var roleController = new RolesController(_roleManager.Object);
-            var result = await roleController.CreateRole(new RoleVM() { Id = "admin", Name = "Admin" });
+            var result = await roleController.CreateRole(new RoleCreateRequest() { Id = "admin", Name = "Admin" });
             Assert.NotNull(result);
             Assert.IsType<CreatedAtActionResult>(result);
         }
@@ -49,7 +47,7 @@ namespace API.UnitTest
             // gia lap create that bai
             _roleManager.Setup(x => x.CreateAsync(It.IsAny<IdentityRole>())).ReturnsAsync(IdentityResult.Failed(new IdentityError[] { }));
             var roleController = new RolesController(_roleManager.Object);
-            var result = await roleController.CreateRole(new RoleVM() { Id = "admin", Name = "Admin" });
+            var result = await roleController.CreateRole(new RoleCreateRequest() { Id = "admin", Name = "Admin" });
             Assert.NotNull(result);
             Assert.IsType<BadRequestObjectResult>(result);
         }

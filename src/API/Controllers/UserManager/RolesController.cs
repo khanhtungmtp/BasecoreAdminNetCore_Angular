@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ViewModels.UserManager;
 
-namespace API.Controllers;
+namespace API.Controllers.UserManager;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -14,18 +14,18 @@ public class RolesController(RoleManager<IdentityRole> rolesManager) : Controlle
 
     // url: POST : http://localhost:6001/api/roles
     [HttpPost]
-    public async Task<IActionResult> CreateRole(RoleVM roleVM)
+    public async Task<IActionResult> CreateRole(RoleCreateRequest request)
     {
         var role = new IdentityRole()
         {
-            Id = roleVM.Id,
-            Name = roleVM.Name,
-            NormalizedName = roleVM.Name.ToUpper(),
+            Id = request.Id,
+            Name = request.Name,
+            NormalizedName = request.Name.ToUpper(),
         };
         var result = await _rolesManager.CreateAsync(role);
         if (result.Succeeded)
         {
-            return CreatedAtAction(nameof(GetById), new { id = roleVM.Id }, roleVM);
+            return CreatedAtAction(nameof(GetById), new { id = request.Id }, request);
         }
         else
             return BadRequest(result.Errors);
@@ -67,17 +67,17 @@ public class RolesController(RoleManager<IdentityRole> rolesManager) : Controlle
 
     // url: PUT : http:localhost:6001/api/roles/{id}
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutRole(string id, [FromBody] RoleVM roleVM)
+    public async Task<IActionResult> PutRole(string id, [FromBody] RoleCreateRequest request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
-        if (id != roleVM.Id)
+        if (id != request.Id)
             return BadRequest();
         var role = await _rolesManager.FindByIdAsync(id);
         if (role is null)
             return NotFound();
-        role.Name = roleVM.Name;
-        role.NormalizedName = roleVM.Name.ToUpper();
+        role.Name = request.Name;
+        role.NormalizedName = request.Name.ToUpper();
         var result = await _rolesManager.UpdateAsync(role);
         if (result.Succeeded)
             return NoContent();
