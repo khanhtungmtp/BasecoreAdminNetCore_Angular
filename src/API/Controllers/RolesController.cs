@@ -1,6 +1,7 @@
 using API.Helpers.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ViewModels.UserManager;
 
 namespace API.Controllers;
@@ -32,12 +33,21 @@ public class RolesController(RoleManager<IdentityRole> rolesManager) : Controlle
 
     // url: GET : http:localhost:6001/api/roles
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] PaginationParam pagination)
+    public async Task<IActionResult> GetAll([FromQuery] PaginationParam pagination, RoleVM roleVM)
     {
-        var role = _rolesManager.Roles.Select(x => new RoleVM() { Id = x.Id, Name = x.Name ?? string.Empty });
+        var role = _rolesManager.Roles;
         if (role is null)
             return NotFound();
-        return Ok(await PaginationUtility<RoleVM>.CreateAsync(role, pagination.PageNumber, pagination.PageSize));
+        if (!string.IsNullOrWhiteSpace(roleVM.Id))
+        {
+            role = role.Where(x => x.Id.Contains(roleVM.Id));
+        }
+        if (!string.IsNullOrWhiteSpace(roleVM.Name))
+        {
+            role = role.Where(x => x.Name != null && x.Name.Contains(roleVM.Name));
+        }
+        var listRoleVM = await role.Select(x => new RoleVM() { Id = x.Id, Name = x.Name ?? string.Empty }).ToListAsync();
+        return Ok(PaginationUtility<RoleVM>.Create(listRoleVM, pagination.PageNumber, pagination.PageSize));
     }
 
     // url: GET : http:localhost:6001/api/roles/{id}
