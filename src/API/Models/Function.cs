@@ -25,4 +25,8 @@ public class Function
     [MaxLength(50)]
     [Column(TypeName = "varchar(50)")]
     public string ParentId { get; set; } = string.Empty;
+
+    [MaxLength(50)]
+    [Column(TypeName = "varchar(50)")]
+    public string Icon { get; set; } = string.Empty;
 }

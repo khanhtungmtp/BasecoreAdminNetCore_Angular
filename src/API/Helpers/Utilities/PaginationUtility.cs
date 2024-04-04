@@ -3,33 +3,33 @@ using Microsoft.EntityFrameworkCore;
 namespace API.Helpers.Utilities;
 
 
-public class PaginationUtility<T> where T : class
+public class PagingResult<T> where T : class
 {
     public PaginationResult Pagination { get; set; }
     public List<T> Result { get; set; }
 
-    public PaginationUtility(List<T> items, int count, int pageNumber, int pageSize, int skip)
+    public PagingResult(List<T> items, int count, int pageNumber, int pageSize, int skip)
     {
         Result = items;
         Pagination = PaginationResult.Create(count, pageNumber, pageSize, skip);
     }
 
-    public static async Task<PaginationUtility<T>> CreateAsync(IQueryable<T> source, int pageNumber, int pageSize = 10, bool isPaging = true)
+    public static async Task<PagingResult<T>> CreateAsync(IQueryable<T> source, int pageNumber, int pageSize = 10, bool isPaging = true)
     {
         var count = await source.CountAsync();
         var skip = (pageNumber - 1) * pageSize;
         var items = isPaging ? await source.Skip(skip).Take(pageSize).ToListAsync() : await source.ToListAsync();
 
-        return new PaginationUtility<T>(items, count, pageNumber, pageSize, skip);
+        return new PagingResult<T>(items, count, pageNumber, pageSize, skip);
     }
 
-    public static PaginationUtility<T> Create(List<T> source, int pageNumber, int pageSize = 10, bool isPaging = true)
+    public static PagingResult<T> Create(List<T> source, int pageNumber, int pageSize = 10, bool isPaging = true)
     {
         var count = source.Count;
         var skip = (pageNumber - 1) * pageSize;
         var items = isPaging ? source.Skip(skip).Take(pageSize).ToList() : [.. source];
 
-        return new PaginationUtility<T>(items, count, pageNumber, pageSize, skip);
+        return new PagingResult<T>(items, count, pageNumber, pageSize, skip);
     }
 
     public class PaginationResult

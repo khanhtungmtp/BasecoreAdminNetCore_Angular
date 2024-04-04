@@ -27,9 +27,9 @@ public class Repository<T, DBContext>(DBContext context) : IRepository<T> where 
         return noTracking == true ? _context.Set<T>().Where(predicate).AsNoTracking() : _context.Set<T>().Where(predicate);
     }
 
-    public async Task<T> FindById(object id)
+    public async Task<T> FindByIdAsync(object id)
     {
-        return await _context.Set<T>().FindAsync(id) ?? default!;
+        return await _context.Set<T>().FindAsync(id) ?? null!;
     }
 
     public void Remove(T entity)
@@ -39,7 +39,7 @@ public class Repository<T, DBContext>(DBContext context) : IRepository<T> where 
 
     public void Remove(object id)
     {
-        Remove(FindById(id));
+        Remove(FindByIdAsync(id));
     }
 
     public void RemoveMultiple(List<T> entities)

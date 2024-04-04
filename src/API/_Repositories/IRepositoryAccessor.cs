@@ -6,7 +6,7 @@ namespace API._Repositories
     [DependencyInjection(ServiceLifetime.Scoped)]
     public interface IRepositoryAccessor
     {
-        Task<bool> SaveAsync();
+        Task<bool> SaveChangesAsync();
         Task<IDbContextTransaction> BeginTransactionAsync();
         IRepository<Command> Commands { get; }
         IRepository<CommandInFunction> CommandInFunctions { get; }

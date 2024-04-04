@@ -4,9 +4,20 @@ using System.ComponentModel.DataAnnotations;
 namespace API.Models;
 public class User : IdentityUser
 {
+    public User() { }
+
+    public User(string id, string userName, string fullName, string email, string phoneNumber, DateTime dateOfBirth)
+    {
+        Id = id;
+        UserName = userName;
+        FullName = fullName;
+        Email = email;
+        PhoneNumber = phoneNumber;
+        DateOfBirth = dateOfBirth;
+    }
     [MaxLength(50)]
     [Required]
-    public required string FullName { get; set; }
+    public string FullName { get; set; } = string.Empty;
 
     [Required]
     public DateTime DateOfBirth { get; set; }

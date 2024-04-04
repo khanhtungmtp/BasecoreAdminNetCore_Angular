@@ -47,7 +47,7 @@ public class RolesController(RoleManager<IdentityRole> rolesManager) : Controlle
             role = role.Where(x => x.Name != null && x.Name.Contains(roleVM.Name));
         }
         var listRoleVM = await role.Select(x => new RoleVM() { Id = x.Id, Name = x.Name ?? string.Empty }).ToListAsync();
-        return Ok(PaginationUtility<RoleVM>.Create(listRoleVM, pagination.PageNumber, pagination.PageSize));
+        return Ok(PagingResult<RoleVM>.Create(listRoleVM, pagination.PageNumber, pagination.PageSize));
     }
 
     // url: GET : http:localhost:6001/api/roles/{id}

@@ -34,7 +34,7 @@ namespace API._Repositories
 
         public IRepository<Attachment> Attachments { get; set; } = default!;
 
-        public async Task<bool> SaveAsync()
+        public async Task<bool> SaveChangesAsync()
         {
             return await _dbContext.SaveChangesAsync() > 0;
         }

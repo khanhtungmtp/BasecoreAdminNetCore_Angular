@@ -29,8 +29,9 @@ public class UsersController : ControllerBase
             FullName = request.FullName,
             Email = request.Email,
             PhoneNumber = request.PhoneNumber,
+            DateOfBirth = request.DateOfBirth
         };
-        var result = await _userManager.CreateAsync(user);
+        IdentityResult? result = await _userManager.CreateAsync(user, request.Password);
         if (result.Succeeded)
         {
             return CreatedAtAction(nameof(GetById), new { id = user.Id }, request);
@@ -41,22 +42,19 @@ public class UsersController : ControllerBase
 
     // url: GET : http:localhost:6001/api/user
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] PaginationParam pagination, UserVM userVM)
+    public async Task<IActionResult> GetAllPaging(string filter, [FromQuery] PaginationParam pagination, UserVM userVM)
     {
         var user = _userManager.Users;
         if (user is null)
             return NotFound();
-        if (!string.IsNullOrWhiteSpace(userVM.Id))
+        if (!string.IsNullOrWhiteSpace(filter))
         {
-            user = user.Where(x => x.Id.Contains(userVM.Id));
-        }
-        if (!string.IsNullOrWhiteSpace(userVM.FullName))
-        {
-            user = user.Where(x => x.FullName.Contains(userVM.FullName));
+            bool isDate = DateTime.TryParse(filter, out DateTime filterDate);
+            user = user.Where(x => x.FullName.Contains(filter) || x.Email != null && x.Email.Contains(filter) || (isDate && x.DateOfBirth.Date == filterDate.Date));
         }
         // more request search...
         var listUserVM = await user.Select(x => new UserVM() { Id = x.Id, FullName = x.FullName ?? string.Empty }).ToListAsync();
-        return Ok(PaginationUtility<UserVM>.Create(listUserVM, pagination.PageNumber, pagination.PageSize));
+        return Ok(PagingResult<UserVM>.Create(listUserVM, pagination.PageNumber, pagination.PageSize));
     }
 
     // url: GET : http:localhost:6001/api/user/{id}
@@ -83,7 +81,22 @@ public class UsersController : ControllerBase
             return NotFound();
         user.FullName = request.FullName;
         user.DateOfBirth = request.DateOfBirth;
+        user.UpdateDate = DateTime.Now;
+
         var result = await _userManager.UpdateAsync(user);
+        if (result.Succeeded)
+            return NoContent();
+        return BadRequest(result.Errors);
+    }
+
+    // url: PUT : http:localhost:6001/api/user/{id}/change-password
+    [HttpPut("{id}/change-password")]
+    public async Task<IActionResult> ChangePassword(string id, [FromBody] UserPasswordChangeRequest request)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user is null)
+            return NotFound();
+        var result = await _userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
         if (result.Succeeded)
             return NoContent();
         return BadRequest(result.Errors);
@@ -102,7 +115,12 @@ public class UsersController : ControllerBase
             var userVM = new UserVM()
             {
                 Id = user.Id,
-                FullName = user.FullName ?? string.Empty
+                UserName = user.UserName ?? string.Empty,
+                FullName = user.FullName ?? string.Empty,
+                DateOfBirth = user.DateOfBirth,
+                CreateDate = user.CreateDate,
+                Email = user.Email ?? string.Empty,
+                PhoneNumber = user.PhoneNumber ?? string.Empty
             };
             return Ok(userVM);
         }

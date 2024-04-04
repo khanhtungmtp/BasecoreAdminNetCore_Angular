@@ -4,7 +4,7 @@ namespace API._Repositories;
 
 public interface IRepository<T> where T : class
 {
-    Task<T> FindById(object id);
+    Task<T> FindByIdAsync(object id);
 
     IQueryable<T> FindAll(bool? noTracking = false);
 

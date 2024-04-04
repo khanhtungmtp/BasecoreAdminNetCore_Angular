@@ -17,19 +17,19 @@ public class ExceptionHandlingMiddleware(IHostEnvironment env) : IMiddleware
         {
             var (statusCode, message) = HandleException(ex);
 
-            var response = new APIError((int)statusCode, message);
+            var response = new ApiResponse((int)statusCode, message);
 
             if (_env.IsDevelopment())
             {
-                response = new APIError((int)statusCode, ex.Message, ex.StackTrace ?? "No stack trace available");
+                response = new ApiResponse((int)statusCode, ex.Message, ex.StackTrace ?? "No stack trace available");
             }
-            Logger logger = NLog.LogManager.GetLogger("applog");
+            Logger logger = LogManager.GetLogger("applog");
             logger.Log(NLog.LogLevel.Error, $"{DateTime.UtcNow} - Path: {context?.Request?.Path} - Body: {response}{Environment.NewLine} ==> Error: {ex} {Environment.NewLine}==> Inner: {ex?.InnerException}");
             if (context != null)
             {
                 context.Response.StatusCode = (int)statusCode;
                 context.Response.ContentType = "application/json";
-                await context.Response.WriteAsync(response.ToString());
+                await context.Response.WriteAsync(response.ToString() ?? "Unknown error");
             }
         }
     }

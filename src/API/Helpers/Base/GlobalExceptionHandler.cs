@@ -1,28 +1,63 @@
+using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using NLog;
 
 namespace API.Helpers.Base;
 
-public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
+public class GlobalExceptionHandler(IHostEnvironment env) : IExceptionHandler
 {
-    private readonly ILogger<GlobalExceptionHandler> _logger = logger;
+    private readonly IHostEnvironment _env = env;
 
-    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
+    public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception ex, CancellationToken cancellationToken)
     {
-        _logger.LogError(
-            exception, "Exception occurred: {Message}", exception.Message);
+        var (statusCode, message) = HandleException(ex);
 
-        var problemDetails = new ProblemDetails
+        var response = new ApiResponse((int)statusCode, message);
+
+        if (_env.IsDevelopment())
         {
-            Status = StatusCodes.Status500InternalServerError,
-            Title = "Server error"
-        };
+            response = new ApiResponse((int)statusCode, ex.Message, ex.StackTrace ?? "No stack trace available");
+        }
 
-        httpContext.Response.StatusCode = problemDetails.Status.Value;
+        Logger logger = LogManager.GetLogger("applog");
+        logger.Log(NLog.LogLevel.Error, $"{DateTime.UtcNow} - Path: {context?.Request?.Path} - Body: {response}{Environment.NewLine} ==> Error: {ex} {Environment.NewLine}==> Inner: {ex?.InnerException}");
 
-        await httpContext.Response
-            .WriteAsJsonAsync(problemDetails, cancellationToken);
+        if (context != null)
+        {
+            context.Response.StatusCode = (int)statusCode;
+            context.Response.ContentType = "application/json";
 
-        return true;
+            // Fixed: Serialize the ApiResponse object to JSON
+            await context.Response.WriteAsJsonAsync(response, cancellationToken);
+            return true;
+        }
+        return false;
+    }
+
+
+    private (HttpStatusCode, string) HandleException(Exception ex)
+    {
+        var exceptionType = ex.GetType();
+        var statusCode = HttpStatusCode.InternalServerError;
+        var message = "Internal Server Error";
+
+        if (exceptionType == typeof(ApplicationException))
+        {
+            statusCode = HttpStatusCode.BadRequest;
+            message = "Bad Request";
+        }
+        else if (exceptionType == typeof(KeyNotFoundException) || exceptionType == typeof(NullReferenceException))
+        {
+            statusCode = HttpStatusCode.NotFound;
+            message = "Not Found";
+        }
+        else if (exceptionType == typeof(UnauthorizedAccessException))
+        {
+            statusCode = HttpStatusCode.Unauthorized;
+            message = "Permission Denied";
+        }
+
+        return (statusCode, message);
     }
 }
