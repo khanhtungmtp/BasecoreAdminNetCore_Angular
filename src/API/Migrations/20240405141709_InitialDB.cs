@@ -57,6 +57,8 @@ namespace API.Migrations
                     NumberOfKnowledgeBases = table.Column<int>(type: "int", nullable: true),
                     NumberOfVotes = table.Column<int>(type: "int", nullable: true),
                     NumberOfReports = table.Column<int>(type: "int", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -165,7 +167,8 @@ namespace API.Migrations
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Url = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     SortOrder = table.Column<int>(type: "int", nullable: false),
-                    ParentId = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
+                    ParentId = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    Icon = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {

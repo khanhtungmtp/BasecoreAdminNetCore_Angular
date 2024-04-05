@@ -1,3 +1,4 @@
+using API.Helpers.Base;
 using API.Helpers.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -28,16 +29,16 @@ public class RolesController(RoleManager<IdentityRole> rolesManager) : Controlle
             return CreatedAtAction(nameof(GetById), new { id = request.Id }, request);
         }
         else
-            return BadRequest(result.Errors);
+            return BadRequest(new ApiBadRequestResponse(result));
     }
 
     // url: GET : http:localhost:6001/api/roles
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] PaginationParam pagination, RoleVM roleVM)
+    public async Task<IActionResult> GetAll([FromQuery] PaginationParam pagination, [FromQuery] RoleVM roleVM)
     {
         var role = _rolesManager.Roles;
         if (role is null)
-            return NotFound();
+            return NotFound(new ApiNotFoundResponse("Role not found"));
         if (!string.IsNullOrWhiteSpace(roleVM.Id))
         {
             role = role.Where(x => x.Id.Contains(roleVM.Id));
@@ -56,7 +57,7 @@ public class RolesController(RoleManager<IdentityRole> rolesManager) : Controlle
     {
         var role = await _rolesManager.FindByIdAsync(id);
         if (role is null)
-            return NotFound();
+            return NotFound(new ApiNotFoundResponse("Role not found"));
         var roleVM = new RoleVM()
         {
             Id = role.Id,
@@ -69,13 +70,11 @@ public class RolesController(RoleManager<IdentityRole> rolesManager) : Controlle
     [HttpPut("{id}")]
     public async Task<IActionResult> PutRole(string id, [FromBody] RoleCreateRequest request)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(new ApiBadRequestResponse("Role not found"));
         var role = await _rolesManager.FindByIdAsync(id);
         if (role is null)
-            return NotFound();
+            return NotFound(new ApiNotFoundResponse("Role not found"));
         role.Name = request.Name;
         role.NormalizedName = request.Name.ToUpper();
         var result = await _rolesManager.UpdateAsync(role);
@@ -90,7 +89,7 @@ public class RolesController(RoleManager<IdentityRole> rolesManager) : Controlle
     {
         var role = await _rolesManager.FindByIdAsync(id);
         if (role is null)
-            return NotFound();
+            return NotFound(new ApiNotFoundResponse("Role not found"));
         var result = await _rolesManager.DeleteAsync(role);
         if (result.Succeeded)
         {

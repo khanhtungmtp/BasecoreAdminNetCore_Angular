@@ -1,22 +1,18 @@
 using API._Services.Interfaces.System;
-using API.Helpers.Base;
-using API.Models;
+using API.Helpers.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using ViewModels.System;
 
 namespace API.Controllers.System;
 
-public class FunctionsController : BaseController
+public class FunctionsController(I_Function functionService, I_CommandInFunction commandInFunctionService) : BaseController
 {
-    private readonly I_Function _functionService;
-    public FunctionsController(I_Function functionService)
-    {
-        _functionService = functionService;
-    }
+    private readonly I_Function _functionService = functionService;
+    private readonly I_CommandInFunction _commandInFunctionService = commandInFunctionService;
 
     // url: POST : http://localhost:6001/api/function
     [HttpPost]
-    public async Task<IActionResult> CreateUser(FunctionCreateRequest request)
+    public async Task<IActionResult> PostFunction(FunctionCreateRequest request)
     {
         var result = await _functionService.CreateAsync(request);
         if (result.Succeeded)
@@ -24,89 +20,108 @@ public class FunctionsController : BaseController
             return CreatedAtAction(nameof(GetById), new { id = result.Data }, request);
         }
         else
-            return BadRequest(result.Error);
+            return BadRequest(result);
     }
 
-    // url: GET : http:localhost:6001/api/function
-    // [HttpGet]
-    // public async Task<IActionResult> GetAllPaging(string filter, [FromQuery] PaginationParam pagination, FunctionVM userVM)
-    // {
-    //     var function = _userManager.Users;
-    //     if (function is null)
-    //         return NotFound();
-    //     if (!string.IsNullOrWhiteSpace(filter))
-    //     {
-    //         bool isDate = DateTime.TryParse(filter, out DateTime filterDate);
-    //         function = function.Where(x => x.FullName.Contains(filter) || x.Email != null && x.Email.Contains(filter) || (isDate && x.DateOfBirth.Date == filterDate.Date));
-    //     }
-    //     // more request search...
-    //     var listUserVM = await function.Select(x => new FunctionVM() { Id = x.Id, FullName = x.FullName ?? string.Empty }).ToListAsync();
-    //     return Ok(PagingResult<FunctionVM>.Create(listUserVM, pagination.PageNumber, pagination.PageSize));
-    // }
+    // url: GET : http:localhost:6001/api/functions
+    [HttpGet]
+    public async Task<IActionResult> GetAllPaging(string? filter, [FromQuery] PaginationParam pagination, [FromQuery] FunctionVM userVM)
+    {
+        filter ??= string.Empty;
+        return Ok(await _functionService.GetAllPaging(filter, pagination, userVM));
+    }
 
     // // url: GET : http:localhost:6001/api/function/{id}
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(string id)
     {
-        var function = await _functionService.FindByIdAsync(id);
-        if (!function.Succeeded)
-            return NotFound(new ApiNotFoundResponse(function.Message));
-        return Ok(function);
+        var result = await _functionService.FindByIdAsync(id);
+        if (!result.Succeeded)
+        {
+            if (result.Status == 404)
+                return NotFound(result);
+            else
+                return BadRequest(result);
+        }
+        return Ok(result);
     }
 
     // // url: PUT : http:localhost:6001/api/function/{id}
-    // [HttpPut("{id}")]
-    // public async Task<IActionResult> PutUser(string id, [FromBody] FunctionCreateRequest request)
-    // {
-    //     var function = await _userManager.FindByIdAsync(id);
-    //     if (function is null)
-    //         return NotFound();
-    //     function.FullName = request.FullName;
-    //     function.DateOfBirth = request.DateOfBirth;
-    //     function.UpdateDate = DateTime.Now;
-
-    //     var result = await _userManager.UpdateAsync(function);
-    //     if (result.Succeeded)
-    //         return NoContent();
-    //     return BadRequest(result.Errors);
-    // }
-
-    // // url: PUT : http:localhost:6001/api/function/{id}/change-password
-    // [HttpPut("{id}/change-password")]
-    // public async Task<IActionResult> ChangePassword(string id, [FromBody] UserPasswordChangeRequest request)
-    // {
-    //     var function = await _userManager.FindByIdAsync(id);
-    //     if (function is null)
-    //         return NotFound();
-    //     var result = await _userManager.ChangePasswordAsync(function, request.OldPassword, request.NewPassword);
-    //     if (result.Succeeded)
-    //         return NoContent();
-    //     return BadRequest(result.Errors);
-    // }
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutFunction(string id, [FromBody] FunctionCreateRequest request)
+    {
+        var result = await _functionService.PutFunction(id, request);
+        if (!result.Succeeded)
+        {
+            if (result.Status == 404)
+                return NotFound(result);
+            else
+                return BadRequest(result);
+        }
+        return Ok(result);
+    }
 
     // // url: DELETE : http:localhost:6001/api/function/{id}
-    // [HttpDelete("{id}")]
-    // public async Task<IActionResult> DeleteUser(string id)
-    // {
-    //     var function = await _userManager.FindByIdAsync(id);
-    //     if (function is null)
-    //         return NotFound();
-    //     var result = await _userManager.DeleteAsync(function);
-    //     if (result.Succeeded)
-    //     {
-    //         var userVM = new FunctionVM()
-    //         {
-    //             Id = function.Id,
-    //             UserName = function.UserName ?? string.Empty,
-    //             FullName = function.FullName ?? string.Empty,
-    //             DateOfBirth = function.DateOfBirth,
-    //             CreateDate = function.CreateDate,
-    //             Email = function.Email ?? string.Empty,
-    //             PhoneNumber = function.PhoneNumber ?? string.Empty
-    //         };
-    //         return Ok(userVM);
-    //     }
-    //     return BadRequest(result.Errors);
-    // }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteFunction(string id)
+    {
+        var result = await _functionService.DeleteFunction(id);
+        if (!result.Succeeded)
+        {
+            if (result.Status == 404)
+                return NotFound(result);
+            else
+                return BadRequest(result);
+        }
+        return Ok(result);
+    }
+
+    // ========AREA COMMMAND IN FUNCTION=====
+    // GET: http://localhost:6001/api/function/{functionId}/command-in-function
+    [HttpGet("{functionId}/command-in-function")]
+    public async Task<IActionResult> GetCommandInFunction(string functionId)
+    {
+        var result = await _commandInFunctionService.GetCommandInFunction(functionId);
+        if (!result.Succeeded)
+        {
+            if (result.Status == 404)
+                return NotFound(result);
+            else
+                return BadRequest(result);
+        }
+        return Ok(result);
+    }
+
+    // PostCommandToFunction
+    // POST: http://localhost:6001/api/function/{functionId}/commands
+    [HttpPost("{functionId}/commands")]
+    public async Task<IActionResult> PostCommandToFunction(string functionId, [FromBody] CommandAssignRequest request)
+    {
+        var result = await _commandInFunctionService.PostCommandInFunction(functionId, request);
+        if (!result.Succeeded)
+        {
+            if (result.Status == 404)
+                return NotFound(result);
+            else
+                return BadRequest(result);
+        }
+        return Ok(result);
+    }
+
+    //DeleteCommandToFunction
+    // DELETE: http://localhost:6001/api/function/{functionId}/commands
+    [HttpDelete("{functionId}/commands")]
+    public async Task<IActionResult> DeleteCommandToFunction(string functionId, [FromBody] CommandAssignRequest request)
+    {
+        var result = await _commandInFunctionService.DeleteCommandInFunction(functionId, request);
+        if (!result.Succeeded)
+        {
+            if (result.Status == 404)
+                return NotFound(result);
+            else
+                return BadRequest(result);
+        }
+        return Ok(result);
+    }
 
 }

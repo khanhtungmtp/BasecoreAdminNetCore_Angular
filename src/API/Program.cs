@@ -1,8 +1,11 @@
+using System.Net;
 using API.Configurations;
 using API.Data;
 using API.Helpers.Base;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using NLog.Web;
 using ViewModels.UserManager.Validator;
 try
@@ -11,7 +14,27 @@ try
     builder.Host.UseNLog();
 
     // Add services to the container.
-    builder.Services.AddControllers();
+    builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
+     options.InvalidModelStateResponseFactory = actionContext =>
+     {
+         var context = actionContext.HttpContext;
+         var trackId = Guid.NewGuid().ToString();
+         context.Response.Headers.Append("TrackId", trackId); // Bạn có thể thêm TrackId vào header của phản hồi
+
+         var modelState = actionContext.ModelState.Values;
+         var errors = modelState.SelectMany(x => x.Errors).Select(x => x.ErrorMessage);
+
+         return new BadRequestObjectResult(new ApiResponse
+         {
+             TrackId = trackId,
+             Message = ReasonPhrases.GetReasonPhrase((int)HttpStatusCode.BadRequest),
+             Status = (int)HttpStatusCode.BadRequest,
+             Errors = errors
+         });
+     }).AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+});
     builder.Services.AddFluentValidationAutoValidation();
     builder.Services.AddFluentValidationClientsideAdapters();
     builder.Services.AddValidatorsFromAssemblyContaining<RoleVmValidator>();
@@ -28,7 +51,10 @@ try
     builder.Services.AddSwaggerGenConfiguration();
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
+    if (builder.Environment.IsDevelopment())
+    {
+        builder.Services.AddSwaggerGen();
+    }
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
     builder.Services.AddProblemDetails();
     var app = builder.Build();

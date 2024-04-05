@@ -5,6 +5,9 @@ namespace API._Repositories;
 public interface IRepository<T> where T : class
 {
     Task<T> FindByIdAsync(object id);
+    // Returns:
+    //     The query results.
+    Task<T> FindAsync(params object[] keyValues);
 
     IQueryable<T> FindAll(bool? noTracking = false);
 

@@ -32,6 +32,12 @@ public class Repository<T, DBContext>(DBContext context) : IRepository<T> where 
         return await _context.Set<T>().FindAsync(id) ?? null!;
     }
 
+    public async Task<T> FindAsync(params object[] keyValues)
+    {
+        return await _context.Set<T>().FindAsync(keyValues) ?? null!;
+    }
+
+
     public void Remove(T entity)
     {
         _context.Set<T>().Remove(entity);

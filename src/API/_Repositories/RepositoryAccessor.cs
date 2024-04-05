@@ -3,9 +3,17 @@ using API.Models;
 using Microsoft.EntityFrameworkCore.Storage;
 namespace API._Repositories
 {
-    public class RepositoryAccessor(DataContext dbContext) : IRepositoryAccessor
+    public class RepositoryAccessor : IRepositoryAccessor
     {
-        private readonly DataContext _dbContext = dbContext;
+        private readonly DataContext _dbContext;
+
+        public RepositoryAccessor(DataContext dbContext)
+        {
+            _dbContext = dbContext;
+            Functions = new Repository<Function, DataContext>(_dbContext);
+            CommandInFunctions = new Repository<CommandInFunction, DataContext>(_dbContext);
+            Commands = new Repository<Command, DataContext>(_dbContext);
+        }
 
         public IRepository<Command> Commands { get; set; } = default!;
 

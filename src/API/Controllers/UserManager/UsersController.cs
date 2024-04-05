@@ -40,9 +40,26 @@ public class UsersController : ControllerBase
             return BadRequest(result.Errors);
     }
 
+    // url: PUT : http:localhost:6001/api/user/{id}
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutUser(string id, [FromBody] UserCreateRequest request)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user is null)
+            return NotFound();
+        user.FullName = request.FullName;
+        user.DateOfBirth = request.DateOfBirth;
+        user.UpdateDate = DateTime.Now;
+
+        var result = await _userManager.UpdateAsync(user);
+        if (result.Succeeded)
+            return NoContent();
+        return BadRequest(result.Errors);
+    }
+
     // url: GET : http:localhost:6001/api/user
     [HttpGet]
-    public async Task<IActionResult> GetAllPaging(string filter, [FromQuery] PaginationParam pagination, UserVM userVM)
+    public async Task<IActionResult> GetAllPaging(string? filter, [FromQuery] PaginationParam pagination, [FromQuery] UserVM userVM)
     {
         var user = _userManager.Users;
         if (user is null)
@@ -70,23 +87,6 @@ public class UsersController : ControllerBase
             FullName = user.FullName ?? string.Empty
         };
         return Ok(userVM);
-    }
-
-    // url: PUT : http:localhost:6001/api/user/{id}
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutUser(string id, [FromBody] UserCreateRequest request)
-    {
-        var user = await _userManager.FindByIdAsync(id);
-        if (user is null)
-            return NotFound();
-        user.FullName = request.FullName;
-        user.DateOfBirth = request.DateOfBirth;
-        user.UpdateDate = DateTime.Now;
-
-        var result = await _userManager.UpdateAsync(user);
-        if (result.Succeeded)
-            return NoContent();
-        return BadRequest(result.Errors);
     }
 
     // url: PUT : http:localhost:6001/api/user/{id}/change-password
