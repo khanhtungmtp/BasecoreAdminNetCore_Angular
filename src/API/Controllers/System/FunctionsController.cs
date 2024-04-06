@@ -76,7 +76,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
         return Ok(result);
     }
 
-    // ========AREA COMMMAND IN FUNCTION=====
+    // ========AREA COMMMAND IN FUNCTION (ACTION)=====
     // GET: http://localhost:6001/api/function/{functionId}/command-in-function
     [HttpGet("{functionId}/command-in-function")]
     public async Task<IActionResult> GetCommandInFunction(string functionId)
@@ -98,14 +98,14 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     public async Task<IActionResult> PostCommandToFunction(string functionId, [FromBody] CommandAssignRequest request)
     {
         var result = await _commandInFunctionService.PostCommandInFunction(functionId, request);
-        if (!result.Succeeded)
+        if (!result.Succeeded || result.Data is null)
         {
             if (result.Status == 404)
                 return NotFound(result);
             else
                 return BadRequest(result);
         }
-        return Ok(result);
+        return CreatedAtAction(nameof(GetById), new CommandInFunctionVM() { CommandIds = result.Data.CommandIds, FunctionId = result.Data.FunctionId }, request);
     }
 
     //DeleteCommandToFunction

@@ -34,12 +34,12 @@ public class S_CommandInFunction(IRepositoryAccessor repositoryAccessor) : BaseS
     }
 
     // PostCommandInFunction
-    public async Task<ApiResponse<object>> PostCommandInFunction(string functionId, CommandAssignRequest request)
+    public async Task<ApiResponse<CommandInFunctionVM>> PostCommandInFunction(string functionId, CommandAssignRequest request)
     {
         foreach (var commandId in request.CommandIds)
         {
             if (await _repositoryAccessor.CommandInFunctions.FindAsync(commandId, functionId) != null)
-                return new ApiResponse<object>((int)HttpStatusCode.Conflict, false, "Command already exists in function.", null!);
+                return new ApiResponse<CommandInFunctionVM>((int)HttpStatusCode.Conflict, false, "Command already exists in function.", null!);
 
             var entity = new CommandInFunction()
             {
@@ -71,9 +71,9 @@ public class S_CommandInFunction(IRepositoryAccessor repositoryAccessor) : BaseS
         bool result = await _repositoryAccessor.SaveChangesAsync();
 
         if (result)
-            return new ApiResponse<object>((int)HttpStatusCode.OK, true, new { request.CommandIds, functionId });
+            return new ApiResponse<CommandInFunctionVM>((int)HttpStatusCode.OK, true, new CommandInFunctionVM() { CommandIds = request.CommandIds, FunctionId = functionId });
         else
-            return new ApiResponse<object>(500, false, "Add command to function failed.", null!);
+            return new ApiResponse<CommandInFunctionVM>(500, false, "Add command to function failed.", null!);
     }
 
     public async Task<ApiResponse> DeleteCommandInFunction(string functionId, CommandAssignRequest request)
