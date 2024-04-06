@@ -105,7 +105,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
             else
                 return BadRequest(result);
         }
-        return CreatedAtAction(nameof(GetById), new CommandInFunctionVM() { CommandIds = result.Data.CommandIds, FunctionId = result.Data.FunctionId }, request);
+        return CreatedAtAction(nameof(GetById), new CommandInFunctionResponseVM() { CommandIds = result.Data.CommandIds, FunctionId = result.Data.FunctionId }, request);
     }
 
     //DeleteCommandToFunction

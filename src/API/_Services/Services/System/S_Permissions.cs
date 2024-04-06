@@ -1,0 +1,33 @@
+using System.Net;
+using API._Repositories;
+using API._Services.Interfaces.System;
+using API.Helpers.Base;
+using Microsoft.EntityFrameworkCore;
+using ViewModels.System;
+
+namespace API._Services.Services.System;
+public class S_Permissions(IRepositoryAccessor repositoryAccessor) : BaseServices(repositoryAccessor), I_Permissions
+{
+    public async Task<ApiResponse<List<PermissionScreenVm>>> GetCommandViews()
+    {
+        var result = await (
+        from f in _repositoryAccessor.Functions.FindAll(true)
+        join cif in _repositoryAccessor.CommandInFunctions.FindAll(true) on f.Id equals cif.FunctionId into functionCommands
+        from sa in functionCommands.DefaultIfEmpty()
+        group sa by new { f.Id, f.Name, f.ParentId } into grouped
+        orderby grouped.Key.ParentId
+        select new PermissionScreenVm()
+        {
+            Id = grouped.Key.Id,
+            Name = grouped.Key.Name,
+            ParentId = grouped.Key.ParentId,
+            HasCreate = grouped.Any(x => x != null && x.CommandId == "CREATE"),
+            HasUpdate = grouped.Any(x => x != null && x.CommandId == "UPDATE"),
+            HasDelete = grouped.Any(x => x != null && x.CommandId == "DELETE"),
+            HasView = grouped.Any(x => x != null && x.CommandId == "VIEW"),
+            HasApprove = grouped.Any(x => x != null && x.CommandId == "APPROVE")
+        }
+        ).ToListAsync();
+        return new ApiResponse<List<PermissionScreenVm>>((int)HttpStatusCode.OK, true, result);
+    }
+}

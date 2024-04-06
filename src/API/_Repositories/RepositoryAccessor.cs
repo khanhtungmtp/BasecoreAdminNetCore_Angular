@@ -13,6 +13,7 @@ namespace API._Repositories
             Functions = new Repository<Function, DataContext>(_dbContext);
             CommandInFunctions = new Repository<CommandInFunction, DataContext>(_dbContext);
             Commands = new Repository<Command, DataContext>(_dbContext);
+            Permissions = new Repository<Permission, DataContext>(_dbContext);
         }
 
         public IRepository<Command> Commands { get; set; } = default!;

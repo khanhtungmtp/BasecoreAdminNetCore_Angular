@@ -1,17 +1,20 @@
+using API._Services.Interfaces.UserManager;
 using API.Helpers.Base;
 using API.Helpers.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ViewModels.System;
 using ViewModels.UserManager;
 
 namespace API.Controllers.UserManager;
 
 [ApiController]
 [Route("api/[controller]")]
-public class RolesController(RoleManager<IdentityRole> rolesManager) : ControllerBase
+public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles roles) : ControllerBase
 {
     private readonly RoleManager<IdentityRole> _rolesManager = rolesManager;
+    private readonly I_Roles _roles = roles;
 
     // url: POST : http://localhost:6001/api/roles
     [HttpPost]
@@ -80,7 +83,7 @@ public class RolesController(RoleManager<IdentityRole> rolesManager) : Controlle
         var result = await _rolesManager.UpdateAsync(role);
         if (result.Succeeded)
             return NoContent();
-        return BadRequest(result.Errors);
+        return BadRequest(new ApiBadRequestResponse(result));
     }
 
     // url: DELETE : http:localhost:6001/api/roles/{id}
@@ -100,7 +103,29 @@ public class RolesController(RoleManager<IdentityRole> rolesManager) : Controlle
             };
             return Ok(roleVM);
         }
-        return BadRequest(result.Errors);
+        return BadRequest(new ApiBadRequestResponse(result));
+    }
+
+    // GetPermissionByRoleId
+    // url: GET : http:localhost:6001/api/roles/{id}/permissions
+    [HttpGet("{roleId}/permissions")]
+    public async Task<IActionResult> GetPermissionByRoleId(string roleId)
+    {
+        var role = await _roles.GetPermissionByRoleId(roleId);
+        if (!role.Succeeded)
+            return NotFound(role);
+        return Ok(role);
+    }
+
+    // PutPermissionByRoleId
+    // url: PUT : http:localhost:6001/api/roles/{id}/permissions
+    [HttpPut("{roleId}/permissions")]
+    public async Task<IActionResult> PutPermissionByRoleId(string roleId, [FromBody] UpdatePermissionRequest request)
+    {
+        var role = await _roles.PutPermissionByRoleId(roleId, request);
+        if (!role.Succeeded)
+            return NotFound(role);
+        return Ok(role);
     }
 
 }

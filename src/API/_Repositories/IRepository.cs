@@ -16,6 +16,7 @@ public interface IRepository<T> where T : class
     void Add(T entity);
 
     void AddMultiple(List<T> entities);
+    void AddMultiple(IEnumerable<T> entities);
 
     void Update(T entity);
 
@@ -26,6 +27,7 @@ public interface IRepository<T> where T : class
     void Remove(object id);
 
     void RemoveMultiple(List<T> entities);
+    void RemoveMultiple(IEnumerable<T> entities);
 
     bool All(Expression<Func<T, bool>> predicate);
 

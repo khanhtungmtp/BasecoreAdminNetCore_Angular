@@ -10,7 +10,7 @@ public interface I_CommandInFunction
 {
     Task<ApiResponse<List<CommandVm>>> GetCommandInFunction(string functionId);
     // PostCommandInFunction
-    Task<ApiResponse<CommandInFunctionVM>> PostCommandInFunction(string functionId, CommandAssignRequest request);
+    Task<ApiResponse<CommandInFunctionResponseVM>> PostCommandInFunction(string functionId, CommandAssignRequest request);
     // DeleteCommandInFunction
     Task<ApiResponse> DeleteCommandInFunction(string functionId, CommandAssignRequest request);
 }

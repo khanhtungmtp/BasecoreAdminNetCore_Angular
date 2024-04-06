@@ -17,6 +17,11 @@ public class Repository<T, DBContext>(DBContext context) : IRepository<T> where 
         _context.AddRange(entities);
     }
 
+    public void AddMultiple(IEnumerable<T> entities)
+    {
+        _context.AddRange(entities);
+    }
+
     public IQueryable<T> FindAll(bool? noTracking = false)
     {
         return noTracking == true ? _context.Set<T>().AsNoTracking() : _context.Set<T>();
@@ -49,6 +54,11 @@ public class Repository<T, DBContext>(DBContext context) : IRepository<T> where 
     }
 
     public void RemoveMultiple(List<T> entities)
+    {
+        _context.Set<T>().RemoveRange(entities);
+    }
+
+    public void RemoveMultiple(IEnumerable<T> entities)
     {
         _context.Set<T>().RemoveRange(entities);
     }

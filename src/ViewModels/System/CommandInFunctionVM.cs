@@ -1,6 +1,6 @@
 namespace ViewModels.System;
 
-public class CommandInFunctionVM
+public class CommandInFunctionResponseVM
 {
     public required string[] CommandIds { get; set; }
 

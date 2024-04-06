@@ -1,3 +1,4 @@
+using API._Services.Interfaces.UserManager;
 using API.Helpers.Utilities;
 using API.Models;
 using Microsoft.AspNetCore.Identity;
@@ -12,10 +13,12 @@ namespace API.Controllers.UserManager;
 public class UsersController : ControllerBase
 {
     private readonly UserManager<User> _userManager;
+    private readonly I_User _user;
 
-    public UsersController(UserManager<User> userManager)
+    public UsersController(UserManager<User> userManager, I_User user)
     {
         _userManager = userManager;
+        _user = user;
     }
 
     // url: POST : http://localhost:6001/api/user
@@ -51,7 +54,7 @@ public class UsersController : ControllerBase
         user.DateOfBirth = request.DateOfBirth;
         user.UpdateDate = DateTime.Now;
 
-        var result = await _userManager.UpdateAsync(user);
+        IdentityResult result = await _userManager.UpdateAsync(user);
         if (result.Succeeded)
             return NoContent();
         return BadRequest(result.Errors);
@@ -125,6 +128,17 @@ public class UsersController : ControllerBase
             return Ok(userVM);
         }
         return BadRequest(result.Errors);
+    }
+
+    // GetMenuByUserPermission
+    [HttpGet("{userId}/menu")]
+    public async Task<IActionResult> GetMenuByUserPermission(string userId)
+    {
+        var result = await _user.GetMenuByUserPermission(userId);
+        if (!result.Succeeded)
+            return BadRequest(result);
+
+        return Ok(result);
     }
 
 }
