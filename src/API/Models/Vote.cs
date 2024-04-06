@@ -7,7 +7,7 @@ namespace API.Models;
 [Table("Votes")]
 public class Vote : IDateTracking
 {
-    public int KnowledgeBaseId { get; set; }
+    public int ForumId { get; set; }
 
     [MaxLength(50)]
     [Column(TypeName = "varchar(50)")]

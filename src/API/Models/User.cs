@@ -22,7 +22,7 @@ public class User : IdentityUser
     [Required]
     public DateTime DateOfBirth { get; set; }
 
-    public int? NumberOfKnowledgeBases { get; set; }
+    public int? NumberOfForums { get; set; }
 
     public int? NumberOfVotes { get; set; }
 

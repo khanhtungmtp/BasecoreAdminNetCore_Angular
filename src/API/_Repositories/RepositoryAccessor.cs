@@ -14,6 +14,8 @@ namespace API._Repositories
             CommandInFunctions = new Repository<CommandInFunction, DataContext>(_dbContext);
             Commands = new Repository<Command, DataContext>(_dbContext);
             Permissions = new Repository<Permission, DataContext>(_dbContext);
+            Forums = new Repository<Forum, DataContext>(_dbContext);
+            // Categories = new Repository<Category, DataContext>(_dbContext);
         }
 
         public IRepository<Command> Commands { get; set; } = default!;
@@ -28,11 +30,11 @@ namespace API._Repositories
 
         public IRepository<Function> Functions { get; set; } = default!;
 
-        public IRepository<KnowledgeBase> KnowledgeBases { get; set; } = default!;
+        public IRepository<Forum> Forums { get; set; } = default!;
 
         public IRepository<Label> Labels { get; set; } = default!;
 
-        public IRepository<LabelInKnowledgeBase> LabelInKnowledgeBases { get; set; } = default!;
+        public IRepository<LabelInForum> LabelInForums { get; set; } = default!;
 
         public IRepository<Permission> Permissions { get; set; } = default!;
 

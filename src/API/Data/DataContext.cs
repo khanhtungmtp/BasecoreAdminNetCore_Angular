@@ -14,19 +14,19 @@ public class DataContext(DbContextOptions options) : IdentityDbContext<User>(opt
         builder.Entity<IdentityRole>().Property(x => x.Id).HasMaxLength(50).IsUnicode(false);
         builder.Entity<User>().Property(x => x.Id).HasMaxLength(50).IsUnicode(false);
 
-        builder.Entity<LabelInKnowledgeBase>()
-                    .HasKey(c => new { c.LabelId, c.KnowledgeBaseId });
+        builder.Entity<LabelInForum>()
+                    .HasKey(c => new { c.LabelId, c.ForumId });
 
         builder.Entity<Permission>()
                    .HasKey(c => new { c.RoleId, c.FunctionId, c.CommandId });
 
         builder.Entity<Vote>()
-                    .HasKey(c => new { c.KnowledgeBaseId, c.UserId });
+                    .HasKey(c => new { c.ForumId, c.UserId });
 
         builder.Entity<CommandInFunction>()
                    .HasKey(c => new { c.CommandId, c.FunctionId });
 
-        builder.HasSequence("KnowledgeBaseSequence");
+        builder.HasSequence("Forumsequence");
     }
 
     public DbSet<Command> Commands => Set<Command>();
@@ -36,9 +36,9 @@ public class DataContext(DbContextOptions options) : IdentityDbContext<User>(opt
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Comment> Comments => Set<Comment>();
     public DbSet<Function> Functions => Set<Function>();
-    public DbSet<KnowledgeBase> KnowledgeBases => Set<KnowledgeBase>();
+    public DbSet<Forum> Forums => Set<Forum>();
     public DbSet<Label> Labels => Set<Label>();
-    public DbSet<LabelInKnowledgeBase> LabelInKnowledgeBases => Set<LabelInKnowledgeBase>();
+    public DbSet<LabelInForum> LabelInForums => Set<LabelInForum>();
     public DbSet<Permission> Permissions => Set<Permission>();
     public DbSet<Report> Reports => Set<Report>();
     public DbSet<Vote> Votes => Set<Vote>();

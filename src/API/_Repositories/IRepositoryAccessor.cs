@@ -14,9 +14,9 @@ namespace API._Repositories
         IRepository<Category> Categories { get; }
         IRepository<Comment> Comments { get; }
         IRepository<Function> Functions { get; }
-        IRepository<KnowledgeBase> KnowledgeBases { get; }
+        IRepository<Forum> Forums { get; }
         IRepository<Label> Labels { get; }
-        IRepository<LabelInKnowledgeBase> LabelInKnowledgeBases { get; }
+        IRepository<LabelInForum> LabelInForums { get; }
         IRepository<Permission> Permissions { get; }
         IRepository<Report> Reports { get; }
         IRepository<Vote> Votes { get; }

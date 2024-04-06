@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240405141709_InitialDB")]
-    partial class InitialDB
+    [Migration("20240406085443_AddTable")]
+    partial class AddTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.HasSequence("KnowledgeBaseSequence");
+            modelBuilder.HasSequence("Forumsequence");
 
             modelBuilder.Entity("API.Models.ActivityLog", b =>
                 {
@@ -103,7 +103,7 @@ namespace API.Migrations
                         .HasMaxLength(4)
                         .HasColumnType("varchar(4)");
 
-                    b.Property<int?>("KnowledgeBaseId")
+                    b.Property<int?>("ForumId")
                         .HasColumnType("int");
 
                     b.Property<string>("Type")
@@ -203,7 +203,7 @@ namespace API.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("KnowledgeBaseId")
+                    b.Property<int>("ForumId")
                         .HasColumnType("int");
 
                     b.Property<string>("OwnwerUserId")
@@ -219,41 +219,7 @@ namespace API.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("API.Models.Function", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("Icon")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ParentId")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Functions");
-                });
-
-            modelBuilder.Entity("API.Models.KnowledgeBase", b =>
+            modelBuilder.Entity("API.Models.Forum", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -333,7 +299,41 @@ namespace API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("KnowledgeBases");
+                    b.ToTable("Forums");
+                });
+
+            modelBuilder.Entity("API.Models.Function", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Icon")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ParentId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Functions");
                 });
 
             modelBuilder.Entity("API.Models.Label", b =>
@@ -352,18 +352,18 @@ namespace API.Migrations
                     b.ToTable("Labels");
                 });
 
-            modelBuilder.Entity("API.Models.LabelInKnowledgeBase", b =>
+            modelBuilder.Entity("API.Models.LabelInForum", b =>
                 {
                     b.Property<string>("LabelId")
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
-                    b.Property<int>("KnowledgeBaseId")
+                    b.Property<int>("ForumId")
                         .HasColumnType("int");
 
-                    b.HasKey("LabelId", "KnowledgeBaseId");
+                    b.HasKey("LabelId", "ForumId");
 
-                    b.ToTable("LabelInKnowledgeBases");
+                    b.ToTable("LabelInForums");
                 });
 
             modelBuilder.Entity("API.Models.Permission", b =>
@@ -404,11 +404,11 @@ namespace API.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("ForumId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsProcessed")
                         .HasColumnType("bit");
-
-                    b.Property<int?>("KnowledgeBaseId")
-                        .HasColumnType("int");
 
                     b.Property<string>("ReportUserId")
                         .IsRequired()
@@ -474,7 +474,7 @@ namespace API.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<int?>("NumberOfKnowledgeBases")
+                    b.Property<int?>("NumberOfForums")
                         .HasColumnType("int");
 
                     b.Property<int?>("NumberOfReports")
@@ -520,7 +520,7 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Models.Vote", b =>
                 {
-                    b.Property<int>("KnowledgeBaseId")
+                    b.Property<int>("ForumId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
@@ -533,7 +533,7 @@ namespace API.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("KnowledgeBaseId", "UserId");
+                    b.HasKey("ForumId", "UserId");
 
                     b.ToTable("Votes");
                 });

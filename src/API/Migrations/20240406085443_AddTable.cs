@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace API.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialDB : Migration
+    public partial class AddTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateSequence(
-                name: "KnowledgeBaseSequence");
+                name: "Forumsequence");
 
             migrationBuilder.CreateTable(
                 name: "ActivityLogs",
@@ -54,7 +54,7 @@ namespace API.Migrations
                     Id = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    NumberOfKnowledgeBases = table.Column<int>(type: "int", nullable: true),
+                    NumberOfForums = table.Column<int>(type: "int", nullable: true),
                     NumberOfVotes = table.Column<int>(type: "int", nullable: true),
                     NumberOfReports = table.Column<int>(type: "int", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -89,7 +89,7 @@ namespace API.Migrations
                     FilePath = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     FileType = table.Column<string>(type: "varchar(4)", maxLength: 4, nullable: false),
                     FileSize = table.Column<long>(type: "bigint", nullable: false),
-                    KnowledgeBaseId = table.Column<int>(type: "int", nullable: true),
+                    ForumId = table.Column<int>(type: "int", nullable: true),
                     CommentId = table.Column<int>(type: "int", nullable: true),
                     Type = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -149,7 +149,7 @@ namespace API.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Content = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    KnowledgeBaseId = table.Column<int>(type: "int", nullable: false),
+                    ForumId = table.Column<int>(type: "int", nullable: false),
                     OwnwerUserId = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -160,23 +160,7 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Functions",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Url = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    SortOrder = table.Column<int>(type: "int", nullable: false),
-                    ParentId = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
-                    Icon = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Functions", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "KnowledgeBases",
+                name: "Forums",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -201,19 +185,35 @@ namespace API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_KnowledgeBases", x => x.Id);
+                    table.PrimaryKey("PK_Forums", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "LabelInKnowledgeBases",
+                name: "Functions",
                 columns: table => new
                 {
-                    KnowledgeBaseId = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    SortOrder = table.Column<int>(type: "int", nullable: false),
+                    ParentId = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    Icon = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Functions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LabelInForums",
+                columns: table => new
+                {
+                    ForumId = table.Column<int>(type: "int", nullable: false),
                     LabelId = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LabelInKnowledgeBases", x => new { x.LabelId, x.KnowledgeBaseId });
+                    table.PrimaryKey("PK_LabelInForums", x => new { x.LabelId, x.ForumId });
                 });
 
             migrationBuilder.CreateTable(
@@ -247,7 +247,7 @@ namespace API.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    KnowledgeBaseId = table.Column<int>(type: "int", nullable: true),
+                    ForumId = table.Column<int>(type: "int", nullable: true),
                     CommentId = table.Column<int>(type: "int", nullable: true),
                     Content = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     ReportUserId = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
@@ -265,14 +265,14 @@ namespace API.Migrations
                 name: "Votes",
                 columns: table => new
                 {
-                    KnowledgeBaseId = table.Column<int>(type: "int", nullable: false),
+                    ForumId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Votes", x => new { x.KnowledgeBaseId, x.UserId });
+                    table.PrimaryKey("PK_Votes", x => new { x.ForumId, x.UserId });
                 });
 
             migrationBuilder.CreateTable(
@@ -458,13 +458,13 @@ namespace API.Migrations
                 name: "Comments");
 
             migrationBuilder.DropTable(
+                name: "Forums");
+
+            migrationBuilder.DropTable(
                 name: "Functions");
 
             migrationBuilder.DropTable(
-                name: "KnowledgeBases");
-
-            migrationBuilder.DropTable(
-                name: "LabelInKnowledgeBases");
+                name: "LabelInForums");
 
             migrationBuilder.DropTable(
                 name: "Labels");
@@ -485,7 +485,7 @@ namespace API.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropSequence(
-                name: "KnowledgeBaseSequence");
+                name: "Forumsequence");
         }
     }
 }

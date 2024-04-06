@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace API.Models;
 
-[Table("LabelInKnowledgeBases")]
-public class LabelInKnowledgeBase
+[Table("LabelInForums")]
+public class LabelInForum
 {
-    public int KnowledgeBaseId { get; set; }
+    public int ForumId { get; set; }
 
     [MaxLength(50)]
     [Column(TypeName = "varchar(50)")]

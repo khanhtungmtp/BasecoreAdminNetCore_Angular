@@ -26,7 +26,7 @@ public class Attachment : IDateTracking
     [Required]
     public long FileSize { get; set; }
 
-    public int? KnowledgeBaseId { get; set; }
+    public int? ForumId { get; set; }
 
     public int? CommentId { get; set; }
 

@@ -129,6 +129,23 @@ public static partial class FunctionUtility
         return str;
     }
 
+    public static string GenerateSlug(string text)
+    {
+        // First, remove Vietnamese accents
+        text = RemoveUnicode(text);
+
+        // Remove all non-valid chars
+        text = MyRegex1().Replace(text, "");
+
+        // Replace multiple spaces and hyphens with a single hyphen
+        text = MyRegex2().Replace(text, "-").Trim('-');
+
+        // Convert multiple hyphens into a single hyphen
+        text = MyRegex3().Replace(text, "-").ToLower();
+
+        return text;
+    }
+
     public static string GenerateCodeIdentity(string code)
     {
         return (Convert.ToInt32(code) + 1).ToString().PadLeft(5, '0');
@@ -136,4 +153,10 @@ public static partial class FunctionUtility
 
     [GeneratedRegex("[^0-9a-zA-Z]+")]
     private static partial Regex MyRegex();
+    [GeneratedRegex(@"[^a-zA-Z0-9\s-]")]
+    private static partial Regex MyRegex1();
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex MyRegex2();
+    [GeneratedRegex(@"-+")]
+    private static partial Regex MyRegex3();
 }

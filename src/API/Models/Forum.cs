@@ -4,8 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace API.Models;
 
-[Table("KnowledgeBases")]
-public class KnowledgeBase : IDateTracking
+[Table("Forums")]
+public class Forum : IDateTracking
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

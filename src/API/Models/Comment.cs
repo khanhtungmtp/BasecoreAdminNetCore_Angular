@@ -17,7 +17,7 @@ public class Comment : IDateTracking
 
     [Required]
     [Range(1, Double.PositiveInfinity)]
-    public int KnowledgeBaseId { get; set; }
+    public int ForumId { get; set; }
 
     [MaxLength(50)]
     [Column(TypeName = "varchar(50)")]
