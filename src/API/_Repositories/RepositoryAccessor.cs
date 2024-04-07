@@ -15,9 +15,18 @@ namespace API._Repositories
             Commands = new Repository<Command, DataContext>(_dbContext);
             Permissions = new Repository<Permission, DataContext>(_dbContext);
             Forums = new Repository<Forum, DataContext>(_dbContext);
-            // Categories = new Repository<Category, DataContext>(_dbContext);
+            Categories = new Repository<Category, DataContext>(_dbContext);
+            ActivityLogs = new Repository<ActivityLog, DataContext>(_dbContext);
+            Comments = new Repository<Comment, DataContext>(_dbContext);
+            Labels = new Repository<Label, DataContext>(_dbContext);
+            LabelInForums = new Repository<LabelInForum, DataContext>(_dbContext);
+            Reports = new Repository<Report, DataContext>(_dbContext);
+            Votes = new Repository<Vote, DataContext>(_dbContext);
+            Attachments = new Repository<Attachment, DataContext>(_dbContext);
+            Users = new Repository<User, DataContext>(_dbContext);
         }
 
+        public IRepository<User> Users { get; set; } = default!;
         public IRepository<Command> Commands { get; set; } = default!;
 
         public IRepository<CommandInFunction> CommandInFunctions { get; set; } = default!;

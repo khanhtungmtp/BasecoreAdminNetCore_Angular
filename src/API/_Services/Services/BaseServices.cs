@@ -2,8 +2,8 @@ using API._Repositories;
 
 namespace API._Services.Services
 {
-    public class BaseServices(IRepositoryAccessor repositoryAccessor)
+    public class BaseServices(IRepositoryAccessor repoStore)
     {
-        protected readonly IRepositoryAccessor _repositoryAccessor = repositoryAccessor;
+        protected readonly IRepositoryAccessor _repoStore = repoStore;
     }
 }

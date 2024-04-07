@@ -9,7 +9,7 @@ using ViewModels.System;
 
 namespace API._Services.Services.System;
 
-public class S_Function(IRepositoryAccessor repositoryAccessor) : BaseServices(repositoryAccessor), I_Function
+public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore), I_Function
 {
     public Task<ApiResponse<string>> CreateAsync(FunctionCreateRequest request)
     {
@@ -23,14 +23,14 @@ public class S_Function(IRepositoryAccessor repositoryAccessor) : BaseServices(r
             Icon = request.Icon
         };
 
-        _repositoryAccessor.Functions.Add(function);
-        _repositoryAccessor.SaveChangesAsync();
+        _repoStore.Functions.Add(function);
+        _repoStore.SaveChangesAsync();
         return Task.FromResult(new ApiResponse<string>((int)HttpStatusCode.OK, true, "Function created successfully.", function.Id));
     }
 
     public async Task<ApiResponse<FunctionVM>> FindByIdAsync(string id)
     {
-        Function? function = await _repositoryAccessor.Functions.FindByIdAsync(id);
+        Function? function = await _repoStore.Functions.FindByIdAsync(id);
         if (function is null)
             return new ApiResponse<FunctionVM>((int)HttpStatusCode.NotFound, false, "Function not found.", null!);
         FunctionVM userVM = new()
@@ -42,9 +42,9 @@ public class S_Function(IRepositoryAccessor repositoryAccessor) : BaseServices(r
         return new ApiResponse<FunctionVM>((int)HttpStatusCode.OK, true, "Get function successfully.", userVM);
     }
 
-    public async Task<PagingResult<FunctionVM>> GetAllPaging(string? filter, PaginationParam pagination, FunctionVM userVM)
+    public async Task<ApiResponse<PagingResult<FunctionVM>>> GetAllPaging(string? filter, PaginationParam pagination, FunctionVM userVM)
     {
-        var query = _repositoryAccessor.Functions.FindAll(true);
+        var query = _repoStore.Functions.FindAll(true);
         if (!string.IsNullOrWhiteSpace(filter))
         {
             query = query.Where(x => x.Id.Contains(filter) || x.Name.Contains(filter));
@@ -55,12 +55,13 @@ public class S_Function(IRepositoryAccessor repositoryAccessor) : BaseServices(r
             Name = x.Name,
             Url = x.Url
         }).ToListAsync();
-        return PagingResult<FunctionVM>.Create(listFunctionVM, pagination.PageNumber, pagination.PageSize);
+        var resultPaging = PagingResult<FunctionVM>.Create(listFunctionVM, pagination.PageNumber, pagination.PageSize);
+        return new ApiResponse<PagingResult<FunctionVM>>((int)HttpStatusCode.OK, true, "Get function successfully.", resultPaging);
     }
 
-    public async Task<ApiResponse<string>> PutFunction(string id, FunctionCreateRequest request)
+    public async Task<ApiResponse<string>> PutFunctionAsync(string id, FunctionCreateRequest request)
     {
-        Function? function = await _repositoryAccessor.Functions.FindByIdAsync(id);
+        Function? function = await _repoStore.Functions.FindByIdAsync(id);
         if (function is null || function.Id != request.Id)
             return new ApiResponse<string>((int)HttpStatusCode.NotFound, false, "Function not found.", null!);
         function.Name = request.Name;
@@ -68,27 +69,27 @@ public class S_Function(IRepositoryAccessor repositoryAccessor) : BaseServices(r
         function.SortOrder = request.SortOrder;
         function.Url = request.Url;
         function.Icon = request.Icon;
-        _repositoryAccessor.Functions.Update(function);
-        var result = await _repositoryAccessor.SaveChangesAsync();
+        _repoStore.Functions.Update(function);
+        var result = await _repoStore.SaveChangesAsync();
         if (result)
             return new ApiResponse<string>((int)HttpStatusCode.OK, true, "Function updated successfully.", function.Id);
 
         return new ApiResponse<string>(500, false, "Function update failed.", null!);
     }
 
-    public async Task<ApiResponse<string>> DeleteFunction(string id)
+    public async Task<ApiResponse<string>> DeleteFunctionAsync(string id)
     {
-        Function? function = await _repositoryAccessor.Functions.FindByIdAsync(id);
+        Function? function = await _repoStore.Functions.FindByIdAsync(id);
         if (function is null)
             return new ApiResponse<string>((int)HttpStatusCode.NotFound, false, "Function not found.", null!);
 
-        _repositoryAccessor.Functions.Remove(function);
+        _repoStore.Functions.Remove(function);
         // remove command in function
-        List<CommandInFunction>? commands = await _repositoryAccessor.CommandInFunctions.FindAll(x => x.FunctionId == id).ToListAsync();
+        List<CommandInFunction>? commands = await _repoStore.CommandInFunctions.FindAll(x => x.FunctionId == id).ToListAsync();
         // if (commands.Count > 0)
-        _repositoryAccessor.CommandInFunctions.RemoveMultiple(commands);
+        _repoStore.CommandInFunctions.RemoveMultiple(commands);
 
-        var result = await _repositoryAccessor.SaveChangesAsync();
+        var result = await _repoStore.SaveChangesAsync();
         if (result)
             return new ApiResponse<string>((int)HttpStatusCode.OK, true, "Function deleted successfully.", function.Id);
         return new ApiResponse<string>(500, false, "Function delete failed.", null!);

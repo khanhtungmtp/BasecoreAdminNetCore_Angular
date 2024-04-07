@@ -10,15 +10,10 @@ using Microsoft.EntityFrameworkCore;
 using ViewModels.System;
 
 namespace API._Services.Services.UserManager;
-public class S_User : BaseServices, I_User
+public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager, RoleManager<IdentityRole> rolesManager) : BaseServices(repoStore), I_User
 {
-    private readonly UserManager<User> _userManager;
-    private readonly RoleManager<IdentityRole> _rolesManager;
-    public S_User(IRepositoryAccessor repositoryAccessor, UserManager<User> userManager, RoleManager<IdentityRole> rolesManager) : base(repositoryAccessor)
-    {
-        _userManager = userManager;
-        _rolesManager = rolesManager;
-    }
+    private readonly UserManager<User> _userManager = userManager;
+    private readonly RoleManager<IdentityRole> _rolesManager = rolesManager;
 
     public async Task<ApiResponse<List<FunctionVM>>> GetMenuByUserPermission(string userId)
     {
@@ -26,11 +21,11 @@ public class S_User : BaseServices, I_User
         if (user is null)
             return new ApiResponse<List<FunctionVM>>((int)HttpStatusCode.NotFound, false, "User not found.", null!);
         var roles = await _userManager.GetRolesAsync(user);
-        IQueryable<FunctionVM>? query = from f in _repositoryAccessor.Functions.FindAll(true)
-                                        join p in _repositoryAccessor.Permissions.FindAll(true)
+        IQueryable<FunctionVM>? query = from f in _repoStore.Functions.FindAll(true)
+                                        join p in _repoStore.Permissions.FindAll(true)
                                             on f.Id equals p.FunctionId
                                         join r in _rolesManager.Roles on p.RoleId equals r.Id
-                                        join a in _repositoryAccessor.Commands.FindAll(true)
+                                        join a in _repoStore.Commands.FindAll(true)
                                             on p.CommandId equals a.Id
                                         where roles.Contains(r.Name ?? string.Empty) && a.Id == "VIEW"
                                         select new FunctionVM

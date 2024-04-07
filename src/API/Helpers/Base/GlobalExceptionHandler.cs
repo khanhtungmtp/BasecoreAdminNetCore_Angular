@@ -8,55 +8,36 @@ public class GlobalExceptionHandler(IHostEnvironment env) : IExceptionHandler
 {
     private readonly IHostEnvironment _env = env;
 
-    public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception ex, CancellationToken cancellationToken)
+    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception ex, CancellationToken cancellationToken)
     {
-        var (statusCode, message) = HandleException(ex);
-
-        var response = new ApiResponse((int)statusCode, message);
-
-        if (_env.IsDevelopment())
-        {
-            response = new ApiResponse((int)statusCode, ex.Message, ex.StackTrace ?? "No stack trace available");
-        }
-
         Logger logger = LogManager.GetLogger("applog");
-        logger.Log(NLog.LogLevel.Error, $"{DateTime.UtcNow} - Path: {context?.Request?.Path} - Body: {response}{Environment.NewLine} ==> Error: {ex} {Environment.NewLine}==> Inner: {ex?.InnerException}");
+        ErrorGlobalResponse? result;
+        string? detail = _env.IsDevelopment() ? ex.Message : "oops an error occurred."; // only development
 
-        if (context != null)
+        result = new ErrorGlobalResponse
         {
-            context.Response.StatusCode = (int)statusCode;
-            context.Response.ContentType = "application/json";
+            TrackId = Guid.NewGuid().ToString(),
+            Status = ex switch
+            {
+                ArgumentNullException => (int)HttpStatusCode.NotFound,
+                _ => (int)HttpStatusCode.InternalServerError
+            },
+            Type = ex.GetType().Name,
+            Title = "An unexpected error occurred",
+            Detail = detail,
+            Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
+        };
 
-            // Fixed: Serialize the ApiResponse object to JSON
-            await context.Response.WriteAsJsonAsync(response, cancellationToken);
+        // Logging the exception
+        logger.Log(NLog.LogLevel.Error, $"{DateTime.UtcNow} - Path: {httpContext?.Request?.Path}  ==> Error: {detail ?? "Details suppressed"}{Environment.NewLine}==> Inner: {ex?.InnerException}");
+
+        // Write the response
+        if (httpContext is not null)
+        {
+            httpContext.Response.StatusCode = result.Status.Value;
+            await httpContext.Response.WriteAsJsonAsync(result, cancellationToken: cancellationToken);
             return true;
         }
         return false;
-    }
-
-
-    private (HttpStatusCode, string) HandleException(Exception ex)
-    {
-        var exceptionType = ex.GetType();
-        var statusCode = HttpStatusCode.InternalServerError;
-        var message = "Internal Server Error";
-
-        if (exceptionType == typeof(ApplicationException))
-        {
-            statusCode = HttpStatusCode.BadRequest;
-            message = "Bad Request";
-        }
-        else if (exceptionType == typeof(KeyNotFoundException) || exceptionType == typeof(NullReferenceException))
-        {
-            statusCode = HttpStatusCode.NotFound;
-            message = "Not Found";
-        }
-        else if (exceptionType == typeof(UnauthorizedAccessException))
-        {
-            statusCode = HttpStatusCode.Unauthorized;
-            message = "Permission Denied";
-        }
-
-        return (statusCode, message);
     }
 }

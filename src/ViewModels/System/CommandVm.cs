@@ -1,6 +1,6 @@
 namespace ViewModels.System;
 
-public class CommandVm
+public class CommandVM
 {
     public string Id { get; set; } = string.Empty;
 

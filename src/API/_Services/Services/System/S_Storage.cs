@@ -1,15 +1,9 @@
 using API._Services.Interfaces.System;
 
 namespace API._Services.Services.System;
-public class S_Storage : I_Storage
+public class S_Storage(IWebHostEnvironment hostingEnvironment) : I_Storage
 {
-
-    public S_Storage(IWebHostEnvironment hostingEnvironment)
-    {
-        _userContentFolder = Path.Combine(hostingEnvironment.WebRootPath, USER_CONTENT_FOLDER_NAME);
-    }
-
-    private readonly string _userContentFolder = string.Empty;
+    private readonly string _userContentFolder = Path.Combine(hostingEnvironment.WebRootPath, USER_CONTENT_FOLDER_NAME);
     private const string USER_CONTENT_FOLDER_NAME = "user-attachments";
 
     public string GetFileUrl(string fileName)

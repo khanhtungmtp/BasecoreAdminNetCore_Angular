@@ -22,7 +22,7 @@ public class Comment : IDateTracking
     [MaxLength(50)]
     [Column(TypeName = "varchar(50)")]
     public string OwnwerUserId { get; set; } = string.Empty;
-
+    public int? ReplyId { get; set; }
     public DateTime CreateDate { get; set; }
     public DateTime? UpdateDate { get; set; }
 }

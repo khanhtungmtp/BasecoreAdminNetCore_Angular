@@ -59,4 +59,5 @@ public class Forum : IDateTracking
     public int? NumberOfVotes { get; set; }
 
     public int? NumberOfReports { get; set; }
+    public int? ViewCount { get; set; }
 }

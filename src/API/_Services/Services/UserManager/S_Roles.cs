@@ -7,16 +7,12 @@ using Microsoft.EntityFrameworkCore;
 using ViewModels.System;
 
 namespace API._Services.Services.UserManager;
-public class S_Roles : BaseServices, I_Roles
+public class S_Roles(IRepositoryAccessor repoStore) : BaseServices(repoStore), I_Roles
 {
-    public S_Roles(IRepositoryAccessor repositoryAccessor) : base(repositoryAccessor)
-    {
-    }
-
     public async Task<ApiResponse<List<PermissionVm>>> GetPermissionByRoleId(string roleId)
     {
-        List<PermissionVm>? permissions = await (from p in _repositoryAccessor.Permissions.FindAll(true)
-                                                 join a in _repositoryAccessor.Commands.FindAll(true)
+        List<PermissionVm>? permissions = await (from p in _repoStore.Permissions.FindAll(true)
+                                                 join a in _repoStore.Commands.FindAll(true)
                                                  on p.CommandId equals a.Id
                                                  where p.RoleId == roleId
                                                  select new PermissionVm()
@@ -36,11 +32,11 @@ public class S_Roles : BaseServices, I_Roles
         {
             newPermissions.Add(new Permission(p.FunctionId, roleId, p.CommandId));
         }
-        var existingPermissions = _repositoryAccessor.Permissions.FindAll(x => x.RoleId == roleId);
+        var existingPermissions = _repoStore.Permissions.FindAll(x => x.RoleId == roleId);
 
-        _repositoryAccessor.Permissions.RemoveMultiple(existingPermissions);
-        _repositoryAccessor.Permissions.AddMultiple(newPermissions.Distinct(new MyPermissionComparer()));
-        var result = await _repositoryAccessor.SaveChangesAsync();
+        _repoStore.Permissions.RemoveMultiple(existingPermissions);
+        _repoStore.Permissions.AddMultiple(newPermissions.Distinct(new MyPermissionComparer()));
+        var result = await _repoStore.SaveChangesAsync();
         if (result)
             return new ApiResponse<string>((int)HttpStatusCode.OK, true, "Save permission successfully");
 

@@ -14,6 +14,13 @@ namespace API.Configurations
                 options.EnableSensitiveDataLogging(true);
             }
             );
+
+            services.AddDistributedSqlServerCache(o =>
+           {
+               o.ConnectionString = configuration.GetConnectionString($"DefaultConnection_{area}");
+               o.SchemaName = "dbo";
+               o.TableName = "CacheTable";
+           });
         }
     }
 }

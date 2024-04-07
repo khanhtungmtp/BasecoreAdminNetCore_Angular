@@ -2,7 +2,7 @@ using static API.Configurations.DependencyInjectionConfig;
 
 namespace API._Services.Interfaces.System;
 
-[DependencyInjection(ServiceLifetime.Scoped)]
+[DependencyInjection(ServiceLifetime.Transient)]
 public interface I_Storage
 {
     string GetFileUrl(string fileName);

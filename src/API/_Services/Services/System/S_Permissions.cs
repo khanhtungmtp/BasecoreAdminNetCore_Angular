@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 using ViewModels.System;
 
 namespace API._Services.Services.System;
-public class S_Permissions(IRepositoryAccessor repositoryAccessor) : BaseServices(repositoryAccessor), I_Permissions
+public class S_Permissions(IRepositoryAccessor repoStore) : BaseServices(repoStore), I_Permissions
 {
     public async Task<ApiResponse<List<PermissionScreenVm>>> GetCommandViews()
     {
         var result = await (
-        from f in _repositoryAccessor.Functions.FindAll(true)
-        join cif in _repositoryAccessor.CommandInFunctions.FindAll(true) on f.Id equals cif.FunctionId into functionCommands
+        from f in _repoStore.Functions.FindAll(true)
+        join cif in _repoStore.CommandInFunctions.FindAll(true) on f.Id equals cif.FunctionId into functionCommands
         from sa in functionCommands.DefaultIfEmpty()
         group sa by new { f.Id, f.Name, f.ParentId } into grouped
         orderby grouped.Key.ParentId

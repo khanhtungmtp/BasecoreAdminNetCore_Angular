@@ -10,16 +10,10 @@ namespace API.Controllers.UserManager;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController : ControllerBase
+public class UsersController(UserManager<User> userManager, I_User user) : ControllerBase
 {
-    private readonly UserManager<User> _userManager;
-    private readonly I_User _user;
-
-    public UsersController(UserManager<User> userManager, I_User user)
-    {
-        _userManager = userManager;
-        _user = user;
-    }
+    private readonly UserManager<User> _userManager = userManager;
+    private readonly I_User _user = user;
 
     // url: POST : http://localhost:6001/api/user
     [HttpPost]

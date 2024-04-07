@@ -8,6 +8,7 @@ namespace API._Repositories
     {
         Task<bool> SaveChangesAsync();
         Task<IDbContextTransaction> BeginTransactionAsync();
+        IRepository<User> Users { get; }
         IRepository<Command> Commands { get; }
         IRepository<CommandInFunction> CommandInFunctions { get; }
         IRepository<ActivityLog> ActivityLogs { get; }

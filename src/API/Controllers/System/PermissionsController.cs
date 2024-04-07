@@ -3,14 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers.System;
 
-public class PermissionsController : BaseController
+public class PermissionsController(I_Permissions permissionService) : BaseController
 {
-    private readonly I_Permissions _permissionService;
-
-    public PermissionsController(I_Permissions permissionService)
-    {
-        _permissionService = permissionService;
-    }
+    private readonly I_Permissions _permissionService = permissionService;
 
     //
     // Summary:

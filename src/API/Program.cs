@@ -18,18 +18,19 @@ try
      options.InvalidModelStateResponseFactory = actionContext =>
      {
          var context = actionContext.HttpContext;
-         var trackId = Guid.NewGuid().ToString();
-         context.Response.Headers.Append("TrackId", trackId); // Bạn có thể thêm TrackId vào header của phản hồi
+         string? trackId = Guid.NewGuid().ToString();
+         context.Response.Headers.Append("TrackId", trackId); // add TrackId to header response
 
          var modelState = actionContext.ModelState.Values;
          var errors = modelState.SelectMany(x => x.Errors).Select(x => x.ErrorMessage);
 
-         return new BadRequestObjectResult(new ApiResponse
+         return new BadRequestObjectResult(new ErrorGlobalResponse
          {
              TrackId = trackId,
-             Message = ReasonPhrases.GetReasonPhrase((int)HttpStatusCode.BadRequest),
+             Title = ReasonPhrases.GetReasonPhrase((int)HttpStatusCode.BadRequest),
              Status = (int)HttpStatusCode.BadRequest,
-             Errors = errors
+             Errors = errors,
+             Instance = $"{context.Request.Method} {context.Request.Path}",
          });
      }).AddJsonOptions(options =>
 {

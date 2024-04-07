@@ -50,7 +50,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     [HttpPut("{id}")]
     public async Task<IActionResult> PutFunction(string id, [FromBody] FunctionCreateRequest request)
     {
-        var result = await _functionService.PutFunction(id, request);
+        var result = await _functionService.PutFunctionAsync(id, request);
         if (!result.Succeeded)
         {
             if (result.Status == 404)
@@ -65,7 +65,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteFunction(string id)
     {
-        var result = await _functionService.DeleteFunction(id);
+        var result = await _functionService.DeleteFunctionAsync(id);
         if (!result.Succeeded)
         {
             if (result.Status == 404)
@@ -81,7 +81,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     [HttpGet("{functionId}/command-in-function")]
     public async Task<IActionResult> GetCommandInFunction(string functionId)
     {
-        var result = await _commandInFunctionService.GetCommandInFunction(functionId);
+        var result = await _commandInFunctionService.FindIdsCommandInFunctionAsync(functionId);
         if (!result.Succeeded)
         {
             if (result.Status == 404)
@@ -97,7 +97,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     [HttpPost("{functionId}/commands")]
     public async Task<IActionResult> PostCommandToFunction(string functionId, [FromBody] CommandAssignRequest request)
     {
-        var result = await _commandInFunctionService.PostCommandInFunction(functionId, request);
+        var result = await _commandInFunctionService.CreateAsync(functionId, request);
         if (!result.Succeeded || result.Data is null)
         {
             if (result.Status == 404)
@@ -113,7 +113,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     [HttpDelete("{functionId}/commands")]
     public async Task<IActionResult> DeleteCommandToFunction(string functionId, [FromBody] CommandAssignRequest request)
     {
-        var result = await _commandInFunctionService.DeleteCommandInFunction(functionId, request);
+        var result = await _commandInFunctionService.DeleteAsync(functionId, request);
         if (!result.Succeeded)
         {
             if (result.Status == 404)
