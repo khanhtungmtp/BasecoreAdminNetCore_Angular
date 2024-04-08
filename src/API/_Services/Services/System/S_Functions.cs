@@ -11,7 +11,7 @@ namespace API._Services.Services.System;
 
 public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore), I_Function
 {
-    public Task<ApiResponse<string>> CreateAsync(FunctionCreateRequest request)
+    public async Task<ApiResponse<string>> CreateAsync(FunctionCreateRequest request)
     {
         var function = new Function()
         {
@@ -24,22 +24,22 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
         };
 
         _repoStore.Functions.Add(function);
-        _repoStore.SaveChangesAsync();
-        return Task.FromResult(new ApiResponse<string>((int)HttpStatusCode.OK, true, "Function created successfully.", function.Id));
+        await _repoStore.SaveChangesAsync();
+        return Success((int)HttpStatusCode.OK, function.Id, "Function created successfully.");
     }
 
     public async Task<ApiResponse<FunctionVM>> FindByIdAsync(string id)
     {
         Function? function = await _repoStore.Functions.FindByIdAsync(id);
         if (function is null)
-            return new ApiResponse<FunctionVM>((int)HttpStatusCode.NotFound, false, "Function not found.", null!);
+            return Fail<FunctionVM>((int)HttpStatusCode.NotFound, "Function not found.");
         FunctionVM userVM = new()
         {
             Id = function.Id,
             Name = function.Name,
             Url = function.Url,
         };
-        return new ApiResponse<FunctionVM>((int)HttpStatusCode.OK, true, "Get function successfully.", userVM);
+        return Success((int)HttpStatusCode.OK, userVM, "Get function successfully.");
     }
 
     public async Task<ApiResponse<PagingResult<FunctionVM>>> GetAllPaging(string? filter, PaginationParam pagination, FunctionVM userVM)
@@ -56,32 +56,32 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
             Url = x.Url
         }).ToListAsync();
         var resultPaging = PagingResult<FunctionVM>.Create(listFunctionVM, pagination.PageNumber, pagination.PageSize);
-        return new ApiResponse<PagingResult<FunctionVM>>((int)HttpStatusCode.OK, true, "Get function successfully.", resultPaging);
+        return Success((int)HttpStatusCode.OK, resultPaging, "Get function successfully.");
     }
 
     public async Task<ApiResponse<string>> PutFunctionAsync(string id, FunctionCreateRequest request)
     {
         Function? function = await _repoStore.Functions.FindByIdAsync(id);
         if (function is null || function.Id != request.Id)
-            return new ApiResponse<string>((int)HttpStatusCode.NotFound, false, "Function not found.", null!);
+            return Fail<string>((int)HttpStatusCode.NotFound, "Function not found.");
         function.Name = request.Name;
         function.ParentId = request.ParentId;
         function.SortOrder = request.SortOrder;
         function.Url = request.Url;
         function.Icon = request.Icon;
         _repoStore.Functions.Update(function);
-        var result = await _repoStore.SaveChangesAsync();
+        bool result = await _repoStore.SaveChangesAsync();
         if (result)
-            return new ApiResponse<string>((int)HttpStatusCode.OK, true, "Function updated successfully.", function.Id);
+            return Success((int)HttpStatusCode.OK, function.Id, "Function updated successfully.");
 
-        return new ApiResponse<string>(500, false, "Function update failed.", null!);
+        return Fail<string>((int)HttpStatusCode.InternalServerError, "Function update failed.");
     }
 
     public async Task<ApiResponse<string>> DeleteFunctionAsync(string id)
     {
         Function? function = await _repoStore.Functions.FindByIdAsync(id);
         if (function is null)
-            return new ApiResponse<string>((int)HttpStatusCode.NotFound, false, "Function not found.", null!);
+            return Fail<string>((int)HttpStatusCode.NotFound, "Function not found.");
 
         _repoStore.Functions.Remove(function);
         // remove command in function
@@ -89,9 +89,9 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
         // if (commands.Count > 0)
         _repoStore.CommandInFunctions.RemoveMultiple(commands);
 
-        var result = await _repoStore.SaveChangesAsync();
+        bool result = await _repoStore.SaveChangesAsync();
         if (result)
-            return new ApiResponse<string>((int)HttpStatusCode.OK, true, "Function deleted successfully.", function.Id);
-        return new ApiResponse<string>(500, false, "Function delete failed.", null!);
+            return Success((int)HttpStatusCode.OK, function.Id, "Function deleted successfully.");
+        return Fail<string>((int)HttpStatusCode.InternalServerError, "Function delete failed.");
     }
 }

@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using API.Models.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
 namespace API.Models;
-public class User : IdentityUser
+public class User : IdentityUser, IDateTracking
 {
     public User() { }
 

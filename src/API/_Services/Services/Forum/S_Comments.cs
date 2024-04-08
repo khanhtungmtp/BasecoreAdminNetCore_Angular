@@ -32,7 +32,7 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         forum.NumberOfComments = forum.NumberOfComments.GetValueOrDefault(0) + 1;
         _repoStore.Forums.Update(forum);
 
-        var result = await _repoStore.SaveChangesAsync();
+        bool result = await _repoStore.SaveChangesAsync();
         if (result)
         {
             await _cacheService.RemoveAsync(CacheConstants.RecentComments);
@@ -123,7 +123,7 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         comment.Content = request.Content;
         _repoStore.Comments.Update(comment);
 
-        var result = await _repoStore.SaveChangesAsync();
+        bool result = await _repoStore.SaveChangesAsync();
 
         if (result)
             return new ApiResponse((int)HttpStatusCode.OK, true, "Update comment successfully");
@@ -145,7 +145,7 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         forum.NumberOfComments = forum.NumberOfComments.GetValueOrDefault(0) - 1;
         _repoStore.Forums.Update(forum);
 
-        var result = await _repoStore.SaveChangesAsync();
+        bool result = await _repoStore.SaveChangesAsync();
         if (result)
         {
             //Delete cache

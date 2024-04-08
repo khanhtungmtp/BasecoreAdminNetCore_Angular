@@ -26,14 +26,14 @@ public class ActivityLog : IDateTracking
     [Required]
     public required string EntityId { get; set; }
 
-    public DateTime CreateDate { get; set; }
-
-    public DateTime? UpdateDate { get; set; }
-
     [MaxLength(50)]
     [Column(TypeName = "varchar(50)")]
     public string UserId { get; set; } = string.Empty;
 
     [MaxLength(500)]
     public string Content { get; set; } = string.Empty;
+
+    public DateTime CreateDate { get; set; }
+
+    public DateTime? UpdateDate { get; set; }
 }

@@ -23,10 +23,10 @@ namespace API.Migrations
                     Action = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
                     EntityName = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
                     EntityId = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserId = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false)
+                    Content = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -151,6 +151,7 @@ namespace API.Migrations
                     Content = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     ForumId = table.Column<int>(type: "int", nullable: false),
                     OwnwerUserId = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    ReplyId = table.Column<int>(type: "int", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -177,11 +178,12 @@ namespace API.Migrations
                     Note = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OwnerUserId = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
                     Labels = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     NumberOfComments = table.Column<int>(type: "int", nullable: true),
                     NumberOfVotes = table.Column<int>(type: "int", nullable: true),
-                    NumberOfReports = table.Column<int>(type: "int", nullable: true)
+                    NumberOfReports = table.Column<int>(type: "int", nullable: true),
+                    ViewCount = table.Column<int>(type: "int", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -251,10 +253,10 @@ namespace API.Migrations
                     CommentId = table.Column<int>(type: "int", nullable: true),
                     Content = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     ReportUserId = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsProcessed = table.Column<bool>(type: "bit", nullable: false),
-                    Type = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
+                    Type = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {

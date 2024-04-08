@@ -1,12 +1,36 @@
 using API.Models;
+using API.Models.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace API.Data;
 
 public class DataContext(DbContextOptions options) : IdentityDbContext<User>(options)
 {
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        IEnumerable<EntityEntry> modified = ChangeTracker.Entries()
+            .Where(e => e.State == EntityState.Modified || e.State == EntityState.Added);
+        foreach (EntityEntry item in modified)
+        {
+            if (item.Entity is IDateTracking changedOrAddedItem)
+            {
+                if (item.State == EntityState.Added)
+                {
+                    changedOrAddedItem.CreateDate = DateTime.Now;
+                }
+                else
+                {
+                    changedOrAddedItem.UpdateDate = DateTime.Now;
+                }
+            }
+        }
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

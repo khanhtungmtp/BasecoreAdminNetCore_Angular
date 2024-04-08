@@ -37,7 +37,7 @@ public class S_Votes(IRepositoryAccessor repoStore) : BaseServices(repoStore), I
         forum.NumberOfVotes = numberOfVotes;
         _repoStore.Forums.Update(forum);
 
-        var result = await _repoStore.SaveChangesAsync();
+        bool result = await _repoStore.SaveChangesAsync();
         if (result)
             return new ApiResponse<int>((int)HttpStatusCode.OK, true, "Vote successfully.", numberOfVotes);
         else
@@ -58,7 +58,7 @@ public class S_Votes(IRepositoryAccessor repoStore) : BaseServices(repoStore), I
         _repoStore.Forums.Update(forum);
 
         _repoStore.Votes.Remove(vote);
-        var result = await _repoStore.SaveChangesAsync();
+        bool result = await _repoStore.SaveChangesAsync();
         if (result)
         {
             return new ApiResponse<string>((int)HttpStatusCode.OK, true, "Delete vote successfully.", userId);

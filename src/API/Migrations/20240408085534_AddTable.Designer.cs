@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240406085443_AddTable")]
+    [Migration("20240408085534_AddTable")]
     partial class AddTable
     {
         /// <inheritdoc />
@@ -211,6 +211,9 @@ namespace API.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
+                    b.Property<int?>("ReplyId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
 
@@ -291,6 +294,9 @@ namespace API.Migrations
 
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("ViewCount")
+                        .HasColumnType("int");
 
                     b.Property<string>("Workaround")
                         .IsRequired()

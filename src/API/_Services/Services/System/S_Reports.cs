@@ -23,26 +23,26 @@ public class S_Reports(IRepositoryAccessor repoStore) : BaseServices(repoStore),
 
         var forum = await _repoStore.Forums.FindAsync(forumId);
         if (forum is null)
-            return new ApiBadRequestResponse($"Cannot found knowledge base with id {forumId}");
+            return Fail((int)HttpStatusCode.NotFound, $"Cannot found knowledge base with id {forumId}");
 
         forum.NumberOfReports = forum.NumberOfReports.GetValueOrDefault(0) + 1;
         _repoStore.Forums.Update(forum);
 
-        var result = await _repoStore.SaveChangesAsync();
+        bool result = await _repoStore.SaveChangesAsync();
         if (result)
-            return new ApiResponse((int)HttpStatusCode.OK, true, "Create report successfully.");
+            return Success((int)HttpStatusCode.OK, "Create report successfully.");
         else
-            return new ApiResponse((int)HttpStatusCode.BadRequest, false, "Create report failed.");
+            return Fail((int)HttpStatusCode.BadRequest, "Create report failed.");
     }
 
     public async Task<ApiResponse<ReportVM>> FindByIdAsync(int reportId)
     {
         var report = await _repoStore.Reports.FindAsync(reportId);
         if (report is null)
-            return new ApiResponse<ReportVM>((int)HttpStatusCode.NotFound, false, "Report not found.", null!);
+            return Fail<ReportVM>((int)HttpStatusCode.NotFound, "Report not found.");
         var user = await _repoStore.Users.FindAsync(report.ReportUserId);
         if (user is null)
-            return new ApiResponse<ReportVM>((int)HttpStatusCode.NotFound, false, "User not found.", null!);
+            return Fail<ReportVM>((int)HttpStatusCode.NotFound, "User not found.");
         var reportVm = new ReportVM()
         {
             Id = report.Id,
@@ -55,7 +55,7 @@ public class S_Reports(IRepositoryAccessor repoStore) : BaseServices(repoStore),
             ReportUserName = user.FullName
         };
 
-        return new ApiResponse<ReportVM>((int)HttpStatusCode.OK, true, "Get report successfully.", reportVm);
+        return Success((int)HttpStatusCode.OK, reportVm, "Get report successfully.");
     }
 
     public async Task<ApiResponse<PagingResult<ReportVM>>> GetReportsPagingAsync(string? filter, PaginationParam pagination, ReportVM reportVM)
@@ -85,14 +85,14 @@ public class S_Reports(IRepositoryAccessor repoStore) : BaseServices(repoStore),
             ReportUserName = c.u.FullName
         }).ToListAsync();
         var resultPaging = PagingResult<ReportVM>.Create(result, pagination.PageNumber, pagination.PageSize);
-        return new ApiResponse<PagingResult<ReportVM>>((int)HttpStatusCode.OK, true, "Get function successfully.", resultPaging);
+        return Success((int)HttpStatusCode.OK, resultPaging, "Get function successfully.");
     }
 
     public async Task<ApiResponse> DeleteAsync(int forumId, int reportId)
     {
         var report = await _repoStore.Reports.FindAsync(reportId);
         if (report is null)
-            return new ApiNotFoundResponse($"Cannot found report with id {reportId}");
+            return Fail((int)HttpStatusCode.NotFound, $"Cannot found report with id {reportId}");
 
         _repoStore.Reports.Remove(report);
 
@@ -103,9 +103,9 @@ public class S_Reports(IRepositoryAccessor repoStore) : BaseServices(repoStore),
         forum.NumberOfReports = forum.NumberOfReports.GetValueOrDefault(0) - 1;
         _repoStore.Forums.Update(forum);
 
-        var result = await _repoStore.SaveChangesAsync();
+        bool result = await _repoStore.SaveChangesAsync();
         if (result)
-            return new ApiResponse((int)HttpStatusCode.OK, true, "Delete report successfully.");
-        return new ApiResponse((int)HttpStatusCode.BadRequest, false, "Delete report failed.");
+            return Success((int)HttpStatusCode.OK, "Delete report successfully.");
+        return Fail((int)HttpStatusCode.BadRequest, "Delete report failed.");
     }
 }

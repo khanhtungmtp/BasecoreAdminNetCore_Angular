@@ -22,17 +22,17 @@ public class S_Category(IRepositoryAccessor repoStore, I_Cache cacheService) : B
             SeoAlias = request.SeoAlias,
             SeoDescription = request.SeoDescription
         };
-        _repoStore.Categories.Add(category);
-        var result = await _repoStore.SaveChangesAsync();
+        await _repoStore.Categories.AddAsync(category);
+        bool result = await _repoStore.SaveChangesAsync();
 
         if (result)
         {
             await _cacheService.RemoveAsync("Categories");
 
-            return new ApiResponse<string>((int)HttpStatusCode.OK, true, "Create category successfully", category.Id.ToString());
+            return Success((int)HttpStatusCode.OK, "Create category successfully", category.Id.ToString());
         }
         else
-            return new ApiResponse<string>((int)HttpStatusCode.BadRequest, false, "Create category failed", null!);
+            return Fail<string>((int)HttpStatusCode.BadRequest, "Create category failed");
 
     }
 
@@ -45,18 +45,18 @@ public class S_Category(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         }
         var listCategoryVM = await query.Select(x => CreateCategoryVM(x)).ToListAsync();
         var resultPaging = PagingResult<CategoryVM>.Create(listCategoryVM, pagination.PageNumber, pagination.PageSize);
-        return new ApiResponse<PagingResult<CategoryVM>>((int)HttpStatusCode.OK, true, "Get function successfully.", resultPaging);
+        return Success((int)HttpStatusCode.OK, resultPaging, "Get function successfully.");
     }
 
     public async Task<ApiResponse<CategoryVM>> FindByIdAsync(int id)
     {
         var category = await _repoStore.Categories.FindAsync(id);
         if (category is null)
-            return new ApiResponse<CategoryVM>((int)HttpStatusCode.NotFound, false, $"Cannot found category with id: {id}", null!);
+            return Fail<CategoryVM>((int)HttpStatusCode.NotFound, $"Cannot found category with id: {id}");
 
         CategoryVM categoryVM = CreateCategoryVM(category);
 
-        return new ApiResponse<CategoryVM>((int)HttpStatusCode.OK, true, $"Get category by id {id} successfully.", categoryVM);
+        return Success((int)HttpStatusCode.OK, categoryVM, $"Get category by id {id} successfully.");
     }
 
     private static CategoryVM CreateCategoryVM(Category category)
@@ -77,10 +77,10 @@ public class S_Category(IRepositoryAccessor repoStore, I_Cache cacheService) : B
     {
         var category = await _repoStore.Categories.FindAsync(id);
         if (category is null)
-            return new ApiNotFoundResponse($"Cannot found category with id: {id}");
+            return Fail((int)HttpStatusCode.NotFound, $"Cannot found category with id: {id}");
 
         if (id == request.ParentId)
-            return new ApiBadRequestResponse("Category cannot be a child itself.");
+            return Fail((int)HttpStatusCode.BadRequest, "Category cannot be a child itself.");
 
         category.Name = request.Name;
         category.ParentId = request.ParentId;
@@ -89,32 +89,32 @@ public class S_Category(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         category.SeoAlias = request.SeoAlias;
 
         _repoStore.Categories.Update(category);
-        var result = await _repoStore.SaveChangesAsync();
+        bool result = await _repoStore.SaveChangesAsync();
 
         if (result)
         {
             await _cacheService.RemoveAsync("Categories");
 
-            return new ApiResponse((int)HttpStatusCode.OK, true, "Update category successfully");
+            return Success((int)HttpStatusCode.OK, "Update category successfully");
         }
-        return new ApiResponse((int)HttpStatusCode.BadRequest, false, "Update category failed");
+        return Fail((int)HttpStatusCode.BadRequest, "Update category failed");
     }
 
     public async Task<ApiResponse<string>> DeleteCategoryAsync(int id)
     {
         var category = await _repoStore.Categories.FindAsync(id);
         if (category is null)
-            return new ApiResponse<string>((int)HttpStatusCode.NotFound, false, $"Cannot found category with id: {id}");
+            return Fail<string>((int)HttpStatusCode.NotFound, $"Cannot found category with id: {id}");
 
         _repoStore.Categories.Remove(category);
-        var result = await _repoStore.SaveChangesAsync();
+        bool result = await _repoStore.SaveChangesAsync();
         if (result)
         {
             await _cacheService.RemoveAsync("Categories");
 
             CategoryVM categoryvm = CreateCategoryVM(category);
-            return new ApiResponse<string>((int)HttpStatusCode.OK, true, "Delete category successfully", categoryvm.Name);
+            return Success((int)HttpStatusCode.OK, categoryvm.Name, "Delete category successfully");
         }
-        return new ApiResponse<string>((int)HttpStatusCode.BadRequest, false, "Delete category failed", null!);
+        return Fail<string>((int)HttpStatusCode.BadRequest, "Delete category failed");
     }
 }

@@ -32,7 +32,7 @@ public class CategoryController(I_Category categoryService) : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetCategoriesPaging(string? filter, PaginationParam pagination, [FromQuery] CategoryVM categoryVM)
+    public async Task<IActionResult> GetCategoriesPaging(string? filter, [FromQuery] PaginationParam pagination, [FromQuery] CategoryVM categoryVM)
     {
         var result = await _categoryService.GetCategoriesPagingAsync(filter, pagination, categoryVM);
         if (!result.Succeeded)

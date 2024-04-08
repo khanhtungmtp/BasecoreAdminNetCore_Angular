@@ -21,7 +21,7 @@ public class S_Roles(IRepositoryAccessor repoStore) : BaseServices(repoStore), I
                                                      CommandId = p.CommandId,
                                                      RoleId = p.RoleId
                                                  }).ToListAsync();
-        return new ApiResponse<List<PermissionVm>>((int)HttpStatusCode.OK, true, permissions);
+        return Success((int)HttpStatusCode.OK, permissions, "Get permission by role id successfully.");
     }
 
     public async Task<ApiResponse<string>> PutPermissionByRoleId(string roleId, UpdatePermissionRequest request)
@@ -36,11 +36,11 @@ public class S_Roles(IRepositoryAccessor repoStore) : BaseServices(repoStore), I
 
         _repoStore.Permissions.RemoveMultiple(existingPermissions);
         _repoStore.Permissions.AddMultiple(newPermissions.Distinct(new MyPermissionComparer()));
-        var result = await _repoStore.SaveChangesAsync();
+        bool result = await _repoStore.SaveChangesAsync();
         if (result)
-            return new ApiResponse<string>((int)HttpStatusCode.OK, true, "Save permission successfully");
+            return Success<string>((int)HttpStatusCode.OK, "Save permission successfully");
 
-        return new ApiResponse<string>((int)HttpStatusCode.BadRequest, false, "Save permission failed");
+        return Fail<string>((int)HttpStatusCode.BadRequest, "Save permission failed");
     }
 
     internal class MyPermissionComparer : IEqualityComparer<Permission>

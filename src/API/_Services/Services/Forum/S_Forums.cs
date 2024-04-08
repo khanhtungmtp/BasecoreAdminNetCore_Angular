@@ -50,7 +50,7 @@ public class S_Forums : BaseServices, I_Forums
             await ProcessLabel(request, fourm);
         }
 
-        var result = await _repoStore.SaveChangesAsync();
+        bool result = await _repoStore.SaveChangesAsync();
 
         if (result)
             return new ApiResponse<string>((int)HttpStatusCode.OK, true, "Forum created successfully.", fourm.Id.ToString());
@@ -397,7 +397,7 @@ public class S_Forums : BaseServices, I_Forums
             return new ApiResponse<string>((int)HttpStatusCode.NotFound, false, $"Cannot found forum with id: {id}", null!);
 
         _repoStore.Forums.Remove(forum);
-        var result = await _repoStore.SaveChangesAsync();
+        bool result = await _repoStore.SaveChangesAsync();
         if (result)
         {
             await _cacheService.RemoveAsync(CacheConstants.LatestForum);
@@ -419,7 +419,7 @@ public class S_Forums : BaseServices, I_Forums
 
         forum.ViewCount += 1;
         _repoStore.Forums.Update(forum);
-        var result = await _repoStore.SaveChangesAsync();
+        bool result = await _repoStore.SaveChangesAsync();
         if (result)
             return new ApiResponse((int)HttpStatusCode.OK, true, "Update view count successfully");
         return new ApiResponse((int)HttpStatusCode.BadRequest, false, "Update view count failed");

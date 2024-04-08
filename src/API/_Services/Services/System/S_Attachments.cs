@@ -24,22 +24,22 @@ public class S_Attachments(IRepositoryAccessor repoStore) : BaseServices(repoSto
                     ForumId = c.ForumId ?? 0
                 }).ToListAsync();
 
-        return new ApiResponse<List<AttachmentVM>>((int)HttpStatusCode.OK, true, "Get attachments successfully.", query);
+        return Success((int)HttpStatusCode.OK, query, "Get attachments successfully.");
     }
 
     public async Task<ApiResponse> DeleteAsync(int attachmentId)
     {
         var attachment = await _repoStore.Attachments.FindAsync(attachmentId);
-        if (attachment == null)
-            return new ApiNotFoundResponse($"Cannot found attachment with id {attachmentId}");
+        if (attachment is null)
+            return Fail((int)HttpStatusCode.NotFound, $"Cannot found attachment with id {attachmentId}");
 
         _repoStore.Attachments.Remove(attachment);
 
-        var result = await _repoStore.SaveChangesAsync();
+        bool result = await _repoStore.SaveChangesAsync();
         if (result)
         {
-            return new ApiResponse((int)HttpStatusCode.OK, true, "Delete attachment Successfully");
+            return Success((int)HttpStatusCode.OK, "Delete attachment Successfully");
         }
-        return new ApiBadRequestResponse("Delete attachment failed");
+        return Fail((int)HttpStatusCode.BadRequest, "Delete attachment failed");
     }
 }

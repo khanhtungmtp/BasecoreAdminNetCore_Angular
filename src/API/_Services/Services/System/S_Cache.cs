@@ -12,7 +12,7 @@ public class S_Cache(IDistributedCache distributedCache, IConfiguration configur
     public async Task<T?> GetAsync<T>(string key)
     {
         byte[]? cacheData = await _distributedCache.GetAsync(key);
-        if (cacheData != null)
+        if (cacheData is not null)
         {
             return JsonSerializer.Deserialize<T>(Encoding.UTF8.GetString(cacheData));
         }

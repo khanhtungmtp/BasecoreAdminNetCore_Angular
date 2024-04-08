@@ -208,6 +208,9 @@ namespace API.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
+                    b.Property<int?>("ReplyId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
 
@@ -288,6 +291,9 @@ namespace API.Migrations
 
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("ViewCount")
+                        .HasColumnType("int");
 
                     b.Property<string>("Workaround")
                         .IsRequired()

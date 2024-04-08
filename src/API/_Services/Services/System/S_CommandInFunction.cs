@@ -30,7 +30,7 @@ public class S_CommandInFunction(IRepositoryAccessor repoStore) : BaseServices(r
             Id = x.Id,
             Name = x.Name
         }).ToListAsync();
-        return new ApiResponse<List<CommandVM>>((int)HttpStatusCode.OK, true, data);
+        return Success((int)HttpStatusCode.OK, data, "Get command in function successfully.");
     }
 
     // PostCommandInFunction
@@ -39,7 +39,7 @@ public class S_CommandInFunction(IRepositoryAccessor repoStore) : BaseServices(r
         foreach (var commandId in request.CommandIds)
         {
             if (await _repoStore.CommandInFunctions.FindAsync(commandId, functionId) != null)
-                return new ApiResponse<CommandInFunctionResponseVM>((int)HttpStatusCode.Conflict, false, "Command already exists in function.", null!);
+                return Fail<CommandInFunctionResponseVM>((int)HttpStatusCode.Conflict, "Command already exists in function.");
 
             var entity = new CommandInFunction()
             {
@@ -71,9 +71,9 @@ public class S_CommandInFunction(IRepositoryAccessor repoStore) : BaseServices(r
         bool result = await _repoStore.SaveChangesAsync();
 
         if (result)
-            return new ApiResponse<CommandInFunctionResponseVM>((int)HttpStatusCode.OK, true, new CommandInFunctionResponseVM() { CommandIds = request.CommandIds, FunctionId = functionId });
+            return Success((int)HttpStatusCode.OK, new CommandInFunctionResponseVM() { CommandIds = request.CommandIds, FunctionId = functionId }, "Add command to function successfully.");
         else
-            return new ApiResponse<CommandInFunctionResponseVM>(500, false, "Add command to function failed.", null!);
+            return Fail<CommandInFunctionResponseVM>((int)HttpStatusCode.InternalServerError, "Add command to function failed.");
     }
 
     public async Task<ApiResponse> DeleteAsync(string functionId, CommandAssignRequest request)
@@ -82,7 +82,7 @@ public class S_CommandInFunction(IRepositoryAccessor repoStore) : BaseServices(r
         {
             var entity = await _repoStore.CommandInFunctions.FindAsync(commandId, functionId);
             if (entity is null)
-                return new ApiResponse((int)HttpStatusCode.NotFound, false, "This command is not existed in function");
+                return Fail((int)HttpStatusCode.NotFound, "This command is not existed in function");
 
             _repoStore.CommandInFunctions.Remove(entity);
         }
@@ -90,9 +90,9 @@ public class S_CommandInFunction(IRepositoryAccessor repoStore) : BaseServices(r
         bool result = await _repoStore.SaveChangesAsync();
 
         if (result)
-            return new ApiResponse((int)HttpStatusCode.OK, true, "Command to function delete successfully.");
+            return Success((int)HttpStatusCode.OK, "Command to function delete successfully.");
         else
-            return new ApiResponse((int)HttpStatusCode.OK, true, "Delete command to function failed.");
+            return Fail((int)HttpStatusCode.OK, "Delete command to function failed.");
 
     }
 }

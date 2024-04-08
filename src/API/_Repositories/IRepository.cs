@@ -14,21 +14,15 @@ public interface IRepository<T> where T : class
     IQueryable<T> FindAll(Expression<Func<T, bool>> predicate, bool? noTracking = false);
 
     void Add(T entity);
-
-    void AddMultiple(List<T> entities);
+    Task AddAsync(T entity);
     void AddMultiple(IEnumerable<T> entities);
-
+    Task AddMultipleAsync(IEnumerable<T> entities);
     void Update(T entity);
-
     void UpdateMultiple(List<T> entities);
-
     void Remove(T entity);
 
     void Remove(object id);
-
-    void RemoveMultiple(List<T> entities);
     void RemoveMultiple(IEnumerable<T> entities);
-
     bool All(Expression<Func<T, bool>> predicate);
 
     Task<bool> AllAsync(Expression<Func<T, bool>> predicate);

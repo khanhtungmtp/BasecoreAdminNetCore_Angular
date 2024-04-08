@@ -17,7 +17,7 @@ public class S_Labels(IRepositoryAccessor repoStore, I_Cache cacheService) : Bas
     {
         var label = await _repoStore.Labels.FindAsync(id);
         if (label is null)
-            return new ApiResponse<LabelVM>((int)HttpStatusCode.NotFound, false, $"Label with id: {id} is not found", null!);
+            return Fail<LabelVM>((int)HttpStatusCode.NotFound, $"Label with id: {id} is not found");
 
         var labelVm = new LabelVM()
         {
@@ -25,7 +25,7 @@ public class S_Labels(IRepositoryAccessor repoStore, I_Cache cacheService) : Bas
             Name = label.Name
         };
 
-        return new ApiResponse<LabelVM>((int)HttpStatusCode.OK, true, "Get label successfully.", labelVm);
+        return Success((int)HttpStatusCode.OK, labelVm, "Get label successfully.");
     }
 
     public async Task<ApiResponse<List<LabelVM>>> GetPopularLabelsAsync(int take)
@@ -52,6 +52,6 @@ public class S_Labels(IRepositoryAccessor repoStore, I_Cache cacheService) : Bas
             cachedData = labels;
         }
 
-        return new ApiResponse<List<LabelVM>>((int)HttpStatusCode.OK, true, "Get popular labels successfully.", cachedData);
+        return Success((int)HttpStatusCode.OK, cachedData, "Get popular labels successfully.");
     }
 }

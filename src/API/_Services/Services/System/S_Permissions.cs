@@ -28,6 +28,6 @@ public class S_Permissions(IRepositoryAccessor repoStore) : BaseServices(repoSto
             HasApprove = grouped.Any(x => x != null && x.CommandId == "APPROVE")
         }
         ).ToListAsync();
-        return new ApiResponse<List<PermissionScreenVm>>((int)HttpStatusCode.OK, true, result);
+        return Success((int)HttpStatusCode.OK, result, "Get command views successfully.");
     }
 }

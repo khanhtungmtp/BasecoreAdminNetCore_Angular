@@ -4,24 +4,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace API.Models;
 
 [Table("Permissions")]
-public class Permission
+public class Permission(string functionId, string roleId, string commandId)
 {
-    public Permission(string functionId, string roleId, string commandId)
-    {
-        FunctionId = functionId;
-        RoleId = roleId;
-        CommandId = commandId;
-    }
+    [MaxLength(50)]
+    [Column(TypeName = "varchar(50)")]
+    public string FunctionId { get; set; } = functionId;
 
     [MaxLength(50)]
     [Column(TypeName = "varchar(50)")]
-    public string FunctionId { get; set; }
+    public string RoleId { get; set; } = roleId;
 
     [MaxLength(50)]
     [Column(TypeName = "varchar(50)")]
-    public string RoleId { get; set; }
-
-    [MaxLength(50)]
-    [Column(TypeName = "varchar(50)")]
-    public string CommandId { get; set; }
+    public string CommandId { get; set; } = commandId;
 }

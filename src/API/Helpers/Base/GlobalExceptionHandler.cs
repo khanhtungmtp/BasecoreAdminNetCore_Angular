@@ -12,18 +12,19 @@ public class GlobalExceptionHandler(IHostEnvironment env) : IExceptionHandler
     {
         Logger logger = LogManager.GetLogger("applog");
         ErrorGlobalResponse? result;
-        string? detail = _env.IsDevelopment() ? ex.Message : "oops an error occurred."; // only development
+        string? detail = _env.IsDevelopment() ? ex.StackTrace?.ToString() : "Oops, an error occurred."; // show only development
 
         result = new ErrorGlobalResponse
         {
             TrackId = Guid.NewGuid().ToString(),
             Status = ex switch
             {
-                ArgumentNullException => (int)HttpStatusCode.NotFound,
+                ArgumentNullException or NullReferenceException or KeyNotFoundException => (int)HttpStatusCode.NotFound,
+                UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized,
                 _ => (int)HttpStatusCode.InternalServerError
             },
             Type = ex.GetType().Name,
-            Title = "An unexpected error occurred",
+            Title = ex.Message,
             Detail = detail,
             Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
         };

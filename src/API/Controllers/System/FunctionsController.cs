@@ -31,7 +31,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
         return Ok(await _functionService.GetAllPaging(filter, pagination, userVM));
     }
 
-    // // url: GET : http:localhost:6001/api/function/{id}
+    // url: GET : http:localhost:6001/api/function/{id}
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(string id)
     {
@@ -46,7 +46,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
         return Ok(result);
     }
 
-    // // url: PUT : http:localhost:6001/api/function/{id}
+    // url: PUT : http:localhost:6001/api/function/{id}
     [HttpPut("{id}")]
     public async Task<IActionResult> PutFunction(string id, [FromBody] FunctionCreateRequest request)
     {
@@ -61,7 +61,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
         return Ok(result);
     }
 
-    // // url: DELETE : http:localhost:6001/api/function/{id}
+    // url: DELETE : http:localhost:6001/api/function/{id}
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteFunction(string id)
     {
