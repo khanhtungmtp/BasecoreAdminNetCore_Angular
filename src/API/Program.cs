@@ -28,7 +28,7 @@ try
          {
              TrackId = trackId,
              Title = ReasonPhrases.GetReasonPhrase((int)HttpStatusCode.BadRequest),
-             Status = (int)HttpStatusCode.BadRequest,
+             Status = (int)(HttpStatusCode)context.Response.StatusCode,
              Errors = errors,
              Instance = $"{context.Request.Method} {context.Request.Path}",
          });
@@ -75,7 +75,7 @@ try
     app.MapControllers();
     app.UseExceptionHandler();
     // seeding inittial Data
-    DataSeeder.SeedDatabase(app);
+    // DataSeeder.SeedDatabase(app);
     app.Run();
 }
 catch

@@ -1,5 +1,4 @@
 using System.Net;
-using System.Text;
 using API._Services.Interfaces.UserManager;
 using API.Helpers.Base;
 using API.Helpers.Utilities;
@@ -37,7 +36,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : Contr
             return CreatedAtAction(nameof(GetById), new { id = user.Id }, request);
         }
         else
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, false, "Create user failed"));
+            return BadRequest(new ApiBadRequestResponse(result));
     }
 
     // url: PUT : http:localhost:6001/api/user/{id}
@@ -54,10 +53,10 @@ public class UsersController(UserManager<User> userManager, I_User user) : Contr
         user.DateOfBirth = request.DateOfBirth;
         user.UpdateDate = DateTime.Now;
 
-        IdentityResult result = await _userManager.UpdateAsync(user);
+        var result = await _userManager.UpdateAsync(user);
         if (result.Succeeded)
             return Ok(new ApiResponse<string>((int)HttpStatusCode.OK, true, "Update user Successfully", user.UserName));
-        return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, false, "Update user failed"));
+        return BadRequest(new ApiBadRequestResponse(result));
     }
 
     // url: GET : http:localhost:6001/api/user
@@ -66,7 +65,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : Contr
     {
         var user = _userManager.Users;
         if (user is null)
-            return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, false, "User not found"));
+            return NotFound(new ApiNotFoundResponse("User not found"));
         if (!string.IsNullOrWhiteSpace(filter))
         {
             bool isDate = DateTime.TryParse(filter, out DateTime filterDate);
@@ -115,13 +114,10 @@ public class UsersController(UserManager<User> userManager, I_User user) : Contr
         var user = await _userManager.FindByIdAsync(id);
         if (user is null)
             return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, false, "User not found"));
-        // Mã hóa mật khẩu mới thành Base64
-        string? newPasswordBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(request.NewPassword));
-
         var result = await _userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
         if (result.Succeeded)
             return Ok(new ApiResponse((int)HttpStatusCode.OK, true, "Change password successfully"));
-        return BadRequest(new ApiResponse((int)HttpStatusCode.NotFound, false, "Change password failed"));
+        return BadRequest(new ApiBadRequestResponse(result));
     }
 
     // url: DELETE : http:localhost:6001/api/user/{id}
@@ -146,7 +142,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : Contr
             };
             return Ok(new ApiResponse<UserVM>((int)HttpStatusCode.OK, true, "Get Users Successfully", userVM));
         }
-        return BadRequest(new ApiResponse((int)HttpStatusCode.NotFound, false, "Delete user failed"));
+        return BadRequest(new ApiBadRequestResponse(result));
     }
 
     // GetMenuByUserPermission

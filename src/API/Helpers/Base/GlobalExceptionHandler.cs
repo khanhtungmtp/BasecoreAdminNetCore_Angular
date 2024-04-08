@@ -17,12 +17,7 @@ public class GlobalExceptionHandler(IHostEnvironment env) : IExceptionHandler
         result = new ErrorGlobalResponse
         {
             TrackId = Guid.NewGuid().ToString(),
-            Status = ex switch
-            {
-                ArgumentNullException or NullReferenceException or KeyNotFoundException => (int)HttpStatusCode.NotFound,
-                UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized,
-                _ => (int)HttpStatusCode.InternalServerError
-            },
+            Status = (int)(HttpStatusCode)httpContext.Response.StatusCode,
             Type = ex.GetType().Name,
             Title = ex.Message,
             Detail = detail,
@@ -35,7 +30,7 @@ public class GlobalExceptionHandler(IHostEnvironment env) : IExceptionHandler
         // Write the response
         if (httpContext is not null)
         {
-            httpContext.Response.StatusCode = result.Status.Value;
+            httpContext.Response.StatusCode = result.Status;
             await httpContext.Response.WriteAsJsonAsync(result, cancellationToken: cancellationToken);
             return true;
         }

@@ -5,33 +5,29 @@ namespace API.Helpers.Base;
 
 public class ApiBadRequestResponse : ApiResponse
 {
-    public IEnumerable<string> Errors { get; }
 
     //* use for model state 
     public ApiBadRequestResponse(ModelStateDictionary modelState)
-        : base(400, false, "Bad Request due to invalid model state.")
+        : base(400, false, string.Join(", ", modelState.SelectMany(x => x.Value?.Errors ?? [])
+            .Select(x => x.ErrorMessage).ToArray()))
     {
         if (modelState.IsValid)
         {
             throw new ArgumentException("ModelState must be invalid", nameof(modelState));
         }
 
-        Errors = modelState.SelectMany(x => x.Value?.Errors ?? [])
-            .Select(x => x.ErrorMessage).ToArray();
     }
 
     //* use for identity result 
     public ApiBadRequestResponse(IdentityResult identityResult)
-       : base(400, false, "Bad Request due to identity result error.")
+        : base(400, false, string.Join(", ", identityResult.Errors
+                .Select(x => x.Code + " - " + x.Description).ToArray()))
     {
-        Errors = identityResult.Errors
-            .Select(x => x.Code + " - " + x.Description).ToArray();
     }
 
     //* for user custom message 
     public ApiBadRequestResponse(string message)
        : base(400, false, message)
     {
-        Errors = [];
     }
 }

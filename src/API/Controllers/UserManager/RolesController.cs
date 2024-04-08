@@ -33,7 +33,7 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
             return CreatedAtAction(nameof(GetById), new { id = request.Id }, request);
         }
         else
-            return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, false, "Create role failed"));
+            return BadRequest(new ApiBadRequestResponse(result));
     }
 
     // url: GET : http:localhost:6001/api/roles
@@ -42,7 +42,7 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
     {
         var role = _rolesManager.Roles;
         if (role is null)
-            return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, false, "Role not found"));
+            return NotFound(new ApiNotFoundResponse("Role not found"));
         if (!string.IsNullOrWhiteSpace(roleVM.Id))
         {
             role = role.Where(x => x.Id.Contains(roleVM.Id));
@@ -62,13 +62,13 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
     {
         var role = await _rolesManager.FindByIdAsync(id);
         if (role is null)
-            return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, false, "Role not found"));
+            return NotFound(new ApiNotFoundResponse("Role not found"));
         var roleVM = new RoleVM()
         {
             Id = role.Id,
             Name = role.Name ?? string.Empty
         };
-        return Ok(new ApiResponse<RoleVM>((int)HttpStatusCode.OK, true, "Get Users Successfully", roleVM));
+        return Ok(new ApiResponse<RoleVM>((int)HttpStatusCode.OK, true, "Get role successfully", roleVM));
     }
 
     // url: PUT : http:localhost:6001/api/roles/{id}
@@ -76,16 +76,16 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
     public async Task<IActionResult> PutRole(string id, [FromBody] RoleCreateRequest request)
     {
         if (id != request.Id)
-            return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, false, "Role not found"));
+            return NotFound(new ApiNotFoundResponse("Role not found"));
         var role = await _rolesManager.FindByIdAsync(id);
         if (role is null)
-            return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, false, "Role not found"));
+            return NotFound(new ApiNotFoundResponse("Role not found"));
         role.Name = request.Name;
         role.NormalizedName = request.Name.ToUpper();
         var result = await _rolesManager.UpdateAsync(role);
         if (result.Succeeded)
             return Ok(new ApiResponse<string>((int)HttpStatusCode.OK, true, "Update role Successfully", role.Name));
-        return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, false, "Update role failed"));
+        return BadRequest(new ApiBadRequestResponse(result));
     }
 
     // url: DELETE : http:localhost:6001/api/roles/{id}
@@ -94,12 +94,12 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
     {
         var role = await _rolesManager.FindByIdAsync(id);
         if (role is null)
-            return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, false, "Role not found"));
+            return NotFound(new ApiNotFoundResponse("Role not found"));
         var result = await _rolesManager.DeleteAsync(role);
         if (result.Succeeded)
             return Ok(new ApiResponse<string>((int)HttpStatusCode.OK, true, "Delete role Successfully", role.Name));
 
-        return BadRequest(new ApiResponse((int)HttpStatusCode.BadRequest, false, "Delete role failed"));
+        return BadRequest(new ApiBadRequestResponse(result));
     }
 
     // GetPermissionByRoleId
