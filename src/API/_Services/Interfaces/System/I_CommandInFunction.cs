@@ -8,7 +8,7 @@ namespace API._Services.Interfaces.System;
 [DependencyInjection(ServiceLifetime.Scoped)]
 public interface I_CommandInFunction
 {
-    Task<ApiResponse<List<CommandVM>>> FindIdsCommandInFunctionAsync(string functionId);
-    Task<ApiResponse<CommandInFunctionResponseVM>> CreateAsync(string functionId, CommandAssignRequest request);
-    Task<ApiResponse> DeleteAsync(string functionId, CommandAssignRequest request);
+    Task<OperationResult<List<CommandVM>>> FindIdsCommandInFunctionAsync(string functionId);
+    Task<OperationResult<CommandInFunctionResponseVM>> CreateAsync(string functionId, CommandAssignRequest request);
+    Task<OperationResult> DeleteAsync(string functionId, CommandAssignRequest request);
 }

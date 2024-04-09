@@ -1,4 +1,3 @@
-using System.Net;
 using API._Repositories;
 using API._Services.Interfaces.System;
 using API.Helpers.Base;
@@ -12,7 +11,7 @@ public class S_Category(IRepositoryAccessor repoStore, I_Cache cacheService) : B
 {
     private readonly I_Cache _cacheService = cacheService;
 
-    public async Task<ApiResponse<string>> CreateAsync(CategoryCreateRequest request)
+    public async Task<OperationResult<string>> CreateAsync(CategoryCreateRequest request)
     {
         var category = new Category()
         {
@@ -29,14 +28,14 @@ public class S_Category(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         {
             await _cacheService.RemoveAsync("Categories");
 
-            return Success((int)HttpStatusCode.OK, "Create category successfully", category.Id.ToString());
+            return OperationResult<string>.Success(category.Name,"Create category successfully");
         }
         else
-            return Fail<string>((int)HttpStatusCode.BadRequest, "Create category failed");
+            return OperationResult<string>.BadRequest("Create category failed");
 
     }
 
-    public async Task<ApiResponse<PagingResult<CategoryVM>>> GetCategoriesPagingAsync(string? filter, PaginationParam pagination, CategoryVM categoryVM)
+    public async Task<OperationResult<PagingResult<CategoryVM>>> GetCategoriesPagingAsync(string? filter, PaginationParam pagination, CategoryVM categoryVM)
     {
         var query = _repoStore.Categories.FindAll(true);
         if (!string.IsNullOrWhiteSpace(filter))
@@ -45,18 +44,18 @@ public class S_Category(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         }
         var listCategoryVM = await query.Select(x => CreateCategoryVM(x)).ToListAsync();
         var resultPaging = PagingResult<CategoryVM>.Create(listCategoryVM, pagination.PageNumber, pagination.PageSize);
-        return Success((int)HttpStatusCode.OK, resultPaging, "Get function successfully.");
+        return OperationResult<PagingResult<CategoryVM>>.Success(resultPaging, "Get function successfully.");
     }
 
-    public async Task<ApiResponse<CategoryVM>> FindByIdAsync(int id)
+    public async Task<OperationResult<CategoryVM>> FindByIdAsync(int id)
     {
         var category = await _repoStore.Categories.FindAsync(id);
         if (category is null)
-            return Fail<CategoryVM>((int)HttpStatusCode.NotFound, $"Cannot found category with id: {id}");
+            return OperationResult<CategoryVM>.NotFound($"Cannot found category with id: {id}");
 
         CategoryVM categoryVM = CreateCategoryVM(category);
 
-        return Success((int)HttpStatusCode.OK, categoryVM, $"Get category by id {id} successfully.");
+        return OperationResult<CategoryVM>.Success(categoryVM, $"Get category by id {id} successfully.");
     }
 
     private static CategoryVM CreateCategoryVM(Category category)
@@ -73,14 +72,14 @@ public class S_Category(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         };
     }
 
-    public async Task<ApiResponse> PutCategoryAsync(int id, CategoryCreateRequest request)
+    public async Task<OperationResult> PutCategoryAsync(int id, CategoryCreateRequest request)
     {
         var category = await _repoStore.Categories.FindAsync(id);
         if (category is null)
-            return Fail((int)HttpStatusCode.NotFound, $"Cannot found category with id: {id}");
+            return OperationResult.NotFound($"Cannot found category with id: {id}");
 
         if (id == request.ParentId)
-            return Fail((int)HttpStatusCode.BadRequest, "Category cannot be a child itself.");
+            return OperationResult.BadRequest("Category cannot be a child itself.");
 
         category.Name = request.Name;
         category.ParentId = request.ParentId;
@@ -95,16 +94,16 @@ public class S_Category(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         {
             await _cacheService.RemoveAsync("Categories");
 
-            return Success((int)HttpStatusCode.OK, "Update category successfully");
+            return OperationResult.Success("Update category successfully");
         }
-        return Fail((int)HttpStatusCode.BadRequest, "Update category failed");
+        return OperationResult.BadRequest("Update category failed");
     }
 
-    public async Task<ApiResponse<string>> DeleteCategoryAsync(int id)
+    public async Task<OperationResult<string>> DeleteCategoryAsync(int id)
     {
         var category = await _repoStore.Categories.FindAsync(id);
         if (category is null)
-            return Fail<string>((int)HttpStatusCode.NotFound, $"Cannot found category with id: {id}");
+            return OperationResult<string>.NotFound($"Cannot found category with id: {id}");
 
         _repoStore.Categories.Remove(category);
         bool result = await _repoStore.SaveChangesAsync();
@@ -113,8 +112,8 @@ public class S_Category(IRepositoryAccessor repoStore, I_Cache cacheService) : B
             await _cacheService.RemoveAsync("Categories");
 
             CategoryVM categoryvm = CreateCategoryVM(category);
-            return Success((int)HttpStatusCode.OK, categoryvm.Name, "Delete category successfully");
+            return OperationResult<string>.Success(categoryvm.Name, "Delete category successfully");
         }
-        return Fail<string>((int)HttpStatusCode.BadRequest, "Delete category failed");
+        return OperationResult<string>.BadRequest("Delete category failed");
     }
 }

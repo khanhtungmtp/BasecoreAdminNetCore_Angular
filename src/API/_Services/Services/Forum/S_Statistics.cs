@@ -1,6 +1,3 @@
-
-
-using System.Net;
 using API._Repositories;
 using API._Services.Interfaces.Forums;
 using API.Helpers.Base;
@@ -10,7 +7,7 @@ using ViewModels.Forum;
 namespace API._Services.Services.Forum;
 public class S_Statistics(IRepositoryAccessor repoStore) : BaseServices(repoStore), I_Statistics
 {
-    public async Task<ApiResponse<List<MonthlyCommentsVM>>> GetMonthlyNewCommentsAsync(int year)
+    public async Task<OperationResult<List<MonthlyCommentsVM>>> GetMonthlyNewCommentsAsync(int year)
     {
         var data = await _repoStore.Comments.FindAll(x => x.CreateDate.Date.Year == year)
                 .GroupBy(x => x.CreateDate.Date.Month)
@@ -22,10 +19,10 @@ public class S_Statistics(IRepositoryAccessor repoStore) : BaseServices(repoStor
                 })
                 .ToListAsync();
 
-        return new ApiResponse<List<MonthlyCommentsVM>>((int)HttpStatusCode.OK, true, "Get monthly new comments successfully.", data);
+        return OperationResult<List<MonthlyCommentsVM>>.Success(data, "Get monthly new comments successfully.");
     }
 
-    public async Task<ApiResponse<List<MonthlyNewKbsVM>>> GetMonthlyNewKbsAsync(int year)
+    public async Task<OperationResult<List<MonthlyNewKbsVM>>> GetMonthlyNewKbsAsync(int year)
     {
         var data = await _repoStore.Forums.FindAll(x => x.CreateDate.Date.Year == year)
                 .GroupBy(x => x.CreateDate.Date.Month)
@@ -36,10 +33,10 @@ public class S_Statistics(IRepositoryAccessor repoStore) : BaseServices(repoStor
                 })
                 .ToListAsync();
 
-        return new ApiResponse<List<MonthlyNewKbsVM>>((int)HttpStatusCode.OK, true, "Get monthly new comments successfully.", data);
+        return OperationResult<List<MonthlyNewKbsVM>>.Success(data, "Get monthly new comments successfully.");
     }
 
-    public async Task<ApiResponse<List<MonthlyNewKbsVM>>> GetMonthlyNewRegistersAsync(int year)
+    public async Task<OperationResult<List<MonthlyNewKbsVM>>> GetMonthlyNewRegistersAsync(int year)
     {
         var data = await _repoStore.Users.FindAll(x => x.CreateDate.Date.Year == year)
               .GroupBy(x => x.CreateDate.Date.Month)
@@ -50,7 +47,7 @@ public class S_Statistics(IRepositoryAccessor repoStore) : BaseServices(repoStor
               })
               .ToListAsync();
 
-        return new ApiResponse<List<MonthlyNewKbsVM>>((int)HttpStatusCode.OK, true, "Get monthly new comments successfully.", data);
+        return OperationResult<List<MonthlyNewKbsVM>>.Success(data, "Get monthly new comments successfully.");
 
     }
 }

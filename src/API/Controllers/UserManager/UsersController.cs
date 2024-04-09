@@ -45,7 +45,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : Contr
     {
         var user = await _userManager.FindByIdAsync(id);
         if (user is null)
-            return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, false, "User not found"));
+            return NotFound(OperationResult.NotFound("User not found"));
         user.FullName = request.FullName;
         user.PasswordHash = request.Password;
         user.Email = request.Email;
@@ -55,7 +55,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : Contr
 
         var result = await _userManager.UpdateAsync(user);
         if (result.Succeeded)
-            return Ok(new ApiResponse<string>((int)HttpStatusCode.OK, true, "Update user Successfully", user.UserName));
+            return Ok(OperationResult<string>.Success(user.UserName ?? string.Empty, "Update user Successfully"));
         return BadRequest(new ApiBadRequestResponse(result));
     }
 
@@ -65,7 +65,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : Contr
     {
         var user = _userManager.Users;
         if (user is null)
-            return NotFound(new ApiNotFoundResponse("User not found"));
+            return NotFound(OperationResult.NotFound("User not found"));
         if (!string.IsNullOrWhiteSpace(filter))
         {
             bool isDate = DateTime.TryParse(filter, out DateTime filterDate);
@@ -83,7 +83,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : Contr
             CreateDate = x.CreateDate
         }).ToListAsync();
         var resultPaging = PagingResult<UserVM>.Create(listUserVM, pagination.PageNumber, pagination.PageSize);
-        return Ok(new ApiResponse<PagingResult<UserVM>>((int)HttpStatusCode.OK, true, "Get Users Successfully", resultPaging));
+        return Ok(OperationResult<PagingResult<UserVM>>.Success(resultPaging, "Get Users Successfully"));
     }
 
     // url: GET : http:localhost:6001/api/user/{id}
@@ -92,7 +92,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : Contr
     {
         var user = await _userManager.FindByIdAsync(id);
         if (user is null)
-            return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, false, "User not found"));
+            return NotFound(OperationResult.NotFound("User not found"));
         var userVM = new UserVM()
         {
             Id = user.Id,
@@ -104,7 +104,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : Contr
             CreateDate = user.CreateDate
 
         };
-        return Ok(new ApiResponse<UserVM>((int)HttpStatusCode.OK, true, "Get Users Successfully", userVM));
+        return Ok(OperationResult<UserVM>.Success(userVM, "Get Users Successfully"));
     }
 
     // url: PUT : http:localhost:6001/api/user/{id}/change-password
@@ -113,10 +113,10 @@ public class UsersController(UserManager<User> userManager, I_User user) : Contr
     {
         var user = await _userManager.FindByIdAsync(id);
         if (user is null)
-            return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, false, "User not found"));
+            return NotFound(OperationResult.NotFound("User not found"));
         var result = await _userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
         if (result.Succeeded)
-            return Ok(new ApiResponse((int)HttpStatusCode.OK, true, "Change password successfully"));
+            return Ok(OperationResult.Success("Change password successfully"));
         return BadRequest(new ApiBadRequestResponse(result));
     }
 
@@ -126,7 +126,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : Contr
     {
         var user = await _userManager.FindByIdAsync(id);
         if (user is null)
-            return NotFound(new ApiResponse((int)HttpStatusCode.NotFound, false, "User not found"));
+            return NotFound(OperationResult.NotFound("User not found"));
         var result = await _userManager.DeleteAsync(user);
         if (result.Succeeded)
         {
@@ -140,7 +140,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : Contr
                 Email = user.Email ?? string.Empty,
                 PhoneNumber = user.PhoneNumber ?? string.Empty
             };
-            return Ok(new ApiResponse<UserVM>((int)HttpStatusCode.OK, true, "Get Users Successfully", userVM));
+            return Ok(OperationResult<UserVM>.Success(userVM, "Get Users Successfully"));
         }
         return BadRequest(new ApiBadRequestResponse(result));
     }

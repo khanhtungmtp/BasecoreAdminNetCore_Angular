@@ -7,6 +7,6 @@ namespace API._Services.Interfaces.System;
 [DependencyInjection(ServiceLifetime.Scoped)]
 public interface I_Labels
 {
-    Task<ApiResponse<LabelVM>> FindByIdAsync(string id);
-    Task<ApiResponse<List<LabelVM>>> GetPopularLabelsAsync(int take);
+    Task<OperationResult<LabelVM>> FindByIdAsync(string id);
+    Task<OperationResult<List<LabelVM>>> GetPopularLabelsAsync(int take);
 }

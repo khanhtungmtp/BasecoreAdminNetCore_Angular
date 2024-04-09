@@ -8,8 +8,8 @@ namespace API._Services.Interfaces.System;
 [DependencyInjection(ServiceLifetime.Scoped)]
 public interface I_Reports
 {
-    Task<ApiResponse> CreateAsync(int forumId, ReportCreateRequest request);
-    Task<ApiResponse> DeleteAsync(int forumId, int reportId);
-    Task<ApiResponse<ReportVM>> FindByIdAsync(int reportId);
-    Task<ApiResponse<PagingResult<ReportVM>>> GetReportsPagingAsync(string? filter, PaginationParam pagination, ReportVM reportVM);
+    Task<OperationResult> CreateAsync(int forumId, ReportCreateRequest request);
+    Task<OperationResult> DeleteAsync(int forumId, int reportId);
+    Task<OperationResult<ReportVM>> FindByIdAsync(int reportId);
+    Task<OperationResult<PagingResult<ReportVM>>> GetReportsPagingAsync(string? filter, PaginationParam pagination, ReportVM reportVM);
 }

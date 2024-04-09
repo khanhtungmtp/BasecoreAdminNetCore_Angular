@@ -15,11 +15,11 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
     private readonly UserManager<User> _userManager = userManager;
     private readonly RoleManager<IdentityRole> _rolesManager = rolesManager;
 
-    public async Task<ApiResponse<List<FunctionVM>>> GetMenuByUserPermission(string userId)
+    public async Task<OperationResult<List<FunctionVM>>> GetMenuByUserPermission(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
-            return Fail<List<FunctionVM>>((int)HttpStatusCode.NotFound, "User not found.");
+            return OperationResult<List<FunctionVM>>.NotFound("User not found.");
         var roles = await _userManager.GetRolesAsync(user);
         IQueryable<FunctionVM>? query = from f in _repoStore.Functions.FindAll(true)
                                         join p in _repoStore.Permissions.FindAll(true)
@@ -41,6 +41,6 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
             .OrderBy(x => x.ParentId)
             .ThenBy(x => x.SortOrder)
             .ToListAsync();
-        return Success((int)HttpStatusCode.OK, data, "Function updated successfully.");
+        return OperationResult<List<FunctionVM>>.Success(data, "Function updated successfully.");
     }
 }

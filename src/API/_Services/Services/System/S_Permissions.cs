@@ -1,4 +1,3 @@
-using System.Net;
 using API._Repositories;
 using API._Services.Interfaces.System;
 using API.Helpers.Base;
@@ -8,7 +7,7 @@ using ViewModels.System;
 namespace API._Services.Services.System;
 public class S_Permissions(IRepositoryAccessor repoStore) : BaseServices(repoStore), I_Permissions
 {
-    public async Task<ApiResponse<List<PermissionScreenVm>>> GetCommandViews()
+    public async Task<OperationResult<List<PermissionScreenVm>>> GetCommandViews()
     {
         var result = await (
         from f in _repoStore.Functions.FindAll(true)
@@ -28,6 +27,6 @@ public class S_Permissions(IRepositoryAccessor repoStore) : BaseServices(repoSto
             HasApprove = grouped.Any(x => x != null && x.CommandId == "APPROVE")
         }
         ).ToListAsync();
-        return Success((int)HttpStatusCode.OK, result, "Get command views successfully.");
+        return OperationResult<List<PermissionScreenVm>>.Success(result, "Get command views successfully.");
     }
 }

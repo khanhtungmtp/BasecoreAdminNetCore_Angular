@@ -7,7 +7,7 @@ namespace API._Services.Interfaces.Forum;
 [DependencyInjection(ServiceLifetime.Scoped)]
 public interface I_Votes
 {
-    Task<ApiResponse<List<VoteVM>>> GetVotesAsync(int forumId);
-    Task<ApiResponse<int>> CreateAsync(int forumId, string userId);
-    Task<ApiResponse<string>> DeleteAsync(int forumId, string userId);
+    Task<OperationResult<List<VoteVM>>> GetVotesAsync(int forumId);
+    Task<OperationResult<int>> CreateAsync(int forumId, string userId);
+    Task<OperationResult<string>> DeleteAsync(int forumId, string userId);
 }

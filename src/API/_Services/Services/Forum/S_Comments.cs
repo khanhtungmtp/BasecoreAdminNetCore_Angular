@@ -1,4 +1,3 @@
-using System.Net;
 using API._Repositories;
 using API._Services.Interfaces.Forum;
 using API._Services.Interfaces.System;
@@ -14,7 +13,7 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
 {
     private readonly I_Cache _cacheService = cacheService;
 
-    public async Task<ApiResponse<CommentResponseVM>> CreateAsync(int forumId, CommentCreateRequest request)
+    public async Task<OperationResult<CommentResponseVM>> CreateAsync(int forumId, CommentCreateRequest request)
     {
         var comment = new Comment()
         {
@@ -27,7 +26,7 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
 
         var forum = await _repoStore.Forums.FindAsync(forumId);
         if (forum == null)
-            return new ApiResponse<CommentResponseVM>((int)HttpStatusCode.NotFound, false, $"Cannot found forum with id: {forumId}", null!);
+            return OperationResult<CommentResponseVM>.NotFound($"Cannot found forum with id: {forumId}");
 
         forum.NumberOfComments = forum.NumberOfComments.GetValueOrDefault(0) + 1;
         _repoStore.Forums.Update(forum);
@@ -54,21 +53,21 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
                 // var htmlContent = await _viewRenderService.RenderToStringAsync("_RepliedCommentEmail", emailModel);
                 // await _emailSender.SendEmailAsync(repledUser.Email, "Có người đang trả lời bạn", htmlContent);
             }
-            return new ApiResponse<CommentResponseVM>((int)HttpStatusCode.OK, true, "Create comment successfully.", new CommentResponseVM { ForumId = forumId.ToString() });
+            return OperationResult<CommentResponseVM>.Success(new CommentResponseVM { ForumId = forumId.ToString() }, "Create comment successfully.");
         }
         else
-            return new ApiResponse<CommentResponseVM>((int)HttpStatusCode.BadRequest, false, "Create comment failed", null!);
+            return OperationResult<CommentResponseVM>.BadRequest("Create comment failed");
 
     }
 
-    public async Task<ApiResponse<CommentVM>> FindByIdAsync(int commentId)
+    public async Task<OperationResult<CommentVM>> FindByIdAsync(int commentId)
     {
         var comment = await _repoStore.Comments.FindAsync(commentId);
         if (comment is null)
-            return new ApiResponse<CommentVM>((int)HttpStatusCode.NotFound, false, $"Cannot found comment with id: {commentId}", null!);
+            return OperationResult<CommentVM>.NotFound($"Cannot found comment with id: {commentId}");
         var user = await _repoStore.Users.FindAsync(comment.OwnwerUserId);
         if (user is null)
-            return new ApiResponse<CommentVM>((int)HttpStatusCode.NotFound, false, $"Cannot found user with id: {comment.OwnwerUserId}", null!);
+            return OperationResult<CommentVM>.NotFound($"Cannot found user with id: {comment.OwnwerUserId}");
         var commentVm = new CommentVM()
         {
             Id = comment.Id,
@@ -80,10 +79,10 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
             OwnerName = user.FullName
         };
 
-        return new ApiResponse<CommentVM>((int)HttpStatusCode.OK, true, "Get comment successfully.", commentVm);
+        return OperationResult<CommentVM>.Success(commentVm, "Get comment successfully.");
     }
 
-    public async Task<ApiResponse<PagingResult<CommentVM>>> GetCommentsPagingAsync(string? filter, PaginationParam pagination, CommentVM commentVM)
+    public async Task<OperationResult<PagingResult<CommentVM>>> GetCommentsPagingAsync(string? filter, PaginationParam pagination, CommentVM commentVM)
     {
         var query = from c in _repoStore.Comments.FindAll(true)
                     join u in _repoStore.Users.FindAll(true)
@@ -108,17 +107,17 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
             OwnerName = c.u.FullName
         }).ToListAsync();
         var resultsPaging = PagingResult<CommentVM>.Create(result, pagination.PageNumber, pagination.PageSize);
-        return new ApiResponse<PagingResult<CommentVM>>((int)HttpStatusCode.OK, true, "Get forums successfully.", resultsPaging);
+        return OperationResult<PagingResult<CommentVM>>.Success(resultsPaging, "Get forums successfully.");
 
     }
 
-    public async Task<ApiResponse> PutAsync(int commentId, CommentCreateRequest request)
+    public async Task<OperationResult> PutAsync(int commentId, CommentCreateRequest request)
     {
         var comment = await _repoStore.Comments.FindAsync(commentId);
         if (comment is null)
-            return new ApiNotFoundResponse($"Cannot found comment with id: {commentId}");
+            return OperationResult.NotFound($"Cannot found comment with id: {commentId}");
         if (comment.OwnwerUserId != request.UserId)
-            return new ApiNotFoundResponse($"Cannot found user with id: {commentId}");
+            return OperationResult.NotFound($"Cannot found user with id: {commentId}");
 
         comment.Content = request.Content;
         _repoStore.Comments.Update(comment);
@@ -126,21 +125,21 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         bool result = await _repoStore.SaveChangesAsync();
 
         if (result)
-            return new ApiResponse((int)HttpStatusCode.OK, true, "Update comment successfully");
-        return new ApiResponse((int)HttpStatusCode.BadRequest, false, "Update comment failed");
+            return OperationResult.Success("Update comment successfully");
+        return OperationResult.BadRequest( "Update comment failed");
     }
 
-    public async Task<ApiResponse> DeleteAsync(int forumId, int commentId)
+    public async Task<OperationResult> DeleteAsync(int forumId, int commentId)
     {
         var comment = await _repoStore.Comments.FindAsync(commentId);
         if (comment is null)
-            return new ApiNotFoundResponse($"Cannot found comment with id: {commentId}");
+            return OperationResult.NotFound($"Cannot found comment with id: {commentId}");
 
         _repoStore.Comments.Remove(comment);
 
         var forum = await _repoStore.Forums.FindAsync(forumId);
         if (forum is null)
-            return new ApiNotFoundResponse($"Cannot found forum with id: {commentId}");
+            return OperationResult.NotFound($"Cannot found forum with id: {commentId}");
 
         forum.NumberOfComments = forum.NumberOfComments.GetValueOrDefault(0) - 1;
         _repoStore.Forums.Update(forum);
@@ -150,12 +149,12 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         {
             //Delete cache
             await _cacheService.RemoveAsync(CacheConstants.RecentComments);
-            return new ApiResponse((int)HttpStatusCode.OK, true, "Delete comment successfully");
+            return OperationResult.Success("Delete comment successfully");
         }
-        return new ApiResponse((int)HttpStatusCode.OK, false, "Delete comment failed");
+        return OperationResult.BadRequest("Delete comment failed");
     }
 
-    public async Task<ApiResponse<List<CommentVM>>> GetRecentCommentsAsync(int take)
+    public async Task<OperationResult<List<CommentVM>>> GetRecentCommentsAsync(int take)
     {
         var cachedData = await _cacheService.GetAsync<List<CommentVM>>(CacheConstants.RecentComments);
         if (cachedData == null)
@@ -183,10 +182,10 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
             cachedData = comments;
         }
 
-        return new ApiResponse<List<CommentVM>>((int)HttpStatusCode.OK, true, "Get recent comments successfully.", cachedData);
+        return OperationResult<List<CommentVM>>.Success(cachedData, "Get recent comments successfully.");
     }
 
-    public async Task<ApiResponse<IEnumerable<CommentVM>>> GetCommentTreeByForumIdAsync(int forumId)
+    public async Task<OperationResult<IEnumerable<CommentVM>>> GetCommentTreeByForumIdAsync(int forumId)
     {
         var query = from c in _repoStore.Comments.FindAll(true)
                     join u in _repoStore.Users.FindAll(true)
@@ -216,6 +215,6 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
                 c.Children = lookup[c.Id].ToList();
         }
 
-        return new ApiResponse<IEnumerable<CommentVM>>((int)HttpStatusCode.OK, true, "Get comment tree successfully.", rootCategories);
+        return OperationResult<IEnumerable<CommentVM>>.Success(rootCategories, "Get comment tree successfully.");
     }
 }

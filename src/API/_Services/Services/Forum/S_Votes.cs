@@ -1,5 +1,3 @@
-
-using System.Net;
 using API._Repositories;
 using API._Services.Interfaces.Forum;
 using API.Helpers.Base;
@@ -10,13 +8,13 @@ using ViewModels.Forum;
 namespace API._Services.Services.Forum;
 public class S_Votes(IRepositoryAccessor repoStore) : BaseServices(repoStore), I_Votes
 {
-    public async Task<ApiResponse<int>> CreateAsync(int forumId, string userId)
+    public async Task<OperationResult<int>> CreateAsync(int forumId, string userId)
     {
         var forum = await _repoStore.Forums.FindAsync(forumId);
         if (forum is null)
-            return new ApiResponse<int>((int)HttpStatusCode.NotFound, false, $"Cannot found knowledge base with id {forumId}");
+            return OperationResult<int>.NotFound($"Cannot found forum with id {forumId}");
 
-        var numberOfVotes = await _repoStore.Votes.CountAsync(x => x.ForumId == forumId);
+        int numberOfVotes = await _repoStore.Votes.CountAsync(x => x.ForumId == forumId);
         var vote = await _repoStore.Votes.FindAsync(forumId, userId);
         if (vote is not null)
         {
@@ -39,20 +37,20 @@ public class S_Votes(IRepositoryAccessor repoStore) : BaseServices(repoStore), I
 
         bool result = await _repoStore.SaveChangesAsync();
         if (result)
-            return new ApiResponse<int>((int)HttpStatusCode.OK, true, "Vote successfully.", numberOfVotes);
+            return OperationResult<int>.Success(numberOfVotes, "Vote successfully." );
         else
-            return new ApiResponse<int>((int)HttpStatusCode.BadRequest, false, "Vote failed.");
+            return OperationResult<int>.BadRequest("Vote failed." );
     }
 
-    public async Task<ApiResponse<string>> DeleteAsync(int forumId, string userId)
+    public async Task<OperationResult<string>> DeleteAsync(int forumId, string userId)
     {
         var vote = await _repoStore.Votes.FindAsync(forumId, userId);
         if (vote is null)
-            return new ApiResponse<string>((int)HttpStatusCode.NotFound, false, $"Cannot found vote with id {userId}");
+            return OperationResult<string>.NotFound($"Cannot found vote with id {userId}");
 
         var forum = await _repoStore.Forums.FindAsync(forumId);
         if (forum is null)
-            return new ApiResponse<string>((int)HttpStatusCode.NotFound, false, $"Cannot found forum with id {forumId}");
+            return OperationResult<string>.NotFound($"Cannot found forum with id {forumId}");
 
         forum.NumberOfVotes = forum.NumberOfVotes.GetValueOrDefault(0) - 1;
         _repoStore.Forums.Update(forum);
@@ -61,12 +59,12 @@ public class S_Votes(IRepositoryAccessor repoStore) : BaseServices(repoStore), I
         bool result = await _repoStore.SaveChangesAsync();
         if (result)
         {
-            return new ApiResponse<string>((int)HttpStatusCode.OK, true, "Delete vote successfully.", userId);
+            return OperationResult<string>.Success(userId, "Delete vote successfully.");
         }
-        return new ApiResponse<string>((int)HttpStatusCode.BadRequest, false, "Delete vote failed.");
+        return OperationResult<string>.BadRequest("Delete vote failed.");
     }
 
-    public async Task<ApiResponse<List<VoteVM>>> GetVotesAsync(int forumId)
+    public async Task<OperationResult<List<VoteVM>>> GetVotesAsync(int forumId)
     {
         var votes = await _repoStore.Votes
                 .FindAll(x => x.ForumId == forumId)
@@ -78,6 +76,6 @@ public class S_Votes(IRepositoryAccessor repoStore) : BaseServices(repoStore), I
                     UpdateDate = x.UpdateDate
                 }).ToListAsync();
 
-        return new ApiResponse<List<VoteVM>>((int)HttpStatusCode.OK, true, "Get votes successfully.", votes);
+        return OperationResult<List<VoteVM>>.Success(votes, "Get votes successfully.");
     }
 }

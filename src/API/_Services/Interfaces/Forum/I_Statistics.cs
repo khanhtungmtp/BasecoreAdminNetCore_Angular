@@ -8,7 +8,7 @@ namespace API._Services.Interfaces.Forums;
 [DependencyInjection(ServiceLifetime.Scoped)]
 public interface I_Statistics
 {
-    Task<ApiResponse<List<MonthlyCommentsVM>>> GetMonthlyNewCommentsAsync(int year);
-    Task<ApiResponse<List<MonthlyNewKbsVM>>> GetMonthlyNewKbsAsync(int year);
-    Task<ApiResponse<List<MonthlyNewKbsVM>>> GetMonthlyNewRegistersAsync(int year);
+    Task<OperationResult<List<MonthlyCommentsVM>>> GetMonthlyNewCommentsAsync(int year);
+    Task<OperationResult<List<MonthlyNewKbsVM>>> GetMonthlyNewKbsAsync(int year);
+    Task<OperationResult<List<MonthlyNewKbsVM>>> GetMonthlyNewRegistersAsync(int year);
 }

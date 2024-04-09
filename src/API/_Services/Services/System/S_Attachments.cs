@@ -1,4 +1,3 @@
-using System.Net;
 using API._Repositories;
 using API._Services.Interfaces.System;
 using API.Helpers.Base;
@@ -8,7 +7,7 @@ using ViewModels.System;
 namespace API._Services.Services.System;
 public class S_Attachments(IRepositoryAccessor repoStore) : BaseServices(repoStore), I_Attachments
 {
-    public async Task<ApiResponse<List<AttachmentVM>>> GetAttachmentsAsync(int forumId)
+    public async Task<OperationResult<List<AttachmentVM>>> GetAttachmentsAsync(int forumId)
     {
         var query = await _repoStore.Attachments.FindAll(true)
                 .Where(x => x.ForumId == forumId)
@@ -24,22 +23,22 @@ public class S_Attachments(IRepositoryAccessor repoStore) : BaseServices(repoSto
                     ForumId = c.ForumId ?? 0
                 }).ToListAsync();
 
-        return Success((int)HttpStatusCode.OK, query, "Get attachments successfully.");
+        return OperationResult<List<AttachmentVM>>.Success(query, "Get attachments successfully.");
     }
 
-    public async Task<ApiResponse> DeleteAsync(int attachmentId)
+    public async Task<OperationResult> DeleteAsync(int attachmentId)
     {
         var attachment = await _repoStore.Attachments.FindAsync(attachmentId);
         if (attachment is null)
-            return Fail((int)HttpStatusCode.NotFound, $"Cannot found attachment with id {attachmentId}");
+            return OperationResult.NotFound( $"Cannot found attachment with id {attachmentId}");
 
         _repoStore.Attachments.Remove(attachment);
 
         bool result = await _repoStore.SaveChangesAsync();
         if (result)
         {
-            return Success((int)HttpStatusCode.OK, "Delete attachment Successfully");
+            return OperationResult.Success("Delete attachment Successfully");
         }
-        return Fail((int)HttpStatusCode.BadRequest, "Delete attachment failed");
+        return OperationResult.BadRequest("Delete attachment failed");
     }
 }

@@ -1,5 +1,3 @@
-
-using System.Net;
 using API._Repositories;
 using API._Services.Interfaces.Forum;
 using API.Helpers.Base;
@@ -25,7 +23,7 @@ public class S_Forums : BaseServices, I_Forums
         _cacheService = cacheService;
     }
     #region PostForumAsync
-    public async Task<ApiResponse<string>> CreateAsync(ForumCreateRequest request)
+    public async Task<OperationResult<string>> CreateAsync(ForumCreateRequest request)
     {
         var fourm = CreateForumEntity(request);
         if (string.IsNullOrEmpty(fourm.SeoAlias))
@@ -53,9 +51,9 @@ public class S_Forums : BaseServices, I_Forums
         bool result = await _repoStore.SaveChangesAsync();
 
         if (result)
-            return new ApiResponse<string>((int)HttpStatusCode.OK, true, "Forum created successfully.", fourm.Id.ToString());
+            return OperationResult<string>.Success(fourm.Id.ToString(), "Forum created successfully.");
         else
-            return new ApiResponse<string>((int)HttpStatusCode.BadRequest, false, "Create forum failed.", null!);
+            return OperationResult<string>.BadRequest("Create forum failed.");
     }
     #endregion
     #region automapper private methods
@@ -84,10 +82,10 @@ public class S_Forums : BaseServices, I_Forums
     {
         foreach (var labelText in request.Labels)
         {
-            if (labelText == null) continue;
+            if (labelText is null) continue;
             var labelId = FunctionUtility.GenerateSlug(labelText.ToString());
             var existingLabel = await _repoStore.Labels.FindAsync(labelId);
-            if (existingLabel == null)
+            if (existingLabel is null)
             {
                 var labelEntity = new Label()
                 {
@@ -216,12 +214,12 @@ public class S_Forums : BaseServices, I_Forums
 
         forum.Note = request.Note;
 
-        if (request.Labels != null)
+        if (request.Labels is not null)
             forum.Labels = string.Join(',', request.Labels);
     }
 
     #endregion
-    public async Task<ApiResponse<PagingResult<ForumQuickVM>>> GetForumsPagingAsync(string? filter, PaginationParam pagination, ForumQuickVM forumVM)
+    public async Task<OperationResult<PagingResult<ForumQuickVM>>> GetForumsPagingAsync(string? filter, PaginationParam pagination, ForumQuickVM forumVM)
     {
         var query = from k in _repoStore.Forums.FindAll(true)
                     join c in _repoStore.Categories.FindAll(true) on k.CategoryId equals c.Id
@@ -249,13 +247,13 @@ public class S_Forums : BaseServices, I_Forums
 
         }).ToListAsync();
         var resultsPaging = PagingResult<ForumQuickVM>.Create(result, pagination.PageNumber, pagination.PageSize);
-        return new ApiResponse<PagingResult<ForumQuickVM>>((int)HttpStatusCode.OK, true, "Get forums successfully.", resultsPaging);
+        return OperationResult<PagingResult<ForumQuickVM>>.Success(resultsPaging, "Get forums successfully.");
     }
 
-    public async Task<ApiResponse<List<ForumQuickVM>>> GetLatestForumAsync(int take)
+    public async Task<OperationResult<List<ForumQuickVM>>> GetLatestForumAsync(int take)
     {
         var cachedData = await _cacheService.GetAsync<List<ForumQuickVM>>(CacheConstants.LatestForum);
-        if (cachedData == null)
+        if (cachedData is null)
         {
             var forum = from k in _repoStore.Forums.FindAll(true)
                         join c in _repoStore.Categories.FindAll(true) on k.CategoryId equals c.Id
@@ -278,13 +276,13 @@ public class S_Forums : BaseServices, I_Forums
             await _cacheService.SetAsync(CacheConstants.LatestForum, forums, 2);
             cachedData = forums;
         }
-        return new ApiResponse<List<ForumQuickVM>>((int)HttpStatusCode.OK, true, "Get latest forums successfully.", cachedData);
+        return OperationResult<List<ForumQuickVM>>.Success(cachedData, "Get latest forums successfully.");
     }
 
-    public async Task<ApiResponse<List<ForumQuickVM>>> GetPopularForumAsync(int take)
+    public async Task<OperationResult<List<ForumQuickVM>>> GetPopularForumAsync(int take)
     {
         var cachedData = await _cacheService.GetAsync<List<ForumQuickVM>>(CacheConstants.PopularForum);
-        if (cachedData == null)
+        if (cachedData is null)
         {
             var forums = from k in _repoStore.Forums.FindAll(true)
                          join c in _repoStore.Categories.FindAll(true) on k.CategoryId equals c.Id
@@ -307,10 +305,10 @@ public class S_Forums : BaseServices, I_Forums
             await _cacheService.SetAsync(CacheConstants.PopularForum, forumVms, 24);
             cachedData = forumVms;
         }
-        return new ApiResponse<List<ForumQuickVM>>((int)HttpStatusCode.OK, true, "Get popular forums successfully.", cachedData);
+        return OperationResult<List<ForumQuickVM>>.Success(cachedData, "Get popular forums successfully.");
     }
 
-    public async Task<ApiResponse<PagingResult<ForumQuickVM>>> GetForumByTagIdAsync(string labelId, PaginationParam pagination)
+    public async Task<OperationResult<PagingResult<ForumQuickVM>>> GetForumByTagIdAsync(string labelId, PaginationParam pagination)
     {
         var query = from k in _repoStore.Forums.FindAll(true)
                     join lik in _repoStore.LabelInForums.FindAll(true) on k.Id equals lik.ForumId
@@ -333,14 +331,14 @@ public class S_Forums : BaseServices, I_Forums
             NumberOfComments = u.k.NumberOfComments
         }).ToListAsync();
         var resultsPaging = PagingResult<ForumQuickVM>.Create(items, pagination.PageNumber, pagination.PageSize);
-        return new ApiResponse<PagingResult<ForumQuickVM>>((int)HttpStatusCode.OK, true, "Get forums by tag id successfully.", resultsPaging);
+        return OperationResult<PagingResult<ForumQuickVM>>.Success(resultsPaging, "Get forums by tag id successfully.");
     }
 
-    public async Task<ApiResponse<ForumVM>> FindByIdAsync(int id)
+    public async Task<OperationResult<ForumVM>> FindByIdAsync(int id)
     {
         var forum = await _repoStore.Forums.FindAsync(id);
-        if (forum == null)
-            return new ApiResponse<ForumVM>((int)HttpStatusCode.NotFound, false, $"Cannot found knowledge base with id: {id}", null!);
+        if (forum is null)
+            return OperationResult<ForumVM>.NotFound($"Cannot found knowledge base with id: {id}");
 
         var attachments = await _repoStore.Attachments.FindAll(true)
             .Where(x => x.ForumId == id)
@@ -354,15 +352,15 @@ public class S_Forums : BaseServices, I_Forums
             }).ToListAsync();
         var forums = CreateForumVM(forum);
         forums.Attachments = attachments;
-        return new ApiResponse<ForumVM>((int)HttpStatusCode.OK, true, $"Get forum by id {id} successfully.", forums);
+        return OperationResult<ForumVM>.Success(forums, $"Get forum by id {id} successfully.");
 
     }
 
-    public async Task<ApiResponse> PutAsync(int id, ForumCreateRequest request)
+    public async Task<OperationResult> PutAsync(int id, ForumCreateRequest request)
     {
         var forum = await _repoStore.Forums.FindAsync(id);
         if (forum is null)
-            return new ApiNotFoundResponse($"Cannot found forum with id {id}");
+            return OperationResult.NotFound($"Cannot found forum with id {id}");
         UpdateForum(request, forum);
 
         //Process attachment
@@ -385,16 +383,16 @@ public class S_Forums : BaseServices, I_Forums
         {
             await _cacheService.RemoveAsync("LatestForum");
             await _cacheService.RemoveAsync("PopularForum");
-            return new ApiResponse((int)HttpStatusCode.OK, true, "Update forum successfully");
+            return OperationResult.Success("Update forum successfully");
         }
-        return new ApiResponse((int)HttpStatusCode.BadRequest, false, "Update forum failed");
+        return OperationResult.BadRequest("Update forum failed");
     }
 
-    public async Task<ApiResponse<string>> DeleteAsync(int id)
+    public async Task<OperationResult<string>> DeleteAsync(int id)
     {
         var forum = await _repoStore.Forums.FindAsync(id);
         if (forum is null)
-            return new ApiResponse<string>((int)HttpStatusCode.NotFound, false, $"Cannot found forum with id: {id}", null!);
+            return OperationResult<string>.NotFound($"Cannot found forum with id: {id}");
 
         _repoStore.Forums.Remove(forum);
         bool result = await _repoStore.SaveChangesAsync();
@@ -404,29 +402,29 @@ public class S_Forums : BaseServices, I_Forums
             await _cacheService.RemoveAsync(CacheConstants.PopularForum);
 
             ForumVM forumVM = CreateForumVM(forum);
-            return new ApiResponse<string>((int)HttpStatusCode.OK, true, "Delete forum successfully", forumVM.Id.ToString());
+            return OperationResult<string>.Success(forumVM.Id.ToString(), "Delete forum successfully");
         }
-        return new ApiResponse<string>((int)HttpStatusCode.BadRequest, false, "Delete forum failed", null!);
+        return OperationResult<string>.BadRequest("Delete forum failed");
     }
 
 
-    public async Task<ApiResponse> UpdateViewCountAsync(int id)
+    public async Task<OperationResult> UpdateViewCountAsync(int id)
     {
         var forum = await _repoStore.Forums.FindAsync(id);
-        if (forum == null)
-            return new ApiNotFoundResponse($"Cannot found forum with id: {id}");
+        if (forum is null)
+            return OperationResult.NotFound($"Cannot found forum with id: {id}");
         forum.ViewCount ??= 0;
 
         forum.ViewCount += 1;
         _repoStore.Forums.Update(forum);
         bool result = await _repoStore.SaveChangesAsync();
         if (result)
-            return new ApiResponse((int)HttpStatusCode.OK, true, "Update view count successfully");
-        return new ApiResponse((int)HttpStatusCode.BadRequest, false, "Update view count failed");
+            return OperationResult.Success("Update view count successfully" );
+        return OperationResult.BadRequest("Update view count failed");
     }
 
     #region label
-    public async Task<ApiResponse<List<LabelVM>>> GetLabelsByForumIdAsync(int forumId)
+    public async Task<OperationResult<List<LabelVM>>> GetLabelsByForumIdAsync(int forumId)
     {
         var query = from lik in _repoStore.LabelInForums.FindAll(true)
                     join l in _repoStore.Labels.FindAll(true) on lik.LabelId equals l.Id
@@ -440,7 +438,7 @@ public class S_Forums : BaseServices, I_Forums
             Name = u.Name
         }).ToListAsync();
 
-        return new ApiResponse<List<LabelVM>>((int)HttpStatusCode.OK, true, "Get labels by forum id successfully.", labels);
+        return OperationResult<List<LabelVM>>.Success(labels, "Get labels by forum id successfully.");
     }
 
     #endregion

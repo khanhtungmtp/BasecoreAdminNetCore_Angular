@@ -7,6 +7,6 @@ namespace API._Services.Interfaces.UserManager;
 [DependencyInjection(ServiceLifetime.Scoped)]
 public interface I_Roles
 {
-    Task<ApiResponse<List<PermissionVm>>> GetPermissionByRoleId(string roleId);
-    Task<ApiResponse<string>> PutPermissionByRoleId(string roleId, UpdatePermissionRequest request);
+    Task<OperationResult<List<PermissionVm>>> GetPermissionByRoleId(string roleId);
+    Task<OperationResult<string>> PutPermissionByRoleId(string roleId, UpdatePermissionRequest request);
 }

@@ -1,4 +1,3 @@
-using System.Net;
 using API._Repositories;
 using API._Services.Interfaces.System;
 using API.Helpers.Base;
@@ -9,7 +8,7 @@ using ViewModels.System;
 namespace API._Services.Services.System;
 public class S_CommandInFunction(IRepositoryAccessor repoStore) : BaseServices(repoStore), I_CommandInFunction
 {
-    public async Task<ApiResponse<List<CommandVM>>> FindIdsCommandInFunctionAsync(string functionId)
+    public async Task<OperationResult<List<CommandVM>>> FindIdsCommandInFunctionAsync(string functionId)
     {
         var query = from a in _repoStore.Commands.FindAll(true)
                     join commandinfunc in _repoStore.CommandInFunctions.FindAll(true) on a.Id equals commandinfunc.CommandId into result1
@@ -30,16 +29,16 @@ public class S_CommandInFunction(IRepositoryAccessor repoStore) : BaseServices(r
             Id = x.Id,
             Name = x.Name
         }).ToListAsync();
-        return Success((int)HttpStatusCode.OK, data, "Get command in function successfully.");
+        return OperationResult<List<CommandVM>>.Success(data, "Get command in function successfully.");
     }
 
     // PostCommandInFunction
-    public async Task<ApiResponse<CommandInFunctionResponseVM>> CreateAsync(string functionId, CommandAssignRequest request)
+    public async Task<OperationResult<CommandInFunctionResponseVM>> CreateAsync(string functionId, CommandAssignRequest request)
     {
         foreach (var commandId in request.CommandIds)
         {
-            if (await _repoStore.CommandInFunctions.FindAsync(commandId, functionId) != null)
-                return Fail<CommandInFunctionResponseVM>((int)HttpStatusCode.Conflict, "Command already exists in function.");
+            if (await _repoStore.CommandInFunctions.FindAsync(commandId, functionId) is not null)
+                return OperationResult<CommandInFunctionResponseVM>.Conflict($"Command {commandId} already exists in function.");
 
             var entity = new CommandInFunction()
             {
@@ -71,18 +70,18 @@ public class S_CommandInFunction(IRepositoryAccessor repoStore) : BaseServices(r
         bool result = await _repoStore.SaveChangesAsync();
 
         if (result)
-            return Success((int)HttpStatusCode.OK, new CommandInFunctionResponseVM() { CommandIds = request.CommandIds, FunctionId = functionId }, "Add command to function successfully.");
+            return OperationResult<CommandInFunctionResponseVM>.Success(new CommandInFunctionResponseVM() { CommandIds = request.CommandIds, FunctionId = functionId }, "Add command to function successfully.");
         else
-            return Fail<CommandInFunctionResponseVM>((int)HttpStatusCode.InternalServerError, "Add command to function failed.");
+            return OperationResult<CommandInFunctionResponseVM>.BadRequest("Add command to function failed.");
     }
 
-    public async Task<ApiResponse> DeleteAsync(string functionId, CommandAssignRequest request)
+    public async Task<OperationResult> DeleteAsync(string functionId, CommandAssignRequest request)
     {
         foreach (var commandId in request.CommandIds)
         {
             var entity = await _repoStore.CommandInFunctions.FindAsync(commandId, functionId);
             if (entity is null)
-                return Fail((int)HttpStatusCode.NotFound, "This command is not existed in function");
+                return OperationResult.NotFound($"This command {commandId} is not existed in function");
 
             _repoStore.CommandInFunctions.Remove(entity);
         }
@@ -90,9 +89,9 @@ public class S_CommandInFunction(IRepositoryAccessor repoStore) : BaseServices(r
         bool result = await _repoStore.SaveChangesAsync();
 
         if (result)
-            return Success((int)HttpStatusCode.OK, "Command to function delete successfully.");
+            return OperationResult.Success("Command to function delete successfully.");
         else
-            return Fail((int)HttpStatusCode.OK, "Delete command to function failed.");
+            return OperationResult.BadRequest("Delete command to function failed.");
 
     }
 }

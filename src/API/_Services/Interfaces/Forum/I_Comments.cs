@@ -8,11 +8,11 @@ namespace API._Services.Interfaces.Forum;
 [DependencyInjection(ServiceLifetime.Scoped)]
 public interface I_Comments
 {
-    Task<ApiResponse<CommentVM>> FindByIdAsync(int commentId);
-    Task<ApiResponse<CommentResponseVM>> CreateAsync(int forumId, CommentCreateRequest request);
-    Task<ApiResponse<List<CommentVM>>> GetRecentCommentsAsync(int take);
-    Task<ApiResponse<IEnumerable<CommentVM>>> GetCommentTreeByForumIdAsync(int forumId);
-    Task<ApiResponse<PagingResult<CommentVM>>> GetCommentsPagingAsync(string? filter, PaginationParam pagination, CommentVM commentVM);
-    Task<ApiResponse> PutAsync(int commentId, CommentCreateRequest request);
-    Task<ApiResponse> DeleteAsync(int forumId, int commentId);
+    Task<OperationResult<CommentVM>> FindByIdAsync(int commentId);
+    Task<OperationResult<CommentResponseVM>> CreateAsync(int forumId, CommentCreateRequest request);
+    Task<OperationResult<List<CommentVM>>> GetRecentCommentsAsync(int take);
+    Task<OperationResult<IEnumerable<CommentVM>>> GetCommentTreeByForumIdAsync(int forumId);
+    Task<OperationResult<PagingResult<CommentVM>>> GetCommentsPagingAsync(string? filter, PaginationParam pagination, CommentVM commentVM);
+    Task<OperationResult> PutAsync(int commentId, CommentCreateRequest request);
+    Task<OperationResult> DeleteAsync(int forumId, int commentId);
 }

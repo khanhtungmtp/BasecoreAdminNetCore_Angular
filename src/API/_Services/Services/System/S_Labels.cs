@@ -1,6 +1,3 @@
-
-
-using System.Net;
 using API._Repositories;
 using API._Services.Interfaces.System;
 using API.Helpers.Base;
@@ -13,11 +10,11 @@ public class S_Labels(IRepositoryAccessor repoStore, I_Cache cacheService) : Bas
 {
     private readonly I_Cache _cacheService = cacheService;
 
-    public async Task<ApiResponse<LabelVM>> FindByIdAsync(string id)
+    public async Task<OperationResult<LabelVM>> FindByIdAsync(string id)
     {
         var label = await _repoStore.Labels.FindAsync(id);
         if (label is null)
-            return Fail<LabelVM>((int)HttpStatusCode.NotFound, $"Label with id: {id} is not found");
+            return OperationResult<LabelVM>.NotFound($"Label with id: {id} is not found");
 
         var labelVm = new LabelVM()
         {
@@ -25,10 +22,10 @@ public class S_Labels(IRepositoryAccessor repoStore, I_Cache cacheService) : Bas
             Name = label.Name
         };
 
-        return Success((int)HttpStatusCode.OK, labelVm, "Get label successfully.");
+        return OperationResult<LabelVM>.Success(labelVm, "Get label successfully.");
     }
 
-    public async Task<ApiResponse<List<LabelVM>>> GetPopularLabelsAsync(int take)
+    public async Task<OperationResult<List<LabelVM>>> GetPopularLabelsAsync(int take)
     {
         var cachedData = await _cacheService.GetAsync<List<LabelVM>>(CacheConstants.PopularLabels);
         if (cachedData is null)
@@ -52,6 +49,6 @@ public class S_Labels(IRepositoryAccessor repoStore, I_Cache cacheService) : Bas
             cachedData = labels;
         }
 
-        return Success((int)HttpStatusCode.OK, cachedData, "Get popular labels successfully.");
+        return OperationResult<List<LabelVM>>.Success(cachedData, "Get popular labels successfully.");
     }
 }

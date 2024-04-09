@@ -8,5 +8,5 @@ namespace API._Services.Interfaces.UserManager;
 public interface I_User
 {
     // GetMenuByUserPermission
-    Task<ApiResponse<List<FunctionVM>>> GetMenuByUserPermission(string userId);
+    Task<OperationResult<List<FunctionVM>>> GetMenuByUserPermission(string userId);
 }

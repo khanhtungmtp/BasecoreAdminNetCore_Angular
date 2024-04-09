@@ -9,9 +9,9 @@ namespace API._Services.Interfaces.System;
 [DependencyInjection(ServiceLifetime.Scoped)]
 public interface I_Category
 {
-    Task<ApiResponse<string>> CreateAsync(CategoryCreateRequest request);
-    Task<ApiResponse<CategoryVM>> FindByIdAsync(int id);
-    Task<ApiResponse<PagingResult<CategoryVM>>> GetCategoriesPagingAsync(string? filter, PaginationParam pagination, CategoryVM categoryVM);
-    Task<ApiResponse> PutCategoryAsync(int id, CategoryCreateRequest request);
-    Task<ApiResponse<string>> DeleteCategoryAsync(int id);
+    Task<OperationResult<string>> CreateAsync(CategoryCreateRequest request);
+    Task<OperationResult<CategoryVM>> FindByIdAsync(int id);
+    Task<OperationResult<PagingResult<CategoryVM>>> GetCategoriesPagingAsync(string? filter, PaginationParam pagination, CategoryVM categoryVM);
+    Task<OperationResult> PutCategoryAsync(int id, CategoryCreateRequest request);
+    Task<OperationResult<string>> DeleteCategoryAsync(int id);
 }

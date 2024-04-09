@@ -1,4 +1,3 @@
-using System.Net;
 using API._Repositories;
 using API._Services.Interfaces.UserManager;
 using API.Helpers.Base;
@@ -9,7 +8,7 @@ using ViewModels.System;
 namespace API._Services.Services.UserManager;
 public class S_Roles(IRepositoryAccessor repoStore) : BaseServices(repoStore), I_Roles
 {
-    public async Task<ApiResponse<List<PermissionVm>>> GetPermissionByRoleId(string roleId)
+    public async Task<OperationResult<List<PermissionVm>>> GetPermissionByRoleId(string roleId)
     {
         List<PermissionVm>? permissions = await (from p in _repoStore.Permissions.FindAll(true)
                                                  join a in _repoStore.Commands.FindAll(true)
@@ -21,10 +20,10 @@ public class S_Roles(IRepositoryAccessor repoStore) : BaseServices(repoStore), I
                                                      CommandId = p.CommandId,
                                                      RoleId = p.RoleId
                                                  }).ToListAsync();
-        return Success((int)HttpStatusCode.OK, permissions, "Get permission by role id successfully.");
+        return OperationResult<List<PermissionVm>>.Success(permissions, "Get permission by role id successfully.");
     }
 
-    public async Task<ApiResponse<string>> PutPermissionByRoleId(string roleId, UpdatePermissionRequest request)
+    public async Task<OperationResult<string>> PutPermissionByRoleId(string roleId, UpdatePermissionRequest request)
     {
         //create new permission list from user changed
         var newPermissions = new List<Permission>();
@@ -38,9 +37,9 @@ public class S_Roles(IRepositoryAccessor repoStore) : BaseServices(repoStore), I
         _repoStore.Permissions.AddMultiple(newPermissions.Distinct(new MyPermissionComparer()));
         bool result = await _repoStore.SaveChangesAsync();
         if (result)
-            return Success<string>((int)HttpStatusCode.OK, "Save permission successfully");
+            return OperationResult<string>.Success("Save permission successfully");
 
-        return Fail<string>((int)HttpStatusCode.BadRequest, "Save permission failed");
+        return OperationResult<string>.BadRequest("Save permission failed");
     }
 
     internal class MyPermissionComparer : IEqualityComparer<Permission>

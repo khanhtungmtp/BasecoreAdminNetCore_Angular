@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace API.Helpers.Base;
 
-public class ApiBadRequestResponse : ApiResponse
+public class ApiBadRequestResponse : ApiResponseBase
 {
 
     //* use for model state 

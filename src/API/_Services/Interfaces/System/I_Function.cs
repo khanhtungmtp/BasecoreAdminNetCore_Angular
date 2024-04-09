@@ -8,9 +8,9 @@ namespace API._Services.Interfaces.System;
 [DependencyInjection(ServiceLifetime.Scoped)]
 public interface I_Function
 {
-    Task<ApiResponse<string>> CreateAsync(FunctionCreateRequest request);
-    Task<ApiResponse<FunctionVM>> FindByIdAsync(string id);
-    Task<ApiResponse<PagingResult<FunctionVM>>> GetAllPaging(string? filter, PaginationParam pagination, FunctionVM functionVM);
-    Task<ApiResponse<string>> PutFunctionAsync(string id, FunctionCreateRequest request);
-    Task<ApiResponse<string>> DeleteFunctionAsync(string id);
+    Task<OperationResult<string>> CreateAsync(FunctionCreateRequest request);
+    Task<OperationResult<FunctionVM>> FindByIdAsync(string id);
+    Task<OperationResult<PagingResult<FunctionVM>>> GetAllPaging(string? filter, PaginationParam pagination, FunctionVM functionVM);
+    Task<OperationResult<string>> PutFunctionAsync(string id, FunctionCreateRequest request);
+    Task<OperationResult<string>> DeleteFunctionAsync(string id);
 }
