@@ -26,45 +26,27 @@ public class CategoryController(I_Category categoryService) : BaseController
     public async Task<IActionResult> GetById(int id)
     {
         var result = await _categoryService.FindByIdAsync(id);
-        if (!result.Succeeded)
-            return NotFound(result);
-        return Ok(result);
+        return HandleResult(result);
     }
 
     [HttpGet]
     public async Task<IActionResult> GetCategoriesPaging(string? filter, [FromQuery] PaginationParam pagination, [FromQuery] CategoryVM categoryVM)
     {
-        var result = await _categoryService.GetCategoriesPagingAsync(filter, pagination, categoryVM);
-        if (!result.Succeeded)
-            return BadRequest(result);
-        return Ok(result);
+        var result = await _categoryService.GetPagingAsync(filter, pagination, categoryVM);
+        return HandleResult(result);
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> PutCategory(int id, [FromBody] CategoryCreateRequest request)
     {
-        var result = await _categoryService.PutCategoryAsync(id, request);
-        if (!result.Succeeded)
-        {
-            if (result.Status == 404)
-                return NotFound(result);
-            else
-                return BadRequest(result);
-        }
-        return Ok(result);
+        var result = await _categoryService.PutAsync(id, request);
+         return HandleResult(result);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCategory(int id)
     {
-        var result = await _categoryService.DeleteCategoryAsync(id);
-        if (!result.Succeeded)
-        {
-            if (result.Status == 404)
-                return NotFound(result);
-            else
-                return BadRequest(result);
-        }
-        return Ok(result);
+        var result = await _categoryService.DeleteAsync(id);
+         return HandleResult(result);
     }
 }

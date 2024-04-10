@@ -18,20 +18,13 @@ public class ReportsController : BaseController
     public async Task<IActionResult> PostReport(int forumId, [FromBody] ReportCreateRequest request)
     {
         var result = await _reportService.CreateAsync(forumId, request);
-        if (!result.Succeeded)
-        {
-            if (result.Status == 404)
-                return NotFound(result);
-            else
-                return BadRequest(result);
-        }
-        return Ok(result);
+        return HandleResult(result);
     }
 
     [HttpGet("{forumId}/reports/filter")]
     public async Task<IActionResult> GetReportsPaging(string? filter, [FromQuery] PaginationParam pagination, ReportVM reportVM)
     {
-        var result = await _reportService.GetReportsPagingAsync(filter, pagination, reportVM);
+        var result = await _reportService.GetPagingAsync(filter, pagination, reportVM);
         return Ok(result);
     }
 
@@ -46,13 +39,6 @@ public class ReportsController : BaseController
     public async Task<IActionResult> DeleteReport(int forumId, int reportId)
     {
         var result = await _reportService.DeleteAsync(forumId, reportId);
-        if (!result.Succeeded)
-        {
-            if (result.Status == 404)
-                return NotFound(result);
-            else
-                return BadRequest(result);
-        }
-        return Ok(result);
+        return HandleResult(result);
     }
 }

@@ -10,20 +10,14 @@ public class AttachmentsController(I_Attachments attachmentService) : BaseContro
     [HttpGet("{forumId}/attachments")]
     public async Task<IActionResult> GetAttachments(int forumId)
     {
-        var attachments = await _attachmentService.GetAttachmentsAsync(forumId);
-        if (!attachments.Succeeded)
-            return BadRequest(attachments);
-
-        return Ok(attachments);
+        var result = await _attachmentService.GetListAsync(forumId);
+        return HandleResult(result);
     }
 
     [HttpDelete("{forumId}/attachments/{attachmentId}")]
     public async Task<IActionResult> DeleteAttachment(int attachmentId)
     {
         var result = await _attachmentService.DeleteAsync(attachmentId);
-        if (!result.Succeeded)
-            return BadRequest(result);
-
-        return Ok(result);
+        return HandleResult(result);
     }
 }

@@ -1,7 +1,5 @@
 //  Created Date: 2024-04-08 11:00:54
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace API.Helpers.Base
 {
@@ -17,8 +15,8 @@ namespace API.Helpers.Base
         // the HTTP status code.
         // Value:
         // number   
-        [JsonPropertyName("status")]
-        public int Status { get; }
+        [JsonPropertyName("statusCode")]
+        public int StatusCode { get; }
 
         // Summary:
         // flag successful.
@@ -45,7 +43,7 @@ namespace API.Helpers.Base
 
         protected ApiResponseBase(int statusCode, bool succeeded, string? message = null, T? data = default)
         {
-            Status = statusCode;
+            StatusCode = statusCode;
             Succeeded = succeeded;
             Message = message;
             Data = data;

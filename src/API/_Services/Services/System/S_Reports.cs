@@ -57,7 +57,7 @@ public class S_Reports(IRepositoryAccessor repoStore) : BaseServices(repoStore),
         return OperationResult<ReportVM>.Success(reportVm, "Get report successfully.");
     }
 
-    public async Task<OperationResult<PagingResult<ReportVM>>> GetReportsPagingAsync(string? filter, PaginationParam pagination, ReportVM reportVM)
+    public async Task<OperationResult<PagingResult<ReportVM>>> GetPagingAsync(string? filter, PaginationParam pagination, ReportVM reportVM)
     {
         var query = from r in _repoStore.Reports.FindAll(true)
                     join u in _repoStore.Users.FindAll(true)

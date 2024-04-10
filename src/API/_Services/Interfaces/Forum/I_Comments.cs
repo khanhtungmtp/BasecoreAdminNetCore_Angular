@@ -12,7 +12,7 @@ public interface I_Comments
     Task<OperationResult<CommentResponseVM>> CreateAsync(int forumId, CommentCreateRequest request);
     Task<OperationResult<List<CommentVM>>> GetRecentCommentsAsync(int take);
     Task<OperationResult<IEnumerable<CommentVM>>> GetCommentTreeByForumIdAsync(int forumId);
-    Task<OperationResult<PagingResult<CommentVM>>> GetCommentsPagingAsync(string? filter, PaginationParam pagination, CommentVM commentVM);
+    Task<OperationResult<PagingResult<CommentVM>>> GetPagingAsync(string? filter, PaginationParam pagination, CommentVM commentVM);
     Task<OperationResult> PutAsync(int commentId, CommentCreateRequest request);
     Task<OperationResult> DeleteAsync(int forumId, int commentId);
 }

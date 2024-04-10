@@ -9,12 +9,14 @@ using ViewModels.UserManager;
 using Microsoft.AspNetCore.Mvc;
 using API.Helpers.Utilities;
 using MockQueryable.Moq;
+using API._Services.Interfaces.UserManager;
 
 namespace API.UnitTest;
 
 public class UsersControllerTest
 {
     private readonly Mock<UserManager<User>> _mockUserManager;
+    private readonly Mock<I_User> _user;
     private DataContext _context;
 
     private List<User> _userSources = new List<User>(){
@@ -35,7 +37,7 @@ public class UsersControllerTest
         var errors = new Mock<IdentityErrorDescriber>();
         var services = new Mock<IServiceProvider>();
         var logger = new Mock<ILogger<UserManager<User>>>();
-
+        _user = new Mock<I_User>();
         _mockUserManager = new Mock<UserManager<User>>(
             userStore.Object,
             optionsAccessor.Object,
@@ -53,7 +55,7 @@ public class UsersControllerTest
     [Fact]
     public void CreateInstance_NotNull()
     {
-        var usersController = new UsersController(_mockUserManager.Object);
+        var usersController = new UsersController(_mockUserManager.Object, _user.Object);
         Assert.NotNull(usersController);
     }
 
@@ -66,7 +68,7 @@ public class UsersControllerTest
         // setup return user
         _mockUserManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).ReturnsAsync(new User() { FullName = "test1" });
         //Act
-        var usersController = new UsersController(_mockUserManager.Object);
+        var usersController = new UsersController(_mockUserManager.Object, _user.Object);
         // start create user
         var result = await usersController.CreateUser(new UserCreateRequest() { FullName = "test" });
         //  Đảm bảo rằng kết quả trả về từ phương thức CreateUser không phải là null
@@ -84,7 +86,7 @@ public class UsersControllerTest
         // setup return user
         _mockUserManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).ReturnsAsync(new User() { FullName = "test1" });
         //Act
-        var usersController = new UsersController(_mockUserManager.Object);
+        var usersController = new UsersController(_mockUserManager.Object, _user.Object);
         // start create user
         var result = await usersController.CreateUser(new UserCreateRequest() { FullName = "test" });
         //  Đảm bảo rằng kết quả trả về từ phương thức CreateUser không phải là null
@@ -107,14 +109,14 @@ public class UsersControllerTest
 
         var paginationParam = new PaginationParam { PageNumber = 1, PageSize = 10 };
         var userVM = new UserVM();
-        var usersController = new UsersController(_mockUserManager.Object);
+        var usersController = new UsersController(_mockUserManager.Object, _user.Object);
 
         // Act
         /*
         Gọi phương thức GetAllPaging và kiểm tra xem nó có trả về OkObjectResult 
         với kết quả đã phân trang (PagingResult<UserVM>) chứa số lượng phần tử thích hợp với PageSize được đưa ra hay không.
         */
-        var result = await usersController.GetAllPaging("test1", paginationParam, userVM);
+        var result = await usersController.GetPaging("test1", paginationParam, userVM);
 
         // Assert
         var actionResult = Assert.IsType<OkObjectResult>(result);
@@ -130,8 +132,8 @@ public class UsersControllerTest
         _mockUserManager.Setup(x => x.Users).Throws<Exception>();
         var paginationParam = new PaginationParam { PageNumber = 1, PageSize = 10 };
         var userVM = new UserVM();
-        var usersController = new UsersController(_mockUserManager.Object);
-        await Assert.ThrowsAnyAsync<Exception>(async () => await usersController.GetAllPaging("test1", paginationParam, userVM));
+        var usersController = new UsersController(_mockUserManager.Object, _user.Object);
+        await Assert.ThrowsAnyAsync<Exception>(async () => await usersController.GetPaging("test1", paginationParam, userVM));
     }
 
     // get by id user
@@ -140,7 +142,7 @@ public class UsersControllerTest
     {
         // setup return user
         _mockUserManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new User() { FullName = "test1" });
-        var usersController = new UsersController(_mockUserManager.Object);
+        var usersController = new UsersController(_mockUserManager.Object, _user.Object);
         var result = await usersController.GetById("1");
         var okResult = result as OkObjectResult;
         var userVM = okResult?.Value as UserVM;
@@ -155,7 +157,7 @@ public class UsersControllerTest
     {
         // gia lap get loi
         _mockUserManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).Throws<Exception>();
-        var usersController = new UsersController(_mockUserManager.Object);
+        var usersController = new UsersController(_mockUserManager.Object, _user.Object);
         await Assert.ThrowsAnyAsync<Exception>(async () => await usersController.GetById("1"));
     }
 }

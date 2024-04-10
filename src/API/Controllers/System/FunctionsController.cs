@@ -28,7 +28,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     public async Task<IActionResult> GetAllPaging(string? filter, [FromQuery] PaginationParam pagination, [FromQuery] FunctionVM userVM)
     {
         filter ??= string.Empty;
-        return Ok(await _functionService.GetAllPaging(filter, pagination, userVM));
+        return Ok(await _functionService.GetPagingAsync(filter, pagination, userVM));
     }
 
     // url: GET : http:localhost:6001/api/function/{id}
@@ -36,44 +36,23 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     public async Task<IActionResult> GetById(string id)
     {
         var result = await _functionService.FindByIdAsync(id);
-        if (!result.Succeeded)
-        {
-            if (result.Status == 404)
-                return NotFound(result);
-            else
-                return BadRequest(result);
-        }
-        return Ok(result);
+        return HandleResult(result);
     }
 
     // url: PUT : http:localhost:6001/api/function/{id}
     [HttpPut("{id}")]
     public async Task<IActionResult> PutFunction(string id, [FromBody] FunctionCreateRequest request)
     {
-        var result = await _functionService.PutFunctionAsync(id, request);
-        if (!result.Succeeded)
-        {
-            if (result.Status == 404)
-                return NotFound(result);
-            else
-                return BadRequest(result);
-        }
-        return Ok(result);
+        var result = await _functionService.PutAsync(id, request);
+        return HandleResult(result);
     }
 
     // url: DELETE : http:localhost:6001/api/function/{id}
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteFunction(string id)
     {
-        var result = await _functionService.DeleteFunctionAsync(id);
-        if (!result.Succeeded)
-        {
-            if (result.Status == 404)
-                return NotFound(result);
-            else
-                return BadRequest(result);
-        }
-        return Ok(result);
+        var result = await _functionService.DeleteAsync(id);
+        return HandleResult(result);
     }
 
     // ========AREA COMMMAND IN FUNCTION (ACTION)=====
@@ -81,15 +60,8 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     [HttpGet("{functionId}/command-in-function")]
     public async Task<IActionResult> GetCommandInFunction(string functionId)
     {
-        var result = await _commandInFunctionService.FindIdsCommandInFunctionAsync(functionId);
-        if (!result.Succeeded)
-        {
-            if (result.Status == 404)
-                return NotFound(result);
-            else
-                return BadRequest(result);
-        }
-        return Ok(result);
+        var result = await _commandInFunctionService.GetListByIdAsync(functionId);
+        return HandleResult(result);
     }
 
     // PostCommandToFunction
@@ -100,7 +72,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
         var result = await _commandInFunctionService.CreateAsync(functionId, request);
         if (!result.Succeeded || result.Data is null)
         {
-            if (result.Status == 404)
+            if (result.StatusCode == 404)
                 return NotFound(result);
             else
                 return BadRequest(result);
@@ -114,14 +86,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     public async Task<IActionResult> DeleteCommandToFunction(string functionId, [FromBody] CommandAssignRequest request)
     {
         var result = await _commandInFunctionService.DeleteAsync(functionId, request);
-        if (!result.Succeeded)
-        {
-            if (result.Status == 404)
-                return NotFound(result);
-            else
-                return BadRequest(result);
-        }
-        return Ok(result);
+        return HandleResult(result);
     }
 
 }

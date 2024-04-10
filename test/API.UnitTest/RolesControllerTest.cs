@@ -6,12 +6,14 @@ using Microsoft.AspNetCore.Mvc;
 using API.Helpers.Utilities;
 using MockQueryable.Moq;
 using API.Controllers.UserManager;
+using API._Services.Interfaces.UserManager;
 
 namespace API.UnitTest;
 
 public class RolesControllerTest
 {
     private readonly Mock<RoleManager<IdentityRole>> _roleManager;
+    private readonly Mock<I_Roles> _roles;
     public RolesControllerTest()
     {
         var roleStore = new Mock<IRoleStore<IdentityRole>>();
@@ -20,12 +22,13 @@ public class RolesControllerTest
             It.IsAny<ILookupNormalizer>(),
             It.IsAny<IdentityErrorDescriber>(),
             It.IsAny<ILogger<RoleManager<IdentityRole>>>());
+        _roles = new Mock<I_Roles>();
     }
 
     [Fact] // test inject controller
     public void CreateInstance_NotNull()
     {
-        var roleController = new RolesController(_roleManager.Object);
+        var roleController = new RolesController(_roleManager.Object, _roles.Object);
         Assert.NotNull(roleController);
     }
 
@@ -35,7 +38,7 @@ public class RolesControllerTest
         // gia lap create thanh cong
         _roleManager.Setup(x => x.CreateAsync(It.IsAny<IdentityRole>())).ReturnsAsync(IdentityResult.Success);
         //Act
-        var roleController = new RolesController(_roleManager.Object);
+        var roleController = new RolesController(_roleManager.Object, _roles.Object);
         var result = await roleController.CreateRole(new RoleCreateRequest() { Id = "admin", Name = "Admin" });
         Assert.NotNull(result);
         Assert.IsType<CreatedAtActionResult>(result);
@@ -46,7 +49,7 @@ public class RolesControllerTest
     {
         // gia lap create that bai
         _roleManager.Setup(x => x.CreateAsync(It.IsAny<IdentityRole>())).ReturnsAsync(IdentityResult.Failed([]));
-        var roleController = new RolesController(_roleManager.Object);
+        var roleController = new RolesController(_roleManager.Object, _roles.Object);
         var result = await roleController.CreateRole(new RoleCreateRequest() { Id = "admin", Name = "Admin" });
         Assert.NotNull(result);
         Assert.IsType<BadRequestObjectResult>(result);
@@ -75,7 +78,7 @@ public class RolesControllerTest
             }
         };
         _roleManager.Setup(x => x.Roles).Returns(roles.AsQueryable().BuildMock());
-        var roleController = new RolesController(_roleManager.Object);
+        var roleController = new RolesController(_roleManager.Object, _roles.Object);
         var paginationParam = new PaginationParam();
         var roleVM = new RoleVM()
         {
@@ -95,7 +98,7 @@ public class RolesControllerTest
         // gia lap get loi
         _roleManager.Setup(x => x.Roles).Throws<Exception>();
         // Act
-        var roleController = new RolesController(_roleManager.Object);
+        var roleController = new RolesController(_roleManager.Object, _roles.Object);
         var paginationParam = new PaginationParam();
         await Assert.ThrowsAnyAsync<Exception>(async () => await roleController.GetAll(paginationParam, new RoleVM() { }));
     }
@@ -110,7 +113,7 @@ public class RolesControllerTest
             Name = "Admin"
         });
         // Act
-        var roleController = new RolesController(_roleManager.Object);
+        var roleController = new RolesController(_roleManager.Object, _roles.Object);
         var result = await roleController.GetById("admin");
         var okResult = result as OkObjectResult;
         Assert.NotNull(okResult);
@@ -126,7 +129,7 @@ public class RolesControllerTest
         _roleManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((IdentityRole?)null);
 
         // Act
-        var roleController = new RolesController(_roleManager.Object);
+        var roleController = new RolesController(_roleManager.Object, _roles.Object);
         var result = await roleController.GetById(roleId);
         // Assert
         Assert.IsType<NotFoundResult>(result);

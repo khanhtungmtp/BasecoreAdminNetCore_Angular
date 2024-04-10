@@ -35,12 +35,10 @@ public class OperationResult : ApiResponseBase
     }
 
     // Method for handling IdentityResult failures
-    public static OperationResult BadRequest(IdentityResult identityResult)
-    {
-        return new OperationResult((int)HttpStatusCode.BadRequest, false,
-            string.Join(", ", identityResult.Errors
+    public static OperationResult BadRequest(IEnumerable<IdentityError> errors)
+    => new((int)HttpStatusCode.BadRequest, false,
+            string.Join(", ", errors
             .Select(x => x.Code + " - " + x.Description).ToArray()));
-    }
 
 }
 

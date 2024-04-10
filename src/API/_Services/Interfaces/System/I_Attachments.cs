@@ -8,6 +8,6 @@ namespace API._Services.Interfaces.System;
 [DependencyInjection(ServiceLifetime.Scoped)]
 public interface I_Attachments
 {
-    Task<OperationResult<List<AttachmentVM>>> GetAttachmentsAsync(int forumId);
+    Task<OperationResult<List<AttachmentVM>>> GetListAsync(int forumId);
     Task<OperationResult> DeleteAsync(int attachmentId);
 }

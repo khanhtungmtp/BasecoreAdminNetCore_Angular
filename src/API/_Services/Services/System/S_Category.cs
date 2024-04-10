@@ -35,7 +35,7 @@ public class S_Category(IRepositoryAccessor repoStore, I_Cache cacheService) : B
 
     }
 
-    public async Task<OperationResult<PagingResult<CategoryVM>>> GetCategoriesPagingAsync(string? filter, PaginationParam pagination, CategoryVM categoryVM)
+    public async Task<OperationResult<PagingResult<CategoryVM>>> GetPagingAsync(string? filter, PaginationParam pagination, CategoryVM categoryVM)
     {
         var query = _repoStore.Categories.FindAll(true);
         if (!string.IsNullOrWhiteSpace(filter))
@@ -72,7 +72,7 @@ public class S_Category(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         };
     }
 
-    public async Task<OperationResult> PutCategoryAsync(int id, CategoryCreateRequest request)
+    public async Task<OperationResult> PutAsync(int id, CategoryCreateRequest request)
     {
         var category = await _repoStore.Categories.FindAsync(id);
         if (category is null)
@@ -99,7 +99,7 @@ public class S_Category(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         return OperationResult.BadRequest("Update category failed");
     }
 
-    public async Task<OperationResult<string>> DeleteCategoryAsync(int id)
+    public async Task<OperationResult<string>> DeleteAsync(int id)
     {
         var category = await _repoStore.Categories.FindAsync(id);
         if (category is null)

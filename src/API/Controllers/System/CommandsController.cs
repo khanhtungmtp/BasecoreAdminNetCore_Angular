@@ -5,13 +5,9 @@ using ViewModels.System;
 
 namespace API.Controllers.System;
 
-public class CommandsController : BaseController
+public class CommandsController(IRepositoryAccessor repoStore) : BaseController
 {
-    private readonly IRepositoryAccessor _repoStore;
-    public CommandsController(IRepositoryAccessor repoStore)
-    {
-        _repoStore = repoStore;
-    }
+    private readonly IRepositoryAccessor _repoStore = repoStore;
 
     [HttpGet]
     public async Task<IActionResult> GetCommands()

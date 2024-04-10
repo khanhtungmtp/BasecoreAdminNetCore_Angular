@@ -41,7 +41,7 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
         return OperationResult<FunctionVM>.Success(userVM, "Get function successfully.");
     }
 
-    public async Task<OperationResult<PagingResult<FunctionVM>>> GetAllPaging(string? filter, PaginationParam pagination, FunctionVM userVM)
+    public async Task<OperationResult<PagingResult<FunctionVM>>> GetPagingAsync(string? filter, PaginationParam pagination, FunctionVM userVM)
     {
         var query = _repoStore.Functions.FindAll(true);
         if (!string.IsNullOrWhiteSpace(filter))
@@ -58,7 +58,7 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
         return OperationResult<PagingResult<FunctionVM>>.Success(resultPaging, "Get function successfully.");
     }
 
-    public async Task<OperationResult<string>> PutFunctionAsync(string id, FunctionCreateRequest request)
+    public async Task<OperationResult<string>> PutAsync(string id, FunctionCreateRequest request)
     {
         Function? function = await _repoStore.Functions.FindByIdAsync(id);
         if (function is null || function.Id != request.Id)
@@ -76,7 +76,7 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
         return OperationResult<string>.BadRequest("Function update failed.");
     }
 
-    public async Task<OperationResult<string>> DeleteFunctionAsync(string id)
+    public async Task<OperationResult<string>> DeleteAsync(string id)
     {
         Function? function = await _repoStore.Functions.FindByIdAsync(id);
         if (function is null)

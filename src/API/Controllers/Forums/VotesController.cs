@@ -13,7 +13,7 @@ public class VotesController(I_Votes votesService, UserManager<User> userManager
     [HttpGet("{forumId}/votes")]
     public async Task<IActionResult> GetVotes(int forumId)
     {
-        var result = await _votesService.GetVotesAsync(forumId);
+        var result = await _votesService.GetListAsync(forumId);
         return Ok(result);
     }
 
@@ -22,27 +22,13 @@ public class VotesController(I_Votes votesService, UserManager<User> userManager
     {
         string userId = _userManager.GetUserId(User) ?? string.Empty;
         var result = await _votesService.CreateAsync(forumId, userId);
-        if (!result.Succeeded)
-        {
-            if (result.Status == 404)
-                return NotFound(result);
-            else
-                return BadRequest(result);
-        }
-        return Ok(result);
+        return HandleResult(result);
     }
 
     [HttpDelete("{forumId}/votes/{userId}")]
     public async Task<IActionResult> DeleteVote(int forumId, string userId)
     {
         var result = await _votesService.DeleteAsync(forumId, userId);
-        if (!result.Succeeded)
-        {
-            if (result.Status == 404)
-                return NotFound(result);
-            else
-                return BadRequest(result);
-        }
-        return Ok(result);
+        return HandleResult(result);
     }
 }

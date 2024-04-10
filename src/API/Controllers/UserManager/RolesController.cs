@@ -32,7 +32,7 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
             return CreatedAtAction(nameof(GetById), new { id = request.Id }, request);
         }
         else
-            return BadRequest(OperationResult.BadRequest(result));
+            return BadRequest(OperationResult.BadRequest(result.Errors));
     }
 
     // url: GET : http:localhost:6001/api/roles
@@ -84,7 +84,7 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
         var result = await _rolesManager.UpdateAsync(role);
         if (result.Succeeded)
             return Ok(OperationResult<string>.Success(role.Name, "Update role Successfully"));
-        return BadRequest(new ApiBadRequestResponse(result));
+        return BadRequest(OperationResult.BadRequest(result.Errors));
     }
 
     // url: DELETE : http:localhost:6001/api/roles/{id}
@@ -98,7 +98,7 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
         if (result.Succeeded)
             return Ok(OperationResult<string>.Success(role.Name ?? string.Empty, "Delete role Successfully"));
 
-        return BadRequest(new ApiBadRequestResponse(result));
+        return BadRequest(OperationResult.BadRequest(result.Errors));
     }
 
     // GetPermissionByRoleId

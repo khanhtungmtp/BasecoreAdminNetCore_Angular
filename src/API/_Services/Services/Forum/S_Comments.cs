@@ -82,7 +82,7 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         return OperationResult<CommentVM>.Success(commentVm, "Get comment successfully.");
     }
 
-    public async Task<OperationResult<PagingResult<CommentVM>>> GetCommentsPagingAsync(string? filter, PaginationParam pagination, CommentVM commentVM)
+    public async Task<OperationResult<PagingResult<CommentVM>>> GetPagingAsync(string? filter, PaginationParam pagination, CommentVM commentVM)
     {
         var query = from c in _repoStore.Comments.FindAll(true)
                     join u in _repoStore.Users.FindAll(true)
@@ -126,7 +126,7 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
 
         if (result)
             return OperationResult.Success("Update comment successfully");
-        return OperationResult.BadRequest( "Update comment failed");
+        return OperationResult.BadRequest("Update comment failed");
     }
 
     public async Task<OperationResult> DeleteAsync(int forumId, int commentId)

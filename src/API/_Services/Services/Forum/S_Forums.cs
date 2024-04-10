@@ -219,7 +219,7 @@ public class S_Forums : BaseServices, I_Forums
     }
 
     #endregion
-    public async Task<OperationResult<PagingResult<ForumQuickVM>>> GetForumsPagingAsync(string? filter, PaginationParam pagination, ForumQuickVM forumVM)
+    public async Task<OperationResult<PagingResult<ForumQuickVM>>> GetPagingAsync(string? filter, PaginationParam pagination, ForumQuickVM forumVM)
     {
         var query = from k in _repoStore.Forums.FindAll(true)
                     join c in _repoStore.Categories.FindAll(true) on k.CategoryId equals c.Id
@@ -419,7 +419,7 @@ public class S_Forums : BaseServices, I_Forums
         _repoStore.Forums.Update(forum);
         bool result = await _repoStore.SaveChangesAsync();
         if (result)
-            return OperationResult.Success("Update view count successfully" );
+            return OperationResult.Success("Update view count successfully");
         return OperationResult.BadRequest("Update view count failed");
     }
 

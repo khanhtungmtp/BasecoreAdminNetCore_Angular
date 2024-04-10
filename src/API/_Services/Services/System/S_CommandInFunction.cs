@@ -8,7 +8,7 @@ using ViewModels.System;
 namespace API._Services.Services.System;
 public class S_CommandInFunction(IRepositoryAccessor repoStore) : BaseServices(repoStore), I_CommandInFunction
 {
-    public async Task<OperationResult<List<CommandVM>>> FindIdsCommandInFunctionAsync(string functionId)
+    public async Task<OperationResult<List<CommandVM>>> GetListByIdAsync(string functionId)
     {
         var query = from a in _repoStore.Commands.FindAll(true)
                     join commandinfunc in _repoStore.CommandInFunctions.FindAll(true) on a.Id equals commandinfunc.CommandId into result1

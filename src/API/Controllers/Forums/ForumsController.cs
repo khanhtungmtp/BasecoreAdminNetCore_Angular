@@ -20,10 +20,7 @@ public class ForumsController(UserManager<User> userManager, I_Forums forumServi
     {
         request.OwnerUserId = _userManager.GetUserId(User) ?? string.Empty;
         var result = await _forumService.CreateAsync(request);
-        if (!result.Succeeded)
-            return BadRequest(result);
-
-        return Ok(result);
+        return HandleResult(result);
     }
     // get all forums
     [HttpGet]
@@ -31,10 +28,8 @@ public class ForumsController(UserManager<User> userManager, I_Forums forumServi
     public async Task<IActionResult> GetAllForums(string? filter, [FromQuery] PaginationParam pagination, [FromQuery] ForumQuickVM forumVM)
     {
 
-        var result = await _forumService.GetForumsPagingAsync(filter, pagination, forumVM);
-        if (!result.Succeeded)
-            return BadRequest(result);
-        return Ok(result);
+        var result = await _forumService.GetPagingAsync(filter, pagination, forumVM);
+         return HandleResult(result);
     }
 
     [HttpGet("latest/{take:int}")]
@@ -42,9 +37,7 @@ public class ForumsController(UserManager<User> userManager, I_Forums forumServi
     public async Task<IActionResult> GetLatestForums(int take)
     {
         var result = await _forumService.GetLatestForumAsync(take);
-        if (!result.Succeeded)
-            return BadRequest(result);
-        return Ok(result);
+         return HandleResult(result);
     }
 
     [HttpGet("popular/{take:int}")]
@@ -52,9 +45,7 @@ public class ForumsController(UserManager<User> userManager, I_Forums forumServi
     public async Task<IActionResult> GetPopularForums(int take)
     {
         var result = await _forumService.GetPopularForumAsync(take);
-        if (!result.Succeeded)
-            return BadRequest(result);
-        return Ok(result);
+         return HandleResult(result);
     }
 
     [HttpGet("tags/{labelId}")]
@@ -62,9 +53,7 @@ public class ForumsController(UserManager<User> userManager, I_Forums forumServi
     public async Task<IActionResult> GetForumByTagId(string labelId, PaginationParam pagination)
     {
         var result = await _forumService.GetForumByTagIdAsync(labelId, pagination);
-        if (!result.Succeeded)
-            return BadRequest(result);
-        return Ok(result);
+         return HandleResult(result);
     }
 
     [HttpPut("{id}")]
@@ -72,18 +61,14 @@ public class ForumsController(UserManager<User> userManager, I_Forums forumServi
     public async Task<IActionResult> PutForum(int id, [FromForm] ForumCreateRequest request)
     {
         var result = await _forumService.PutAsync(id, request);
-        if (!result.Succeeded)
-            return BadRequest(result);
-        return Ok(result);
+         return HandleResult(result);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteForum(int id)
     {
         var result = await _forumService.DeleteAsync(id);
-        if (!result.Succeeded)
-            return BadRequest(result);
-        return Ok(result);
+         return HandleResult(result);
     }
 
     [HttpGet("{forumId}/labels")]
@@ -91,9 +76,7 @@ public class ForumsController(UserManager<User> userManager, I_Forums forumServi
     public async Task<IActionResult> GetLabelsByForumId(int forumId)
     {
         var result = await _forumService.GetLabelsByForumIdAsync(forumId);
-        if (!result.Succeeded)
-            return BadRequest(result);
-        return Ok(result);
+         return HandleResult(result);
     }
 
     [HttpPut("{id}/view-count")]
@@ -101,9 +84,7 @@ public class ForumsController(UserManager<User> userManager, I_Forums forumServi
     public async Task<IActionResult> UpdateViewCount(int id)
     {
         var result = await _forumService.UpdateViewCountAsync(id);
-        if (!result.Succeeded)
-            return BadRequest(result);
-        return Ok(result);
+         return HandleResult(result);
     }
 
 

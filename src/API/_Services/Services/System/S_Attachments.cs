@@ -7,7 +7,7 @@ using ViewModels.System;
 namespace API._Services.Services.System;
 public class S_Attachments(IRepositoryAccessor repoStore) : BaseServices(repoStore), I_Attachments
 {
-    public async Task<OperationResult<List<AttachmentVM>>> GetAttachmentsAsync(int forumId)
+    public async Task<OperationResult<List<AttachmentVM>>> GetListAsync(int forumId)
     {
         var query = await _repoStore.Attachments.FindAll(true)
                 .Where(x => x.ForumId == forumId)
@@ -30,7 +30,7 @@ public class S_Attachments(IRepositoryAccessor repoStore) : BaseServices(repoSto
     {
         var attachment = await _repoStore.Attachments.FindAsync(attachmentId);
         if (attachment is null)
-            return OperationResult.NotFound( $"Cannot found attachment with id {attachmentId}");
+            return OperationResult.NotFound($"Cannot found attachment with id {attachmentId}");
 
         _repoStore.Attachments.Remove(attachment);
 

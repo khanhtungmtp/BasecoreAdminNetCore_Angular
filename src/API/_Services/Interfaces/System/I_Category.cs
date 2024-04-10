@@ -11,7 +11,7 @@ public interface I_Category
 {
     Task<OperationResult<string>> CreateAsync(CategoryCreateRequest request);
     Task<OperationResult<CategoryVM>> FindByIdAsync(int id);
-    Task<OperationResult<PagingResult<CategoryVM>>> GetCategoriesPagingAsync(string? filter, PaginationParam pagination, CategoryVM categoryVM);
-    Task<OperationResult> PutCategoryAsync(int id, CategoryCreateRequest request);
-    Task<OperationResult<string>> DeleteCategoryAsync(int id);
+    Task<OperationResult<PagingResult<CategoryVM>>> GetPagingAsync(string? filter, PaginationParam pagination, CategoryVM categoryVM);
+    Task<OperationResult> PutAsync(int id, CategoryCreateRequest request);
+    Task<OperationResult<string>> DeleteAsync(int id);
 }

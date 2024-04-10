@@ -10,7 +10,7 @@ public interface I_Function
 {
     Task<OperationResult<string>> CreateAsync(FunctionCreateRequest request);
     Task<OperationResult<FunctionVM>> FindByIdAsync(string id);
-    Task<OperationResult<PagingResult<FunctionVM>>> GetAllPaging(string? filter, PaginationParam pagination, FunctionVM functionVM);
-    Task<OperationResult<string>> PutFunctionAsync(string id, FunctionCreateRequest request);
-    Task<OperationResult<string>> DeleteFunctionAsync(string id);
+    Task<OperationResult<PagingResult<FunctionVM>>> GetPagingAsync(string? filter, PaginationParam pagination, FunctionVM functionVM);
+    Task<OperationResult<string>> PutAsync(string id, FunctionCreateRequest request);
+    Task<OperationResult<string>> DeleteAsync(string id);
 }

@@ -10,7 +10,7 @@ namespace API._Services.Interfaces.Forum;
 public interface I_Forums
 {
     Task<OperationResult<string>> CreateAsync(ForumCreateRequest request);
-    Task<OperationResult<PagingResult<ForumQuickVM>>> GetForumsPagingAsync(string? filter, PaginationParam pagination, ForumQuickVM forumVM);
+    Task<OperationResult<PagingResult<ForumQuickVM>>> GetPagingAsync(string? filter, PaginationParam pagination, ForumQuickVM forumVM);
     Task<OperationResult<List<ForumQuickVM>>> GetLatestForumAsync(int take);
     Task<OperationResult<List<ForumQuickVM>>> GetPopularForumAsync(int take);
     Task<OperationResult<PagingResult<ForumQuickVM>>> GetForumByTagIdAsync(string labelId, PaginationParam pagination);

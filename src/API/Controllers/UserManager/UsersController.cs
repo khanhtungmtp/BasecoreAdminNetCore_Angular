@@ -1,4 +1,3 @@
-using System.Net;
 using API._Services.Interfaces.UserManager;
 using API.Helpers.Base;
 using API.Helpers.Utilities;
@@ -12,7 +11,7 @@ namespace API.Controllers.UserManager;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController(UserManager<User> userManager, I_User user) : ControllerBase
+public class UsersController(UserManager<User> userManager, I_User user) : BaseController
 {
     private readonly UserManager<User> _userManager = userManager;
     private readonly I_User _user = user;
@@ -36,7 +35,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : Contr
             return CreatedAtAction(nameof(GetById), new { id = user.Id }, request);
         }
         else
-            return BadRequest(new ApiBadRequestResponse(result));
+            return BadRequest(OperationResult.BadRequest(result.Errors));
     }
 
     // url: PUT : http:localhost:6001/api/user/{id}
@@ -55,13 +54,13 @@ public class UsersController(UserManager<User> userManager, I_User user) : Contr
 
         var result = await _userManager.UpdateAsync(user);
         if (result.Succeeded)
-            return Ok(OperationResult<string>.Success(user.UserName ?? string.Empty, "Update user Successfully"));
-        return BadRequest(new ApiBadRequestResponse(result));
+            return Ok(OperationResult<string>.Success(user.UserName ?? string.Empty, "Update user successfully"));
+        return BadRequest(OperationResult.BadRequest(result.Errors));
     }
 
     // url: GET : http:localhost:6001/api/user
     [HttpGet]
-    public async Task<IActionResult> GetAllPaging(string? filter, [FromQuery] PaginationParam pagination, [FromQuery] UserVM userVM)
+    public async Task<IActionResult> GetPaging(string? filter, [FromQuery] PaginationParam pagination, [FromQuery] UserVM userVM)
     {
         var user = _userManager.Users;
         if (user is null)
@@ -117,7 +116,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : Contr
         var result = await _userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
         if (result.Succeeded)
             return Ok(OperationResult.Success("Change password successfully"));
-        return BadRequest(new ApiBadRequestResponse(result));
+        return BadRequest(OperationResult.BadRequest(result.Errors));
     }
 
     // url: DELETE : http:localhost:6001/api/user/{id}
@@ -142,7 +141,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : Contr
             };
             return Ok(OperationResult<UserVM>.Success(userVM, "Get Users Successfully"));
         }
-        return BadRequest(new ApiBadRequestResponse(result));
+        return BadRequest(OperationResult.BadRequest(result.Errors));
     }
 
     // GetMenuByUserPermission
@@ -150,10 +149,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : Contr
     public async Task<IActionResult> GetMenuByUserPermission(string userId)
     {
         var result = await _user.GetMenuByUserPermission(userId);
-        if (!result.Succeeded)
-            return BadRequest(result);
-
-        return Ok(result);
+        return HandleResult(result);
     }
 
 }

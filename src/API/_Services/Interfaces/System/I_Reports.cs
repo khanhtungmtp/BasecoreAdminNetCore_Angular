@@ -11,5 +11,5 @@ public interface I_Reports
     Task<OperationResult> CreateAsync(int forumId, ReportCreateRequest request);
     Task<OperationResult> DeleteAsync(int forumId, int reportId);
     Task<OperationResult<ReportVM>> FindByIdAsync(int reportId);
-    Task<OperationResult<PagingResult<ReportVM>>> GetReportsPagingAsync(string? filter, PaginationParam pagination, ReportVM reportVM);
+    Task<OperationResult<PagingResult<ReportVM>>> GetPagingAsync(string? filter, PaginationParam pagination, ReportVM reportVM);
 }

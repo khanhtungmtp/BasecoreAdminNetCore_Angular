@@ -37,9 +37,9 @@ public class S_Votes(IRepositoryAccessor repoStore) : BaseServices(repoStore), I
 
         bool result = await _repoStore.SaveChangesAsync();
         if (result)
-            return OperationResult<int>.Success(numberOfVotes, "Vote successfully." );
+            return OperationResult<int>.Success(numberOfVotes, "Vote successfully.");
         else
-            return OperationResult<int>.BadRequest("Vote failed." );
+            return OperationResult<int>.BadRequest("Vote failed.");
     }
 
     public async Task<OperationResult<string>> DeleteAsync(int forumId, string userId)
@@ -64,7 +64,7 @@ public class S_Votes(IRepositoryAccessor repoStore) : BaseServices(repoStore), I
         return OperationResult<string>.BadRequest("Delete vote failed.");
     }
 
-    public async Task<OperationResult<List<VoteVM>>> GetVotesAsync(int forumId)
+    public async Task<OperationResult<List<VoteVM>>> GetListAsync(int forumId)
     {
         var votes = await _repoStore.Votes
                 .FindAll(x => x.ForumId == forumId)
