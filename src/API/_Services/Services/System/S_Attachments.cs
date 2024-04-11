@@ -14,8 +14,8 @@ public class S_Attachments(IRepositoryAccessor repoStore) : BaseServices(repoSto
                 .Select(c => new AttachmentVM()
                 {
                     Id = c.Id,
-                    LastModifiedDate = c.UpdateDate,
-                    CreateDate = c.CreateDate,
+                    LastModifiedDate = c.UpdatedDate,
+                    CreatedDate = c.CreatedDate,
                     FileName = c.FileName,
                     FilePath = c.FilePath,
                     FileSize = c.FileSize,

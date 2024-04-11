@@ -13,6 +13,6 @@ public class AttachmentVM
 
     public int ForumId { get; set; }
 
-    public DateTime CreateDate { get; set; }
+    public DateTime CreatedDate { get; set; }
     public DateTime? LastModifiedDate { get; set; }
 }

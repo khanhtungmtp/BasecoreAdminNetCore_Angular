@@ -177,9 +177,9 @@ public class S_Forums : BaseServices, I_Forums
 
             Labels = !string.IsNullOrEmpty(forum.Labels) ? forum.Labels.Split(',') : [],
 
-            CreateDate = forum.CreateDate,
+            CreatedDate = forum.CreatedDate,
 
-            LastModifiedDate = forum.UpdateDate,
+            LastModifiedDate = forum.UpdatedDate,
 
             NumberOfComments = forum.NumberOfComments,
 
@@ -242,7 +242,7 @@ public class S_Forums : BaseServices, I_Forums
             CategoryAlias = u.c.SeoAlias,
             CategoryName = u.c.Name,
             NumberOfVotes = u.k.NumberOfVotes,
-            CreateDate = u.k.CreateDate,
+            CreatedDate = u.k.CreatedDate,
             NumberOfComments = u.k.NumberOfComments
 
         }).ToListAsync();
@@ -257,7 +257,7 @@ public class S_Forums : BaseServices, I_Forums
         {
             var forum = from k in _repoStore.Forums.FindAll(true)
                         join c in _repoStore.Categories.FindAll(true) on k.CategoryId equals c.Id
-                        orderby k.CreateDate descending
+                        orderby k.CreatedDate descending
                         select new { k, c };
 
             List<ForumQuickVM>? forums = await forum.Take(take)
@@ -271,7 +271,7 @@ public class S_Forums : BaseServices, I_Forums
                     CategoryAlias = u.c.SeoAlias,
                     CategoryName = u.c.Name,
                     NumberOfVotes = u.k.NumberOfVotes,
-                    CreateDate = u.k.CreateDate
+                    CreatedDate = u.k.CreatedDate
                 }).ToListAsync();
             await _cacheService.SetAsync(CacheConstants.LatestForum, forums, 2);
             cachedData = forums;
@@ -300,7 +300,7 @@ public class S_Forums : BaseServices, I_Forums
                     CategoryAlias = u.c.SeoAlias,
                     CategoryName = u.c.Name,
                     NumberOfVotes = u.k.NumberOfVotes,
-                    CreateDate = u.k.CreateDate
+                    CreatedDate = u.k.CreatedDate
                 }).ToListAsync();
             await _cacheService.SetAsync(CacheConstants.PopularForum, forumVms, 24);
             cachedData = forumVms;
@@ -327,7 +327,7 @@ public class S_Forums : BaseServices, I_Forums
             CategoryAlias = u.c.SeoAlias,
             CategoryName = u.c.Name,
             NumberOfVotes = u.k.NumberOfVotes,
-            CreateDate = u.k.CreateDate,
+            CreatedDate = u.k.CreatedDate,
             NumberOfComments = u.k.NumberOfComments
         }).ToListAsync();
         var resultsPaging = PagingResult<ForumQuickVM>.Create(items, pagination.PageNumber, pagination.PageSize);

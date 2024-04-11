@@ -1,0 +1,11 @@
+using API.Helpers.Base;
+using ViewModels.Auth;
+using static API.Configurations.DependencyInjectionConfig;
+
+namespace API._Services.Interfaces.Auth;
+
+[DependencyInjection(ServiceLifetime.Scoped)]
+public interface I_Auth
+{
+    Task<OperationResult<AuthResponse>> LoginAsync(LoginRequest request);
+}

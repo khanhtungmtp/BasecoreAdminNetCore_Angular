@@ -9,8 +9,8 @@ public class S_Statistics(IRepositoryAccessor repoStore) : BaseServices(repoStor
 {
     public async Task<OperationResult<List<MonthlyCommentsVM>>> GetMonthlyNewCommentsAsync(int year)
     {
-        var data = await _repoStore.Comments.FindAll(x => x.CreateDate.Date.Year == year)
-                .GroupBy(x => x.CreateDate.Date.Month)
+        var data = await _repoStore.Comments.FindAll(x => x.CreatedDate.Date.Year == year)
+                .GroupBy(x => x.CreatedDate.Date.Month)
                 .OrderBy(x => x.Key)
                 .Select(g => new MonthlyCommentsVM()
                 {
@@ -24,8 +24,8 @@ public class S_Statistics(IRepositoryAccessor repoStore) : BaseServices(repoStor
 
     public async Task<OperationResult<List<MonthlyNewKbsVM>>> GetMonthlyNewKbsAsync(int year)
     {
-        var data = await _repoStore.Forums.FindAll(x => x.CreateDate.Date.Year == year)
-                .GroupBy(x => x.CreateDate.Date.Month)
+        var data = await _repoStore.Forums.FindAll(x => x.CreatedDate.Date.Year == year)
+                .GroupBy(x => x.CreatedDate.Date.Month)
                 .Select(g => new MonthlyNewKbsVM()
                 {
                     Month = g.Key,
@@ -38,8 +38,8 @@ public class S_Statistics(IRepositoryAccessor repoStore) : BaseServices(repoStor
 
     public async Task<OperationResult<List<MonthlyNewKbsVM>>> GetMonthlyNewRegistersAsync(int year)
     {
-        var data = await _repoStore.Users.FindAll(x => x.CreateDate.Date.Year == year)
-              .GroupBy(x => x.CreateDate.Date.Month)
+        var data = await _repoStore.Users.FindAll(x => x.CreatedDate.Date.Year == year)
+              .GroupBy(x => x.CreatedDate.Date.Month)
               .Select(g => new MonthlyNewKbsVM()
               {
                   Month = g.Key,

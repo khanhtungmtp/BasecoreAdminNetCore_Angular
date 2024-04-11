@@ -1,4 +1,6 @@
 using API._Services.Interfaces.System;
+using API.Filters.Authorization;
+using API.Helpers.Constants;
 using API.Helpers.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using ViewModels.System;
@@ -12,6 +14,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
 
     // url: POST : http://localhost:6001/api/function
     [HttpPost]
+    [ClaimRequirement(FunctionCode.SYSTEM, CommandCode.CREATE)]
     public async Task<IActionResult> PostFunction(FunctionCreateRequest request)
     {
         var result = await _functionService.CreateAsync(request);
@@ -25,6 +28,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
 
     // url: GET : http:localhost:6001/api/functions
     [HttpGet]
+    [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.VIEW)]
     public async Task<IActionResult> GetAllPaging(string? filter, [FromQuery] PaginationParam pagination, [FromQuery] FunctionVM userVM)
     {
         filter ??= string.Empty;

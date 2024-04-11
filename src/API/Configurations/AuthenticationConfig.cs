@@ -9,21 +9,25 @@ public static class AuthenticationConfig
 {
     public static void AddAuthenticationConfigufation(this IServiceCollection services, IConfiguration configuration)
     {
+        // These will eventually be moved to a secrets file, but for alpha development appsettings is fine
+        var validIssuer = configuration.GetValue<string>("JwtTokenSettings:ValidIssuer");
+        var validAudience = configuration.GetValue<string>("JwtTokenSettings:ValidAudience");
+        string? symmetricSecurityKey = configuration.GetValue<string>("JwtTokenSettings:SymmetricSecurityKey") ?? "";
         // add autentication
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer(options =>
-        {
-            options.RequireHttpsMetadata = false;
-            options.SaveToken = true;
-            options.TokenValidationParameters = new TokenValidationParameters
+       .AddJwtBearer(options =>
             {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII
-                .GetBytes(configuration.GetSection("AppSettings:Token")?.Value ?? "")),
-                ValidateIssuer = false,
-                ValidateAudience = false
-            };
-        });
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII
+                    .GetBytes(configuration.GetSection("Appsettings:Token")?.Value ?? "")),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
         //2. Setup idetntity
         services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<DataContext>();
@@ -42,5 +46,6 @@ public static class AuthenticationConfig
             options.Password.RequireUppercase = true;
             options.User.RequireUniqueEmail = true;
         });
+        services.AddAuthorization();
     }
 }

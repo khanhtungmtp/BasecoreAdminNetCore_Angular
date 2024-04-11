@@ -20,11 +20,11 @@ public class DataContext(DbContextOptions options) : IdentityDbContext<User>(opt
             {
                 if (item.State == EntityState.Added)
                 {
-                    changedOrAddedItem.CreateDate = DateTime.Now;
+                    changedOrAddedItem.CreatedDate = DateTime.Now;
                 }
                 else
                 {
-                    changedOrAddedItem.UpdateDate = DateTime.Now;
+                    changedOrAddedItem.UpdatedDate = DateTime.Now;
                 }
             }
         }

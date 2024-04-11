@@ -14,6 +14,8 @@ try
     builder.Host.UseNLog();
 
     // Add services to the container.
+    builder.Services.Configure<JwtTokenSettings>(builder.Configuration.GetSection("JwtTokenSettings"));
+
     builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
      options.InvalidModelStateResponseFactory = actionContext =>
      {
@@ -28,7 +30,7 @@ try
          {
              TrackId = trackId,
              Title = ReasonPhrases.GetReasonPhrase((int)HttpStatusCode.BadRequest),
-             Status = (int)(HttpStatusCode)context.Response.StatusCode,
+             Status = (int)HttpStatusCode.BadRequest,
              Errors = errors,
              Instance = $"{context.Request.Method} {context.Request.Path}",
          });
@@ -75,7 +77,7 @@ try
     app.MapControllers();
     app.UseExceptionHandler();
     // seeding inittial Data
-    // DataSeeder.SeedDatabase(app);
+    DataSeeder.SeedDatabase(app);
     app.Run();
 }
 catch

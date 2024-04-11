@@ -2,7 +2,8 @@
 
 public interface IDateTracking
 {
-    DateTime CreateDate { get; set; }
-
-    DateTime? UpdateDate { get; set; }
+    string? CreatedBy { get; set; }
+    string? UpdatedBy { get; set; }
+    DateTime CreatedDate { get; set; }
+    DateTime UpdatedDate { get; set; }
 }

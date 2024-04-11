@@ -50,7 +50,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
         user.Email = request.Email;
         user.PhoneNumber = request.PhoneNumber;
         user.DateOfBirth = request.DateOfBirth;
-        user.UpdateDate = DateTime.Now;
+        user.UpdatedDate = DateTime.Now;
 
         var result = await _userManager.UpdateAsync(user);
         if (result.Succeeded)
@@ -79,7 +79,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
             Email = x.Email ?? string.Empty,
             PhoneNumber = x.PhoneNumber ?? string.Empty,
             DateOfBirth = x.DateOfBirth,
-            CreateDate = x.CreateDate
+            CreatedDate = x.CreatedDate
         }).ToListAsync();
         var resultPaging = PagingResult<UserVM>.Create(listUserVM, pagination.PageNumber, pagination.PageSize);
         return Ok(OperationResult<PagingResult<UserVM>>.Success(resultPaging, "Get Users Successfully"));
@@ -100,7 +100,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
             Email = user.Email ?? string.Empty,
             PhoneNumber = user.PhoneNumber ?? string.Empty,
             DateOfBirth = user.DateOfBirth,
-            CreateDate = user.CreateDate
+            CreatedDate = user.CreatedDate
 
         };
         return Ok(OperationResult<UserVM>.Success(userVM, "Get Users Successfully"));
@@ -135,7 +135,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
                 UserName = user.UserName ?? string.Empty,
                 FullName = user.FullName ?? string.Empty,
                 DateOfBirth = user.DateOfBirth,
-                CreateDate = user.CreateDate,
+                CreatedDate = user.CreatedDate,
                 Email = user.Email ?? string.Empty,
                 PhoneNumber = user.PhoneNumber ?? string.Empty
             };

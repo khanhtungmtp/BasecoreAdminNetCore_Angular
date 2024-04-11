@@ -28,7 +28,10 @@ public class User : IdentityUser, IDateTracking
     public int? NumberOfVotes { get; set; }
 
     public int? NumberOfReports { get; set; }
-    public DateTime CreateDate { get; set; }
-
-    public DateTime? UpdateDate { get; set; }
+    public string? RefreshToken { get; set; }
+    public DateTime RefreshTokenExpiryTime { get; set; }
+    public string? CreatedBy { get; set; }
+    public string? UpdatedBy { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime UpdatedDate { get; set; }
 }

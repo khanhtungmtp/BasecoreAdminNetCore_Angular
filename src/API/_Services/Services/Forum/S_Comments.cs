@@ -72,9 +72,9 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         {
             Id = comment.Id,
             Content = comment.Content,
-            CreateDate = comment.CreateDate,
+            CreatedDate = comment.CreatedDate,
             ForumId = comment.ForumId,
-            UpdateDate = comment.UpdateDate,
+            UpdatedDate = comment.UpdatedDate,
             OwnerUserId = comment.OwnwerUserId,
             OwnerName = user.FullName
         };
@@ -100,9 +100,9 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         {
             Id = c.c.Id,
             Content = c.c.Content,
-            CreateDate = c.c.CreateDate,
+            CreatedDate = c.c.CreatedDate,
             ForumId = c.c.ForumId,
-            UpdateDate = c.c.UpdateDate,
+            UpdatedDate = c.c.UpdatedDate,
             OwnerUserId = c.c.OwnwerUserId,
             OwnerName = c.u.FullName
         }).ToListAsync();
@@ -164,13 +164,13 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
                             on c.OwnwerUserId equals u.Id
                         join k in _repoStore.Forums.FindAll(true)
                         on c.ForumId equals k.Id
-                        orderby c.CreateDate descending
+                        orderby c.CreatedDate descending
                         select new { c, u, k };
 
             var comments = await query.Take(take).Select(x => new CommentVM()
             {
                 Id = x.c.Id,
-                CreateDate = x.c.CreateDate,
+                CreatedDate = x.c.CreatedDate,
                 ForumId = x.c.ForumId,
                 OwnerUserId = x.c.OwnwerUserId,
                 ForumTitle = x.k.Title,
@@ -197,7 +197,7 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         {
             Id = x.c.Id,
             Content = x.c.Content,
-            CreateDate = x.c.CreateDate,
+            CreatedDate = x.c.CreatedDate,
             ForumId = x.c.ForumId,
             OwnerUserId = x.c.OwnwerUserId,
             OwnerName = x.u.FullName,

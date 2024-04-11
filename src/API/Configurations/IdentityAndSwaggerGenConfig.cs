@@ -6,7 +6,7 @@ namespace API.Configurations
     {
         public static void AddSwaggerGenConfiguration(this IServiceCollection services)
         {
-            if (services == null) throw new ArgumentNullException(nameof(services));
+            ArgumentNullException.ThrowIfNull(services);
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
@@ -28,7 +28,7 @@ namespace API.Configurations
                                 Id = "Bearer"
                             }
                         },
-                        new string[] { }
+                        Array.Empty<string>()
                     }
                 });
                 c.CustomSchemaIds(type => type.ToString());

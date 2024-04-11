@@ -16,9 +16,9 @@ public class CommentVM
 
     public string OwnerName { get; set; } = string.Empty;
 
-    public DateTime CreateDate { get; set; }
+    public DateTime CreatedDate { get; set; }
 
-    public DateTime? UpdateDate { get; set; }
+    public DateTime? UpdatedDate { get; set; }
 
     public int? ReplyId { get; set; }
 

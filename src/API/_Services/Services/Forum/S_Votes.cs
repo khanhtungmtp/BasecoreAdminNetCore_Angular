@@ -72,8 +72,8 @@ public class S_Votes(IRepositoryAccessor repoStore) : BaseServices(repoStore), I
                 {
                     UserId = x.UserId,
                     ForumId = x.ForumId,
-                    CreateDate = x.CreateDate,
-                    UpdateDate = x.UpdateDate
+                    CreatedDate = x.CreatedDate,
+                    UpdatedDate = x.UpdatedDate
                 }).ToListAsync();
 
         return OperationResult<List<VoteVM>>.Success(votes, "Get votes successfully.");

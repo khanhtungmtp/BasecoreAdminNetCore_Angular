@@ -46,9 +46,9 @@ public class S_Reports(IRepositoryAccessor repoStore) : BaseServices(repoStore),
         {
             Id = report.Id,
             Content = report.Content,
-            CreateDate = report.CreateDate,
+            CreatedDate = report.CreatedDate,
             ForumId = report.ForumId,
-            UpdateDate = report.UpdateDate,
+            UpdatedDate = report.UpdatedDate,
             IsProcessed = report.IsProcessed,
             ReportUserId = report.ReportUserId,
             ReportUserName = user.FullName
@@ -76,9 +76,9 @@ public class S_Reports(IRepositoryAccessor repoStore) : BaseServices(repoStore),
         {
             Id = c.r.Id,
             Content = c.r.Content,
-            CreateDate = c.r.CreateDate,
+            CreatedDate = c.r.CreatedDate,
             ForumId = c.r.ForumId,
-            UpdateDate = c.r.UpdateDate,
+            UpdatedDate = c.r.UpdatedDate,
             IsProcessed = false,
             ReportUserId = c.r.ReportUserId,
             ReportUserName = c.u.FullName

@@ -18,7 +18,7 @@ public class ForumQuickVM
 
     public int? ViewCount { get; set; } = 0;
 
-    public DateTime CreateDate { get; set; }
+    public DateTime CreatedDate { get; set; }
 
     public int? NumberOfVotes { get; set; } = 0;
 
