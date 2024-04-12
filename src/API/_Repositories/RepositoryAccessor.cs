@@ -24,6 +24,7 @@ namespace API._Repositories
             Votes = new Repository<Vote, DataContext>(_dbContext);
             Attachments = new Repository<Attachment, DataContext>(_dbContext);
             Users = new Repository<User, DataContext>(_dbContext);
+            RefreshTokens = new Repository<RefreshToken, DataContext>(_dbContext);
         }
 
         public IRepository<User> Users { get; set; } = default!;
@@ -53,6 +54,8 @@ namespace API._Repositories
 
 
         public IRepository<Attachment> Attachments { get; set; } = default!;
+
+        public IRepository<RefreshToken> RefreshTokens { get; set; } = default!;
 
         public async Task<bool> SaveChangesAsync()
         {

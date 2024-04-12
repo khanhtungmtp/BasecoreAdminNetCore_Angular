@@ -11,13 +11,13 @@ public class AuthController(I_Auth authService) : ControllerBase
     [Route("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var res = await _authService.LoginAsync(request);
-        if (!res.Succeeded)
+        var result = await _authService.LoginAsync(request);
+        if (!result.Succeeded)
         {
-            if (res.StatusCode == 401)
-                return Unauthorized(res);
-            return BadRequest(res);
+            if (result.StatusCode == 401)
+                return Unauthorized(result);
+            return BadRequest(result);
         }
-        return Ok(res);
+        return Ok(result);
     }
 }

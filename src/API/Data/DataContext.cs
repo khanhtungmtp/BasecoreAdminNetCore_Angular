@@ -66,6 +66,6 @@ public class DataContext(DbContextOptions options) : IdentityDbContext<User>(opt
     public DbSet<Permission> Permissions => Set<Permission>();
     public DbSet<Report> Reports => Set<Report>();
     public DbSet<Vote> Votes => Set<Vote>();
-
+public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<Attachment> Attachments => Set<Attachment>();
 }

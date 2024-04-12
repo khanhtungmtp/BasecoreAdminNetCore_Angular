@@ -1,5 +1,7 @@
 using API._Services.Interfaces.UserManager;
+using API.Filters.Authorization;
 using API.Helpers.Base;
+using API.Helpers.Constants;
 using API.Helpers.Utilities;
 using API.Models;
 using Microsoft.AspNetCore.Identity;
@@ -18,6 +20,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
 
     // url: POST : http://localhost:6001/api/user
     [HttpPost]
+    [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.CREATE)]
     public async Task<IActionResult> CreateUser(UserCreateRequest request)
     {
         var user = new User()
@@ -40,6 +43,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
 
     // url: PUT : http:localhost:6001/api/user/{id}
     [HttpPut("{id}")]
+    [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.UPDATE)]
     public async Task<IActionResult> PutUser(string id, [FromBody] UserCreateRequest request)
     {
         var user = await _userManager.FindByIdAsync(id);
@@ -60,6 +64,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
 
     // url: GET : http:localhost:6001/api/user
     [HttpGet]
+    [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
     public async Task<IActionResult> GetPaging(string? filter, [FromQuery] PaginationParam pagination, [FromQuery] UserVM userVM)
     {
         var user = _userManager.Users;
@@ -87,6 +92,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
 
     // url: GET : http:localhost:6001/api/user/{id}
     [HttpGet("{id}")]
+    [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
     public async Task<IActionResult> GetById(string id)
     {
         var user = await _userManager.FindByIdAsync(id);
@@ -108,6 +114,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
 
     // url: PUT : http:localhost:6001/api/user/{id}/change-password
     [HttpPut("{id}/change-password")]
+    [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.UPDATE)]
     public async Task<IActionResult> ChangePassword(string id, [FromBody] UserPasswordChangeRequest request)
     {
         var user = await _userManager.FindByIdAsync(id);
@@ -121,6 +128,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
 
     // url: DELETE : http:localhost:6001/api/user/{id}
     [HttpDelete("{id}")]
+    [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.DELETE)]
     public async Task<IActionResult> DeleteUser(string id)
     {
         var user = await _userManager.FindByIdAsync(id);
@@ -146,6 +154,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
 
     // GetMenuByUserPermission
     [HttpGet("{userId}/menu")]
+    [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
     public async Task<IActionResult> GetMenuByUserPermission(string userId)
     {
         var result = await _user.GetMenuByUserPermission(userId);

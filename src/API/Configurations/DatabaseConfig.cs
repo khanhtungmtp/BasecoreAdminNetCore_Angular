@@ -8,16 +8,17 @@ namespace API.Configurations
         public static void AddDatabaseConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             var area = configuration.GetSection("AppSettings:Area").Value;
+            string? ConnectionString = configuration.GetConnectionString($"DefaultConnection_{area}");
             services.AddDbContext<DataContext>(options =>
             {
-                options.UseSqlServer(configuration.GetConnectionString($"DefaultConnection_{area}"));
+                options.UseSqlServer(ConnectionString);
                 options.EnableSensitiveDataLogging(true);
             }
             );
 
             services.AddDistributedSqlServerCache(o =>
            {
-               o.ConnectionString = configuration.GetConnectionString($"DefaultConnection_{area}");
+               o.ConnectionString = ConnectionString;
                o.SchemaName = "dbo";
                o.TableName = "CacheTable";
            });

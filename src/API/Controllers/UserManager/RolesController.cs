@@ -1,5 +1,7 @@
 using API._Services.Interfaces.UserManager;
+using API.Filters.Authorization;
 using API.Helpers.Base;
+using API.Helpers.Constants;
 using API.Helpers.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +20,7 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
 
     // url: POST : http://localhost:6001/api/roles
     [HttpPost]
+    [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.CREATE)]
     public async Task<IActionResult> CreateRole(RoleCreateRequest request)
     {
         var role = new IdentityRole()
@@ -37,7 +40,8 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
 
     // url: GET : http:localhost:6001/api/roles
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] PaginationParam pagination, [FromQuery] RoleVM roleVM)
+    [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.VIEW)]
+    public async Task<IActionResult> GetPaging([FromQuery] PaginationParam pagination, [FromQuery] RoleVM roleVM)
     {
         var role = _rolesManager.Roles;
         if (role is null)
@@ -57,6 +61,7 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
 
     // url: GET : http:localhost:6001/api/roles/{id}
     [HttpGet("{id}")]
+    [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.VIEW)]
     public async Task<IActionResult> GetById(string id)
     {
         var role = await _rolesManager.FindByIdAsync(id);
@@ -72,6 +77,7 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
 
     // url: PUT : http:localhost:6001/api/roles/{id}
     [HttpPut("{id}")]
+    [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.UPDATE)]
     public async Task<IActionResult> PutRole(string id, [FromBody] RoleCreateRequest request)
     {
         if (id != request.Id)
@@ -89,6 +95,7 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
 
     // url: DELETE : http:localhost:6001/api/roles/{id}
     [HttpDelete("{id}")]
+    [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.DELETE)]
     public async Task<IActionResult> DeleteRole(string id)
     {
         var role = await _rolesManager.FindByIdAsync(id);
@@ -104,6 +111,7 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
     // GetPermissionByRoleId
     // url: GET : http:localhost:6001/api/roles/{id}/permissions
     [HttpGet("{roleId}/permissions")]
+    [ClaimRequirement(FunctionCode.SYSTEM_PERMISSION, CommandCode.VIEW)]
     public async Task<IActionResult> GetPermissionByRoleId(string roleId)
     {
         var role = await _roles.GetPermissionByRoleId(roleId);
@@ -115,6 +123,7 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
     // PutPermissionByRoleId
     // url: PUT : http:localhost:6001/api/roles/{id}/permissions
     [HttpPut("{roleId}/permissions")]
+    [ClaimRequirement(FunctionCode.SYSTEM_PERMISSION, CommandCode.UPDATE)]
     public async Task<IActionResult> PutPermissionByRoleId(string roleId, [FromBody] UpdatePermissionRequest request)
     {
         var role = await _roles.PutPermissionByRoleId(roleId, request);

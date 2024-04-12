@@ -7,6 +7,8 @@ using ViewModels.System;
 
 namespace API.Controllers.System;
 
+[ApiController]
+[Route("api/[controller]")]
 public class FunctionsController(I_Function functionService, I_CommandInFunction commandInFunctionService) : BaseController
 {
     private readonly I_Function _functionService = functionService;
@@ -37,6 +39,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
 
     // url: GET : http:localhost:6001/api/function/{id}
     [HttpGet("{id}")]
+    [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.VIEW)]
     public async Task<IActionResult> GetById(string id)
     {
         var result = await _functionService.FindByIdAsync(id);
@@ -45,6 +48,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
 
     // url: PUT : http:localhost:6001/api/function/{id}
     [HttpPut("{id}")]
+    [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.UPDATE)]
     public async Task<IActionResult> PutFunction(string id, [FromBody] FunctionCreateRequest request)
     {
         var result = await _functionService.PutAsync(id, request);
@@ -53,6 +57,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
 
     // url: DELETE : http:localhost:6001/api/function/{id}
     [HttpDelete("{id}")]
+    [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.DELETE)]
     public async Task<IActionResult> DeleteFunction(string id)
     {
         var result = await _functionService.DeleteAsync(id);
@@ -62,6 +67,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     // ========AREA COMMMAND IN FUNCTION (ACTION)=====
     // GET: http://localhost:6001/api/function/{functionId}/command-in-function
     [HttpGet("{functionId}/command-in-function")]
+    [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.VIEW)]
     public async Task<IActionResult> GetCommandInFunction(string functionId)
     {
         var result = await _commandInFunctionService.GetListByIdAsync(functionId);
@@ -71,6 +77,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     // PostCommandToFunction
     // POST: http://localhost:6001/api/function/{functionId}/commands
     [HttpPost("{functionId}/commands")]
+    [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.CREATE)]
     public async Task<IActionResult> PostCommandToFunction(string functionId, [FromBody] CommandAssignRequest request)
     {
         var result = await _commandInFunctionService.CreateAsync(functionId, request);
@@ -87,6 +94,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     //DeleteCommandToFunction
     // DELETE: http://localhost:6001/api/function/{functionId}/commands
     [HttpDelete("{functionId}/commands")]
+    [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.DELETE)]
     public async Task<IActionResult> DeleteCommandToFunction(string functionId, [FromBody] CommandAssignRequest request)
     {
         var result = await _commandInFunctionService.DeleteAsync(functionId, request);

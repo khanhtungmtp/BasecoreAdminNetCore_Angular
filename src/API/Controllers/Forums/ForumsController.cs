@@ -1,4 +1,6 @@
 using API._Services.Interfaces.Forum;
+using API.Filters.Authorization;
+using API.Helpers.Constants;
 using API.Helpers.Utilities;
 using API.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -16,6 +18,7 @@ public class ForumsController(UserManager<User> userManager, I_Forums forumServi
     // post forum
     [HttpPost]
     [Consumes("multipart/form-data")]
+    [ClaimRequirement(FunctionCode.CONTENT_FORUM, CommandCode.CREATE)]
     public async Task<IActionResult> PostForum([FromForm] ForumCreateRequest request)
     {
         request.OwnerUserId = _userManager.GetUserId(User) ?? string.Empty;
@@ -58,6 +61,7 @@ public class ForumsController(UserManager<User> userManager, I_Forums forumServi
 
     [HttpPut("{id}")]
     [Consumes("multipart/form-data")]
+    [ClaimRequirement(FunctionCode.CONTENT_FORUM, CommandCode.UPDATE)]
     public async Task<IActionResult> PutForum(int id, [FromForm] ForumCreateRequest request)
     {
         var result = await _forumService.PutAsync(id, request);
@@ -65,6 +69,7 @@ public class ForumsController(UserManager<User> userManager, I_Forums forumServi
     }
 
     [HttpDelete("{id}")]
+    [ClaimRequirement(FunctionCode.CONTENT_FORUM, CommandCode.DELETE)]
     public async Task<IActionResult> DeleteForum(int id)
     {
         var result = await _forumService.DeleteAsync(id);

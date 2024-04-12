@@ -22,5 +22,6 @@ namespace API._Repositories
         IRepository<Report> Reports { get; }
         IRepository<Vote> Votes { get; }
         IRepository<Attachment> Attachments { get; }
+        IRepository<RefreshToken> RefreshTokens { get; }
     }
 }

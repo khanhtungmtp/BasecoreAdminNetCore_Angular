@@ -12,6 +12,11 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
     private readonly UserManager<User> _userManager = userManager;
     private readonly RoleManager<IdentityRole> _rolesManager = rolesManager;
 
+    public async Task<User?> GetById(string id)
+    {
+        return await _repoStore.Users.FirstOrDefaultAsync(x => x.Id == id);
+    }
+
     public async Task<OperationResult<List<FunctionVM>>> GetMenuByUserPermission(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);

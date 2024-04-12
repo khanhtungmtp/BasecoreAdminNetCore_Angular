@@ -7,17 +7,26 @@ namespace API.Configurations
         public static void AddSwaggerGenConfiguration(this IServiceCollection services)
         {
             ArgumentNullException.ThrowIfNull(services);
-            services.AddSwaggerGen(c =>
+            _ = services.AddSwaggerGen(swagger =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                //This is to generate the Default UI of Swagger Documentation
+                swagger.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    In = ParameterLocation.Header,
-                    Description = "Please insert JWT with Bearer into field",
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey
+                    Version = "v1",
+                    Title = "BaseCoreAdmin",
+                    Description = ".NET 8 Web API"
                 });
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                // To Enable authorization using Swagger (JWT)
+                swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\"",
+                });
+                swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {
                         new OpenApiSecurityScheme
@@ -31,7 +40,6 @@ namespace API.Configurations
                         Array.Empty<string>()
                     }
                 });
-                c.CustomSchemaIds(type => type.ToString());
             });
         }
     }

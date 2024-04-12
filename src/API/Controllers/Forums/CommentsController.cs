@@ -1,4 +1,6 @@
 using API._Services.Interfaces.Forum;
+using API.Filters.Authorization;
+using API.Helpers.Constants;
 using API.Helpers.Utilities;
 using API.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -22,6 +24,7 @@ public class CommentsController(I_Comments commentService, UserManager<User> use
     }
 
     [HttpGet("{forumId}/comments/{commentId}")]
+    [ClaimRequirement(FunctionCode.CONTENT_COMMENT, CommandCode.VIEW)]
     public async Task<IActionResult> GetCommentDetail(int commentId)
     {
         var result = await _commentService.FindByIdAsync(commentId);
@@ -45,6 +48,7 @@ public class CommentsController(I_Comments commentService, UserManager<User> use
     }
 
     [HttpGet("{forumId}/comments/filter")]
+    [ClaimRequirement(FunctionCode.CONTENT_COMMENT, CommandCode.VIEW)]
     public async Task<IActionResult> GetCommentsPaging(string? filter, PaginationParam pagination, [FromQuery] CommentVM commentVM)
     {
         var result = await _commentService.GetPagingAsync(filter, pagination, commentVM);
@@ -52,6 +56,7 @@ public class CommentsController(I_Comments commentService, UserManager<User> use
     }
 
     [HttpPut("{forumId}/comments/{commentId}")]
+    [ClaimRequirement(FunctionCode.CONTENT_COMMENT, CommandCode.UPDATE)]
     public async Task<IActionResult> PutComment(int commentId, CommentCreateRequest request)
     {
         var result = await _commentService.PutAsync(commentId, request);
@@ -59,6 +64,7 @@ public class CommentsController(I_Comments commentService, UserManager<User> use
     }
 
     [HttpDelete("{forumId}/comments/{commentId}")]
+    [ClaimRequirement(FunctionCode.CONTENT_COMMENT, CommandCode.DELETE)]
     public async Task<IActionResult> DeleteComment(int forumId, int commentId)
     {
         var result = await _commentService.DeleteAsync(forumId, commentId);

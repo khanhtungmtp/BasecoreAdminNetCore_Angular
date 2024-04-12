@@ -2,6 +2,7 @@ using System.Net;
 using API.Configurations;
 using API.Data;
 using API.Helpers.Base;
+using API.Helpers.Utilities;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,7 @@ try
     builder.Host.UseNLog();
 
     // Add services to the container.
-    builder.Services.Configure<JwtTokenSettings>(builder.Configuration.GetSection("JwtTokenSettings"));
+    builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("AppSettings"));
 
     builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
      options.InvalidModelStateResponseFactory = actionContext =>
@@ -35,9 +36,9 @@ try
              Instance = $"{context.Request.Method} {context.Request.Path}",
          });
      }).AddJsonOptions(options =>
-        {
-            options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
-        });
+    {
+        options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+    });
     builder.Services.AddFluentValidationAutoValidation();
     builder.Services.AddFluentValidationClientsideAdapters();
     builder.Services.AddValidatorsFromAssemblyContaining<RoleVmValidator>();
@@ -76,6 +77,7 @@ try
     app.UseAuthorization();
     app.MapControllers();
     app.UseExceptionHandler();
+    app.UseMiddleware<JwtMiddleware>();
     // seeding inittial Data
     DataSeeder.SeedDatabase(app);
     app.Run();

@@ -1,18 +1,12 @@
 using API._Services.Interfaces.Auth;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ViewModels.Auth;
 
 namespace API.Controllers.Auth;
 
-public class TokenController : BaseController
+public class TokenController(I_Token tokenService) : BaseController
 {
-    private readonly I_Token _tokenService;
-
-    public TokenController(I_Token tokenService)
-    {
-        _tokenService = tokenService;
-    }
+    private readonly I_Token _tokenService = tokenService;
 
     [HttpPost]
     [Route("refresh")]
@@ -22,15 +16,15 @@ public class TokenController : BaseController
         return HandleResult(result);
     }
 
-    [HttpPost, Authorize]
-    [Route("revoke")]
-    public async Task<IActionResult> RevokeToken()
-    {
-        var username = User.Identity?.Name;
-        if (string.IsNullOrEmpty(username))
-            return Unauthorized();
+    // [HttpPost, Authorize]
+    // [Route("revoke")]
+    // public async Task<IActionResult> RevokeToken()
+    // {
+    //     var username = User.Identity?.Name;
+    //     if (string.IsNullOrEmpty(username))
+    //         return Unauthorized();
 
-        var result = await _tokenService.RevokeTokenAsync(username);
-        return HandleResult(result);
-    }
+    //     var result = await _tokenService.RevokeTokenAsync(username);
+    //     return HandleResult(result);
+    // }
 }
