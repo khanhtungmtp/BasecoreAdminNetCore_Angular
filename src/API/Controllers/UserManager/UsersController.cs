@@ -159,4 +159,55 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
         return HandleResult(result);
     }
 
+    [HttpGet("{userId}/roles")]
+    [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
+    public async Task<IActionResult> GetUserRoles(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return NotFound(OperationResult.NotFound($"Cannot found user with id: {userId}"));
+        var roles = await _userManager.GetRolesAsync(user);
+        return Ok(OperationResult<IList<string>>.Success(roles, "Get user roles successfully"));
+    }
+
+    [HttpPost("{userId}/roles")]
+    [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.UPDATE)]
+    public async Task<IActionResult> PostRolesToUserUser(string userId, [FromBody] RoleAssignRequest request)
+    {
+        if (request.RoleNames.Length == 0)
+            return BadRequest(OperationResult.BadRequest("Role names cannot empty"));
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return NotFound(OperationResult.NotFound($"Cannot found user with id: {userId}"));
+        var result = await _userManager.AddToRolesAsync(user, request.RoleNames);
+        if (result.Succeeded)
+            return Ok(OperationResult.Success("Add roles to user successfully"));
+
+        return BadRequest(OperationResult.BadRequest(result.Errors));
+    }
+
+    [HttpDelete("{userId}/roles")]
+    [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
+    public async Task<IActionResult> RemoveRolesFromUser(string userId, [FromQuery] RoleAssignRequest request)
+    {
+        if (request.RoleNames.Length == 0)
+            return BadRequest(OperationResult.BadRequest("Role names cannot empty"));
+        if (request.RoleNames.Length == 1 && request.RoleNames[0] == SystemConstants.Roles.Admin)
+            return BadRequest((OperationResult.BadRequest($"Cannot remove {SystemConstants.Roles.Admin} role")));
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return NotFound(OperationResult.NotFound($"Cannot found user with id: {userId}"));
+        var result = await _userManager.RemoveFromRolesAsync(user, request.RoleNames);
+        if (result.Succeeded)
+            return Ok(OperationResult.Success("Remove roles from user successfully"));
+
+        return BadRequest(OperationResult.BadRequest(result.Errors));
+    }
+
+    [HttpGet("{userId}/Forum")]
+    public async Task<IActionResult> GetForumByUserId(string userId, PaginationParam pagination)
+    {
+        return Ok(await _user.GetForumByUserId(userId, pagination));
+    }
 }
+

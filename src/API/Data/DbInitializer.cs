@@ -63,27 +63,27 @@ public class DbInitializer(DataContext context,
         {
             _context.Functions.AddRange(new List<Function>
                 {
-                    new() {Id = "DASHBOARD", Name = "Thống kê", ParentId = string.Empty, SortOrder = 1,Url = "/dashboard"  },
+                    new() {Id = "DASHBOARD", Name = "DASHBOARD", ParentId = string.Empty, SortOrder = 0,Url = "/admin/dashboard"  },
 
-                    new() {Id = "CONTENT",Name = "Nội dung",ParentId = string.Empty,Url = "/content" },
+                    new() {Id = "CONTENT",Name = "Nội dung",ParentId = string.Empty,SortOrder = 1,Url = "/admin/content" },
 
-                    new() {Id = "CONTENT_CATEGORY",Name = "Danh mục",ParentId ="CONTENT",Url = "/content/category"  },
-                    new() {Id = "CONTENT_Forum",Name = "Bài viết",ParentId = "CONTENT",SortOrder = 2,Url = "/content/kb" },
-                    new() {Id = "CONTENT_COMMENT",Name = "Trang",ParentId = "CONTENT",SortOrder = 3,Url = "/content/comment" },
-                    new() {Id = "CONTENT_REPORT",Name = "Báo xấu",ParentId = "CONTENT",SortOrder = 3,Url = "/content/report" },
+                    new() {Id = "CONTENT_CATEGORY",Name = "Danh mục",ParentId ="CONTENT",Url = "/admin/content/category"  },
+                    new() {Id = "CONTENT_Forum",Name = "Bài viết",ParentId = "CONTENT",SortOrder = 2,Url = "/admin/content/kb" },
+                    new() {Id = "CONTENT_COMMENT",Name = "Trang",ParentId = "CONTENT",SortOrder = 3,Url = "/admin/content/comment" },
+                    new() {Id = "CONTENT_REPORT",Name = "Báo xấu",ParentId = "CONTENT",SortOrder = 3,Url = "/admin/content/report" },
 
-                    new() {Id = "STATISTIC",Name = "Thống kê", ParentId = string.Empty, Url = "/statistic" },
+                    new() {Id = "STATISTIC",Name = "Thống kê", ParentId = string.Empty, SortOrder = 2,Url = "/statistic" },
 
-                    new() {Id = "STATISTIC_MONTHLY_NEWMEMBER",Name = "Đăng ký từng tháng",ParentId = "STATISTIC",SortOrder = 1,Url = "/statistic/monthly-register"},
-                    new() {Id = "STATISTIC_MONTHLY_NEWKB",Name = "Bài đăng hàng tháng",ParentId = "STATISTIC",SortOrder = 2,Url = "/statistic/monthly-newkb"},
-                    new() {Id = "STATISTIC_MONTHLY_COMMENT",Name = "Comment theo tháng",ParentId = "STATISTIC",SortOrder = 3,Url = "/statistic/monthly-comment" },
+                    new() {Id = "STATISTIC_MONTHLY_NEWMEMBER",Name = "Đăng ký từng tháng",ParentId = "STATISTIC",SortOrder = 1,Url = "/admin/statistic/monthly-register"},
+                    new() {Id = "STATISTIC_MONTHLY_NEWKB",Name = "Bài đăng hàng tháng",ParentId = "STATISTIC",SortOrder = 2,Url = "/admin/statistic/monthly-newkb"},
+                    new() {Id = "STATISTIC_MONTHLY_COMMENT",Name = "Comment theo tháng",ParentId = "STATISTIC",SortOrder = 3,Url = "/admin/statistic/monthly-comment" },
 
-                    new() {Id = "SYSTEM", Name = "Hệ thống", ParentId = string.Empty, Url = "/system" },
+                    new() {Id = "SYSTEM", Name = "Hệ thống", ParentId = string.Empty, SortOrder = 3,Url = "/system" },
 
-                    new() {Id = "SYSTEM_USER", Name = "Người dùng",ParentId = "SYSTEM",Url = "/system/user"},
-                    new() {Id = "SYSTEM_ROLE", Name = "Nhóm quyền",ParentId = "SYSTEM",Url = "/system/role"},
-                    new() {Id = "SYSTEM_FUNCTION", Name = "Chức năng",ParentId = "SYSTEM",Url = "/system/function"},
-                    new() {Id = "SYSTEM_PERMISSION", Name = "Quyền hạn",ParentId = "SYSTEM",Url = "/system/permission"},
+                    new() {Id = "SYSTEM_USER", Name = "Người dùng",ParentId = "SYSTEM",Url = "/admin/system/user"},
+                    new() {Id = "SYSTEM_ROLE", Name = "Nhóm quyền",ParentId = "SYSTEM",Url = "/admin/system/role"},
+                    new() {Id = "SYSTEM_FUNCTION", Name = "Chức năng",ParentId = "SYSTEM",Url = "/admin/system/function"},
+                    new() {Id = "SYSTEM_PERMISSION", Name = "Quyền hạn",ParentId = "SYSTEM",Url = "/admin/system/permission"},
                 });
             await _context.SaveChangesAsync();
         }

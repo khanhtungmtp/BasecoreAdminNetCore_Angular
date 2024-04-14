@@ -69,7 +69,7 @@ export class NavBarComponent implements OnInit {
   destroyRef = inject(DestroyRef);
 
   constructor() {
-    this.initMenus();
+    // this.initMenus();
     this.getMenuByUser();
     this.subTheme$ = this.isOverMode$.pipe(
       switchMap(res => {
@@ -153,7 +153,8 @@ export class NavBarComponent implements OnInit {
     this.menuServices.getMenuByUserId(this.userProfile.id).subscribe({
       next: (res) => {
         console.log('res: ', res);
-        this.menuss = res;
+        this.leftMenu = res;
+        this.cdr.markForCheck();
       },
       error: () => {
       }
@@ -249,7 +250,7 @@ export class NavBarComponent implements OnInit {
   }
 
   // Change the current menu display state
-  changeOpen(currentMenu: Menu, allMenu: Menu[]): void {
+  changeOpen(currentMenu: FunctionVM, allMenu: FunctionVM[]): void {
     allMenu.forEach(item => {
       item.open = false;
     });
@@ -267,13 +268,13 @@ export class NavBarComponent implements OnInit {
     });
   }
 
-  changeRoute(e: MouseEvent, menu: Menu): void {
+  changeRoute(e: MouseEvent, menu: FunctionVM): void {
     if (menu.newLinkFlag) {
       fnStopMouseEvent(e);
-      window.open(menu.path, '_blank');
+      window.open(menu.url, '_blank');
       return;
     }
-    this.router.navigate([menu.path]);
+    this.router.navigate([menu.url]);
   }
 
   // Listen to collapse menu events

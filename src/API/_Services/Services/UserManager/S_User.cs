@@ -1,9 +1,11 @@
 using API._Repositories;
 using API._Services.Interfaces.UserManager;
 using API.Helpers.Base;
+using API.Helpers.Utilities;
 using API.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using ViewModels.Forum;
 using ViewModels.System;
 
 namespace API._Services.Services.UserManager;
@@ -12,9 +14,36 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
     private readonly UserManager<User> _userManager = userManager;
     private readonly RoleManager<IdentityRole> _rolesManager = rolesManager;
 
-    public async Task<User?> GetById(string id)
+    public async Task<OperationResult<User>> GetByIdAsync(string userId)
     {
-        return await _repoStore.Users.FirstOrDefaultAsync(x => x.Id == id);
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return OperationResult<User>.NotFound("User not found.");
+        return OperationResult<User>.Success(user, "Get User Successfully.");
+    }
+
+    public async Task<OperationResult<PagingResult<ForumQuickVM>>> GetForumByUserId(string userId, PaginationParam pagination)
+    {
+        var query = from k in _repoStore.Forums.FindAll(true)
+                    join c in _repoStore.Categories.FindAll(true) on k.CategoryId equals c.Id
+                    where k.OwnerUserId == userId
+                    orderby k.CreatedDate descending
+                    select new { k, c };
+
+        var totalRecords = await query.Select(u => new ForumQuickVM()
+        {
+            Id = u.k.Id,
+            CategoryId = u.k.CategoryId,
+            Description = u.k.Description,
+            SeoAlias = u.k.SeoAlias,
+            Title = u.k.Title,
+            CategoryAlias = u.c.SeoAlias,
+            CategoryName = u.c.Name,
+            NumberOfVotes = u.k.NumberOfVotes,
+            CreatedDate = u.k.CreatedDate
+        }).ToListAsync();
+        var result = PagingResult<ForumQuickVM>.Create(totalRecords, pagination.PageNumber, pagination.PageSize);
+        return OperationResult<PagingResult<ForumQuickVM>>.Success(result, "Get forums by user id successfully.");
     }
 
     public async Task<OperationResult<List<FunctionVM>>> GetMenuByUserPermission(string userId)
@@ -45,4 +74,5 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
             .ToListAsync();
         return OperationResult<List<FunctionVM>>.Success(data, "Get data successfully.");
     }
+
 }

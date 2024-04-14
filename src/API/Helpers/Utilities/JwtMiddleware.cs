@@ -40,6 +40,6 @@ public class JwtMiddleware(RequestDelegate next, IOptions<AppSetting> appSetting
         var userId = jwtToken.Claims.First(x => x.Type == "Id").Value;
 
         //Attach user to context on successful JWT validation
-        context.Items["User"] = await userService.GetById(userId);
+        context.Items["User"] = await userService.GetByIdAsync(userId);
     }
 }
