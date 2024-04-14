@@ -12,6 +12,9 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
 {
     public async Task<OperationResult<string>> CreateAsync(FunctionCreateRequest request)
     {
+        Function? functionExists = await _repoStore.Functions.FindByIdAsync(request.Id);
+        if (functionExists is not null)
+            return OperationResult<string>.Conflict("Function is existed.");
         var function = new Function()
         {
             Id = request.Id,
@@ -22,7 +25,7 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
             Icon = request.Icon
         };
 
-        _repoStore.Functions.Add(function);
+        await _repoStore.Functions.AddAsync(function);
         await _repoStore.SaveChangesAsync();
         return OperationResult<string>.Success(function.Id, "Function created successfully.");
     }

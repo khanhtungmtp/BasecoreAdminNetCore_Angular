@@ -11,8 +11,6 @@ using ViewModels.UserManager;
 
 namespace API.Controllers.UserManager;
 
-[ApiController]
-[Route("api/[controller]")]
 public class UsersController(UserManager<User> userManager, I_User user) : BaseController
 {
     private readonly UserManager<User> _userManager = userManager;

@@ -1,6 +1,5 @@
 using API._Repositories;
 using API._Services.Interfaces.Forum;
-using API._Services.Interfaces.System;
 using API.Helpers.Base;
 using API.Helpers.Constants;
 using API.Helpers.Utilities;
@@ -9,10 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using ViewModels.Forum;
 
 namespace API._Services.Services.Forum;
-public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : BaseServices(repoStore), I_Comments
+public class S_Comments(IRepositoryAccessor repoStore) : BaseServices(repoStore), I_Comments
 {
-    private readonly I_Cache _cacheService = cacheService;
-
     public async Task<OperationResult<CommentResponseVM>> CreateAsync(int forumId, CommentCreateRequest request)
     {
         var comment = new Comment()
@@ -25,7 +22,7 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         _repoStore.Comments.Add(comment);
 
         var forum = await _repoStore.Forums.FindAsync(forumId);
-        if (forum == null)
+        if (forum is null)
             return OperationResult<CommentResponseVM>.NotFound($"Cannot found forum with id: {forumId}");
 
         forum.NumberOfComments = forum.NumberOfComments.GetValueOrDefault(0) + 1;
@@ -34,13 +31,11 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         bool result = await _repoStore.SaveChangesAsync();
         if (result)
         {
-            await _cacheService.RemoveAsync(CacheConstants.RecentComments);
-
             //Send mail
             if (comment.ReplyId.HasValue)
             {
-                var repliedComment = await _repoStore.Comments.FindAsync(comment.ReplyId.Value);
-                var repledUser = await _repoStore.Users.FindAsync(repliedComment.OwnwerUserId);
+                Comment? repliedComment = await _repoStore.Comments.FindAsync(comment.ReplyId.Value);
+                User? repledUser = await _repoStore.Users.FindAsync(repliedComment.OwnwerUserId);
                 var emailModel = new RepliedCommentVM()
                 {
                     CommentContent = request.Content,
@@ -146,19 +141,12 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
 
         bool result = await _repoStore.SaveChangesAsync();
         if (result)
-        {
-            //Delete cache
-            await _cacheService.RemoveAsync(CacheConstants.RecentComments);
             return OperationResult.Success("Delete comment successfully");
-        }
         return OperationResult.BadRequest("Delete comment failed");
     }
 
     public async Task<OperationResult<List<CommentVM>>> GetRecentCommentsAsync(int take)
     {
-        var cachedData = await _cacheService.GetAsync<List<CommentVM>>(CacheConstants.RecentComments);
-        if (cachedData == null)
-        {
             var query = from c in _repoStore.Comments.FindAll(true)
                         join u in _repoStore.Users.FindAll(true)
                             on c.OwnwerUserId equals u.Id
@@ -167,7 +155,7 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
                         orderby c.CreatedDate descending
                         select new { c, u, k };
 
-            var comments = await query.Take(take).Select(x => new CommentVM()
+        List<CommentVM>? comments = await query.Take(take).Select(x => new CommentVM()
             {
                 Id = x.c.Id,
                 CreatedDate = x.c.CreatedDate,
@@ -178,11 +166,7 @@ public class S_Comments(IRepositoryAccessor repoStore, I_Cache cacheService) : B
                 ForumSeoAlias = x.k.SeoAlias
             }).ToListAsync();
 
-            await _cacheService.SetAsync(CacheConstants.RecentComments, comments);
-            cachedData = comments;
-        }
-
-        return OperationResult<List<CommentVM>>.Success(cachedData, "Get recent comments successfully.");
+        return OperationResult<List<CommentVM>>.Success(comments, "Get recent comments successfully.");
     }
 
     public async Task<OperationResult<IEnumerable<CommentVM>>> GetCommentTreeByForumIdAsync(int forumId)

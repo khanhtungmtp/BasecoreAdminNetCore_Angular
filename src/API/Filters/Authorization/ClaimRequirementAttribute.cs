@@ -18,6 +18,8 @@ public class ClaimRequirementAttribute(FunctionCode functionCode, CommandCode co
 
     public void OnAuthorization(AuthorizationFilterContext context)
     {
+        var httpContext = context.HttpContext;
+        string? trackId = Guid.NewGuid().ToString();
         // skip authorization if action is decorated with [AllowAnonymous] attribute
         var allowAnonymous = context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any();
         if (allowAnonymous)
@@ -25,7 +27,18 @@ public class ClaimRequirementAttribute(FunctionCode functionCode, CommandCode co
 
         // authorization
         User? user = (User?)context.HttpContext.Items["User"];
-        ArgumentNullException.ThrowIfNull(user);
+        if (user is null)
+        {
+            context.Result = new UnauthorizedObjectResult(new ErrorGlobalResponse
+            {
+                TrackId = trackId,
+                Title = ReasonPhrases.GetReasonPhrase((int)HttpStatusCode.Unauthorized),
+                Status = StatusCodes.Status401Unauthorized,
+                Detail = "Unauthorized, Access denied",
+                Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
+            });
+            return;
+        }
 
         // get roles where id 
         DataContext? _db = context.HttpContext.RequestServices.GetService(typeof(DataContext)) as DataContext;
@@ -36,22 +49,17 @@ public class ClaimRequirementAttribute(FunctionCode functionCode, CommandCode co
         List<Permission>? permissions = [.. _db.Permissions.Where(x => roles.Contains(x.RoleId))];
 
         // Check if user roles intersect with the given _roles, if _roles is not empty
-        if (permissions is not null)
+        if (permissions is null || !permissions.Any(x=>x.FunctionId == _functionCode.ToString() && x.CommandId == _commandCode.ToString()))
         {
-            var httpContext = context.HttpContext;
-            string? trackId = Guid.NewGuid().ToString();
-            if (permissions is null || !permissions.Any(x=>x.FunctionId == _functionCode.ToString() && x.CommandId == _commandCode.ToString()))
+            context.Result = new UnauthorizedObjectResult(new ErrorGlobalResponse
             {
-                context.Result = new UnauthorizedObjectResult(new ErrorGlobalResponse
-                {
-                    TrackId = trackId,
-                    Title = ReasonPhrases.GetReasonPhrase((int)HttpStatusCode.Unauthorized),
-                    Status = StatusCodes.Status401Unauthorized,
-                    Detail = "Unauthorized, Access denied",
-                    Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
-                });
-            }
+                TrackId = trackId,
+                Status = StatusCodes.Status403Forbidden,
+                Title = ReasonPhrases.GetReasonPhrase((int)HttpStatusCode.Forbidden),
+                Detail = "Access denied",
+                Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
+            }){StatusCode = StatusCodes.Status403Forbidden};
         }
-        
+
     }
 }

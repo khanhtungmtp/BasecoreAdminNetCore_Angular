@@ -30,7 +30,6 @@ public class ForumsController(UserManager<User> userManager, I_Forums forumServi
     [AllowAnonymous]
     public async Task<IActionResult> GetAllForums(string? filter, [FromQuery] PaginationParam pagination, [FromQuery] ForumQuickVM forumVM)
     {
-
         var result = await _forumService.GetPagingAsync(filter, pagination, forumVM);
          return HandleResult(result);
     }

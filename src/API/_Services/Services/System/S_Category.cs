@@ -7,10 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using ViewModels.System;
 
 namespace API._Services.Services.System;
-public class S_Category(IRepositoryAccessor repoStore, I_Cache cacheService) : BaseServices(repoStore), I_Category
+public class S_Category(IRepositoryAccessor repoStore) : BaseServices(repoStore), I_Category
 {
-    private readonly I_Cache _cacheService = cacheService;
-
     public async Task<OperationResult<string>> CreateAsync(CategoryCreateRequest request)
     {
         var category = new Category()
@@ -25,11 +23,7 @@ public class S_Category(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         bool result = await _repoStore.SaveChangesAsync();
 
         if (result)
-        {
-            await _cacheService.RemoveAsync("Categories");
-
-            return OperationResult<string>.Success(category.Name,"Create category successfully");
-        }
+            return OperationResult<string>.Success(category.Name, "Create category successfully");
         else
             return OperationResult<string>.BadRequest("Create category failed");
 
@@ -37,7 +31,7 @@ public class S_Category(IRepositoryAccessor repoStore, I_Cache cacheService) : B
 
     public async Task<OperationResult<PagingResult<CategoryVM>>> GetPagingAsync(string? filter, PaginationParam pagination, CategoryVM categoryVM)
     {
-        var query = _repoStore.Categories.FindAll(true);
+        IQueryable<Category>? query = _repoStore.Categories.FindAll(true);
         if (!string.IsNullOrWhiteSpace(filter))
         {
             query = query.Where(x => x.SeoDescription.Contains(filter) || x.Name.Contains(filter));
@@ -49,7 +43,7 @@ public class S_Category(IRepositoryAccessor repoStore, I_Cache cacheService) : B
 
     public async Task<OperationResult<CategoryVM>> FindByIdAsync(int id)
     {
-        var category = await _repoStore.Categories.FindAsync(id);
+        Category? category = await _repoStore.Categories.FindAsync(id);
         if (category is null)
             return OperationResult<CategoryVM>.NotFound($"Cannot found category with id: {id}");
 
@@ -91,11 +85,7 @@ public class S_Category(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         bool result = await _repoStore.SaveChangesAsync();
 
         if (result)
-        {
-            await _cacheService.RemoveAsync("Categories");
-
             return OperationResult.Success("Update category successfully");
-        }
         return OperationResult.BadRequest("Update category failed");
     }
 
@@ -109,8 +99,6 @@ public class S_Category(IRepositoryAccessor repoStore, I_Cache cacheService) : B
         bool result = await _repoStore.SaveChangesAsync();
         if (result)
         {
-            await _cacheService.RemoveAsync("Categories");
-
             CategoryVM categoryvm = CreateCategoryVM(category);
             return OperationResult<string>.Success(categoryvm.Name, "Delete category successfully");
         }

@@ -11,17 +11,10 @@ using API.Helpers.Constants;
 using ViewModels.System;
 
 namespace API._Services.Services.Forums;
-public class S_Forums : BaseServices, I_Forums
+public class S_Forums(IRepositoryAccessor repoStore, I_Sequence sequenceService, I_Storage storageService) : BaseServices(repoStore), I_Forums
 {
-    private readonly I_Sequence _sequenceService;
-    private readonly I_Storage _storageService;
-    private readonly I_Cache _cacheService;
-    public S_Forums(IRepositoryAccessor repoStore, I_Sequence sequenceService, I_Storage storageService, I_Cache cacheService) : base(repoStore)
-    {
-        _sequenceService = sequenceService;
-        _storageService = storageService;
-        _cacheService = cacheService;
-    }
+    private readonly I_Sequence _sequenceService = sequenceService;
+    private readonly I_Storage _storageService = storageService;
     #region PostForumAsync
     public async Task<OperationResult<string>> CreateAsync(ForumCreateRequest request)
     {
@@ -64,7 +57,7 @@ public class S_Forums : BaseServices, I_Forums
             throw new InvalidOperationException("File content disposition is missing.");
         }
         var originalFileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition)?.FileName?.Trim('"');
-        var fileName = $"{originalFileName?.Substring(0, originalFileName.LastIndexOf('.'))}{Path.GetExtension(originalFileName)}";
+        var fileName = $"{originalFileName?[..originalFileName.LastIndexOf('.')]}{Path.GetExtension(originalFileName)}";
         await _storageService.SaveFileAsync(file.OpenReadStream(), fileName);
         var attachmentEntity = new Attachment()
         {
@@ -80,7 +73,7 @@ public class S_Forums : BaseServices, I_Forums
 
     private async Task ProcessLabel(ForumCreateRequest request, Models.Forum forum)
     {
-        foreach (var labelText in request.Labels)
+        foreach (string? labelText in request.Labels)
         {
             if (labelText is null) continue;
             var labelId = FunctionUtility.GenerateSlug(labelText.ToString());
@@ -94,7 +87,7 @@ public class S_Forums : BaseServices, I_Forums
                 };
                 _repoStore.Labels.Add(labelEntity);
             }
-            if (await _repoStore.LabelInForums.FindAsync(labelId, forum.Id) == null)
+            if (await _repoStore.LabelInForums.FindAsync(labelId, forum.Id) is null)
             {
                 _repoStore.LabelInForums.Add(new LabelInForum()
                 {
@@ -252,9 +245,6 @@ public class S_Forums : BaseServices, I_Forums
 
     public async Task<OperationResult<List<ForumQuickVM>>> GetLatestForumAsync(int take)
     {
-        var cachedData = await _cacheService.GetAsync<List<ForumQuickVM>>(CacheConstants.LatestForum);
-        if (cachedData is null)
-        {
             var forum = from k in _repoStore.Forums.FindAll(true)
                         join c in _repoStore.Categories.FindAll(true) on k.CategoryId equals c.Id
                         orderby k.CreatedDate descending
@@ -273,17 +263,11 @@ public class S_Forums : BaseServices, I_Forums
                     NumberOfVotes = u.k.NumberOfVotes,
                     CreatedDate = u.k.CreatedDate
                 }).ToListAsync();
-            await _cacheService.SetAsync(CacheConstants.LatestForum, forums, 2);
-            cachedData = forums;
-        }
-        return OperationResult<List<ForumQuickVM>>.Success(cachedData, "Get latest forums successfully.");
+        return OperationResult<List<ForumQuickVM>>.Success(forums, "Get latest forums successfully.");
     }
 
     public async Task<OperationResult<List<ForumQuickVM>>> GetPopularForumAsync(int take)
     {
-        var cachedData = await _cacheService.GetAsync<List<ForumQuickVM>>(CacheConstants.PopularForum);
-        if (cachedData is null)
-        {
             var forums = from k in _repoStore.Forums.FindAll(true)
                          join c in _repoStore.Categories.FindAll(true) on k.CategoryId equals c.Id
                          orderby k.ViewCount descending
@@ -302,10 +286,7 @@ public class S_Forums : BaseServices, I_Forums
                     NumberOfVotes = u.k.NumberOfVotes,
                     CreatedDate = u.k.CreatedDate
                 }).ToListAsync();
-            await _cacheService.SetAsync(CacheConstants.PopularForum, forumVms, 24);
-            cachedData = forumVms;
-        }
-        return OperationResult<List<ForumQuickVM>>.Success(cachedData, "Get popular forums successfully.");
+        return OperationResult<List<ForumQuickVM>>.Success(forumVms, "Get popular forums successfully.");
     }
 
     public async Task<OperationResult<PagingResult<ForumQuickVM>>> GetForumByTagIdAsync(string labelId, PaginationParam pagination)
@@ -380,11 +361,7 @@ public class S_Forums : BaseServices, I_Forums
         bool result = await _repoStore.SaveChangesAsync();
 
         if (result)
-        {
-            await _cacheService.RemoveAsync("LatestForum");
-            await _cacheService.RemoveAsync("PopularForum");
             return OperationResult.Success("Update forum successfully");
-        }
         return OperationResult.BadRequest("Update forum failed");
     }
 
@@ -398,15 +375,11 @@ public class S_Forums : BaseServices, I_Forums
         bool result = await _repoStore.SaveChangesAsync();
         if (result)
         {
-            await _cacheService.RemoveAsync(CacheConstants.LatestForum);
-            await _cacheService.RemoveAsync(CacheConstants.PopularForum);
-
             ForumVM forumVM = CreateForumVM(forum);
             return OperationResult<string>.Success(forumVM.Id.ToString(), "Delete forum successfully");
         }
         return OperationResult<string>.BadRequest("Delete forum failed");
     }
-
 
     public async Task<OperationResult> UpdateViewCountAsync(int id)
     {
@@ -432,7 +405,7 @@ public class S_Forums : BaseServices, I_Forums
                     where lik.ForumId == forumId
                     select new { l.Id, l.Name };
 
-        var labels = await query.Select(u => new LabelVM()
+        List<LabelVM>? labels = await query.Select(u => new LabelVM()
         {
             Id = u.Id,
             Name = u.Name

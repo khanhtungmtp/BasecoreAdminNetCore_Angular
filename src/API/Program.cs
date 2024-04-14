@@ -16,7 +16,7 @@ try
 
     // Add services to the container.
     builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("AppSettings"));
-
+    // redirect fluent validation exceptions to the global error handler
     builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
      options.InvalidModelStateResponseFactory = actionContext =>
      {
@@ -30,8 +30,9 @@ try
          return new BadRequestObjectResult(new ErrorGlobalResponse
          {
              TrackId = trackId,
-             Title = ReasonPhrases.GetReasonPhrase((int)HttpStatusCode.BadRequest),
              Status = (int)HttpStatusCode.BadRequest,
+             Type ="ValidatorError",
+             Title = ReasonPhrases.GetReasonPhrase((int)HttpStatusCode.BadRequest),
              Errors = errors,
              Instance = $"{context.Request.Method} {context.Request.Path}",
          });

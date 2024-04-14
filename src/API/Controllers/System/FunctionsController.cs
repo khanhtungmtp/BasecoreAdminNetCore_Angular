@@ -16,7 +16,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
 
     // url: POST : http://localhost:6001/api/function
     [HttpPost]
-    [ClaimRequirement(FunctionCode.SYSTEM, CommandCode.CREATE)]
+    [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.CREATE)]
     public async Task<IActionResult> PostFunction(FunctionCreateRequest request)
     {
         var result = await _functionService.CreateAsync(request);

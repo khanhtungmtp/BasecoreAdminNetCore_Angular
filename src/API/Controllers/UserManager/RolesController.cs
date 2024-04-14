@@ -11,9 +11,7 @@ using ViewModels.UserManager;
 
 namespace API.Controllers.UserManager;
 
-[ApiController]
-[Route("api/[controller]")]
-public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles roles) : ControllerBase
+public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles roles) : BaseController
 {
     private readonly RoleManager<IdentityRole> _rolesManager = rolesManager;
     private readonly I_Roles _roles = roles;

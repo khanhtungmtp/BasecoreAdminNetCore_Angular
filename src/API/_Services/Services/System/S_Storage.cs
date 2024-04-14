@@ -1,9 +1,17 @@
 using API._Services.Interfaces.System;
 
 namespace API._Services.Services.System;
-public class S_Storage(IWebHostEnvironment hostingEnvironment) : I_Storage
+public class S_Storage: I_Storage
 {
-    private readonly string _userContentFolder = Path.Combine(hostingEnvironment.WebRootPath, USER_CONTENT_FOLDER_NAME);
+    private readonly string _userContentFolder;
+    public S_Storage(IWebHostEnvironment hostingEnvironment)
+    {
+        // Kiểm tra xem `WebRootPath` có giá trị null hay không và đưa ra cảnh báo hoặc thiết lập giá trị mặc định.
+        if (string.IsNullOrEmpty(hostingEnvironment.WebRootPath))
+        ArgumentNullException.ThrowIfNull(hostingEnvironment.WebRootPath);
+
+        _userContentFolder = Path.Combine(hostingEnvironment.WebRootPath, USER_CONTENT_FOLDER_NAME);
+    }
     private const string USER_CONTENT_FOLDER_NAME = "user-attachments";
 
     public string GetFileUrl(string fileName)
