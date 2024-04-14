@@ -1,0 +1,54 @@
+<div class="admin-header-wrap">
+  <span class="admin-header-icon">
+    <i nz-icon
+       nzType="search"
+       nzTheme="outline"></i>
+  </span>
+  <span class="admin-header-icon"><i nz-icon
+       nzType="question-circle"
+       nzTheme="outline"></i></span>
+  <span class="admin-header-icon"
+        nz-dropdown
+        [nzPlacement]="'bottomCenter'"
+        [nzDropdownMenu]="langSetting">
+    <i nz-icon
+       nzType="setting"
+       nzTheme="outline"
+       class="admin-header_usr_menu_icon"></i>
+    <nz-dropdown-menu #langSetting="nzDropdownMenu">
+      <!-- <ul nz-menu>
+        @for (lang of listLanguage; track $index) {
+        <li nz-menu-item
+            (click)="switchLang(lang.languageCode)"><nz-avatar nzIcon="user"
+                     nzSrc="{{baseImage + lang.urlImage}}"></nz-avatar>{{lang.languageName}}</li>
+        }
+      </ul> -->
+    </nz-dropdown-menu>
+  </span>
+  <span class="admin-header-icon"
+        nz-dropdown
+        [nzDropdownMenu]="userSettingMenu">
+    <img src="assets/img/default_face.png"
+         class="avatar-header">
+    <span style="font-size: 14px;">{{userName}}</span>
+  </span>
+  <nz-dropdown-menu #userSettingMenu="nzDropdownMenu">
+    <ul nz-menu
+        class="admin-header_usr_menu">
+      <li nz-menu-item>
+        <i nz-icon
+           nzType="setting"
+           nzTheme="outline"
+           class="admin-header_usr_menu_icon"></i><span>{{ "system.caption.setting" | translate }}</span>
+      </li>
+      <li nz-menu-divider></li>
+      <li nz-menu-item
+          (click)="logout()">
+        <i nz-icon
+           nzType="logout"
+           nzTheme="outline"
+           class="admin-header_usr_menu_icon"></i><span>{{ "login.logout" | translate }}</span>
+      </li>
+    </ul>
+  </nz-dropdown-menu>
+</div>

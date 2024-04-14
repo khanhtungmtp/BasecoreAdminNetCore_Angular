@@ -1,0 +1,28 @@
+<ul nz-menu
+    nzTheme="dark"
+    nzMode="inline"
+    [nzInlineCollapsed]="isCollapsed">
+
+  @if (menuResource && menuResource.length > 0) {
+  @for (menuParent of menuResource; track menuParent.title) {
+  <li nz-submenu
+      nzOpen
+      nzTitle="{{menuParent.title}}"
+      nzIcon="{{menuParent.icon}}">
+
+    @if (menuParent.children && menuParent.children.length > 0) {
+    @for (menuChildren of menuParent.children; track menuChildren.title) {
+    <ul>
+      <li nz-menu-item
+          nzMatchRouter>
+        <a routerLink="{{menuChildren.url}}">{{menuChildren.title}}</a>
+      </li>
+    </ul>
+    }
+    }@else {
+    <a routerLink="{{menuParent.url}}">{{menuParent.title}}</a>
+    }
+  </li>
+  }
+  }
+</ul>

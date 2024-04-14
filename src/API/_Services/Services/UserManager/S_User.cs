@@ -43,6 +43,6 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
             .OrderBy(x => x.ParentId)
             .ThenBy(x => x.SortOrder)
             .ToListAsync();
-        return OperationResult<List<FunctionVM>>.Success(data, "Function updated successfully.");
+        return OperationResult<List<FunctionVM>>.Success(data, "Get data successfully.");
     }
 }

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using ViewModels.Auth;
 namespace API.Controllers.Auth;
 
+[ApiController]
+[Route("api/[controller]")]
 public class AuthController(I_Auth authService) : ControllerBase
 {
     private readonly I_Auth _authService = authService;

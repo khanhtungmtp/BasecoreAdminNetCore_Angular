@@ -44,6 +44,7 @@ public class S_Auth(IRepositoryAccessor repoStore, UserManager<User> userManager
         userInDb.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);
         var res = new AuthResponse
         {
+            Id = userInDb.Id,
             Username = userInDb.UserName ?? string.Empty,
             Email = userInDb.Email,
             Token = token.AccessToken,

@@ -13,13 +13,14 @@ public class GlobalExceptionHandler(IHostEnvironment env) : IExceptionHandler
         Logger logger = LogManager.GetLogger("applog");
         ErrorGlobalResponse? result;
         string? detail = _env.IsDevelopment() ? ex.StackTrace?.ToString() : "Oops, an error occurred."; // show only development
+        string? message = _env.IsDevelopment() && ex.GetType().Name == "SqlException" ? ex.Message?.ToString() : "Oops, an error occurred."; // show only development
 
         result = new ErrorGlobalResponse
         {
             TrackId = Guid.NewGuid().ToString(),
-            Status = (int)(HttpStatusCode)httpContext.Response.StatusCode,
+            StatusCode = (int)(HttpStatusCode)httpContext.Response.StatusCode,
             Type = ex.GetType().Name,
-            Title = ex.Message,
+            Message = message,
             Detail = detail,
             Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
         };
@@ -30,7 +31,7 @@ public class GlobalExceptionHandler(IHostEnvironment env) : IExceptionHandler
         // Write the response
         if (httpContext is not null)
         {
-            httpContext.Response.StatusCode = result.Status;
+            httpContext.Response.StatusCode = result.StatusCode;
             await httpContext.Response.WriteAsJsonAsync(result, cancellationToken: cancellationToken);
             return true;
         }

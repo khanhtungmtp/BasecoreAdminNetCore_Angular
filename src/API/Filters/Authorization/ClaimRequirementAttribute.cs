@@ -32,8 +32,8 @@ public class ClaimRequirementAttribute(FunctionCode functionCode, CommandCode co
             context.Result = new UnauthorizedObjectResult(new ErrorGlobalResponse
             {
                 TrackId = trackId,
-                Title = ReasonPhrases.GetReasonPhrase((int)HttpStatusCode.Unauthorized),
-                Status = StatusCodes.Status401Unauthorized,
+                Message = ReasonPhrases.GetReasonPhrase((int)HttpStatusCode.Unauthorized),
+                StatusCode = StatusCodes.Status401Unauthorized,
                 Detail = "Unauthorized, Access denied",
                 Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
             });
@@ -54,8 +54,8 @@ public class ClaimRequirementAttribute(FunctionCode functionCode, CommandCode co
             context.Result = new UnauthorizedObjectResult(new ErrorGlobalResponse
             {
                 TrackId = trackId,
-                Status = StatusCodes.Status403Forbidden,
-                Title = ReasonPhrases.GetReasonPhrase((int)HttpStatusCode.Forbidden),
+                StatusCode = StatusCodes.Status403Forbidden,
+                Message = ReasonPhrases.GetReasonPhrase((int)HttpStatusCode.Forbidden),
                 Detail = "Access denied",
                 Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
             }){StatusCode = StatusCodes.Status403Forbidden};

@@ -1,0 +1,40 @@
+.admin-header-wrap {
+  float: right;
+  margin-right: 8px;
+}
+
+.admin-header-icon {
+  cursor: pointer;
+  padding: 0 12px;
+  display: inline-block;
+  transition: all 0.3s;
+  height: 100%;
+  font-size: 16px;
+}
+
+.admin-header-icon:hover {
+  background-color: rgba(0, 0, 0, 0.025);
+}
+
+.admin-badge {
+  padding: 8px 2px;
+}
+
+/**
+ * 个人设置
+*/
+.admin-header_usr_menu {
+  width: 150px;
+
+  &_icon {
+    margin-right: 8px;
+  }
+}
+
+.avatar-header {
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  margin: 20px 8px 20px 0;
+  vertical-align: top;
+}

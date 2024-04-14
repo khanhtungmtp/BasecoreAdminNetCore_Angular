@@ -13,7 +13,7 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
     builder.Host.UseNLog();
-
+builder.Services.AddCors();
     // Add services to the container.
     builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("AppSettings"));
     // redirect fluent validation exceptions to the global error handler
@@ -30,9 +30,9 @@ try
          return new BadRequestObjectResult(new ErrorGlobalResponse
          {
              TrackId = trackId,
-             Status = (int)HttpStatusCode.BadRequest,
+             StatusCode = (int)HttpStatusCode.BadRequest,
              Type ="ValidatorError",
-             Title = ReasonPhrases.GetReasonPhrase((int)HttpStatusCode.BadRequest),
+             Message = ReasonPhrases.GetReasonPhrase((int)HttpStatusCode.BadRequest),
              Errors = errors,
              Instance = $"{context.Request.Method} {context.Request.Path}",
          });
@@ -70,7 +70,7 @@ try
         app.UseSwagger();
         app.UseSwaggerUI();
     }
-
+    app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
     app.UseHttpsRedirection();
     app.UseRouting();
     app.UseStaticFiles();
