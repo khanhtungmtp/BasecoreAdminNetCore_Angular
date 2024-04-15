@@ -28,6 +28,14 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
             return BadRequest(result);
     }
 
+    // url: GET : http:localhost:6001/api/functions/parentids
+    [HttpGet("parentids")]
+    [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.VIEW)]
+    public async Task<IActionResult> GetParentIdsAsync()
+    {
+        return Ok(await _functionService.GetParentIdsAsync());
+    }
+
     // url: GET : http:localhost:6001/api/functions
     [HttpGet]
     [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.VIEW)]

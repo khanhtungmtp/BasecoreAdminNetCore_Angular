@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -26,6 +26,7 @@ import { S_1_3_SystemLanguageSettingService } from '@app/_core/services/system-m
 import { SystemLanguageDto } from '@app/_core/models/system-maintenance/1_3-system-language-setting';
 import { LocalStorageConstants } from '@app/_core/constants/local-storage.constants';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
+import { UrlRouteConstants } from '@app/_core/constants/url-route.constants';
 
 @Component({
   selector: 'app-layout-head-right-menu',
@@ -51,6 +52,7 @@ export class LayoutHeadRightMenuComponent implements OnInit {
   private accountService = inject(AccountService);
   private translate = inject(TranslateService);
   private languageService = inject(S_1_3_SystemLanguageSettingService);
+  private cdr = inject(ChangeDetectorRef);
 
   // lock screen
   lockScreen(): void {
@@ -99,8 +101,10 @@ export class LayoutHeadRightMenuComponent implements OnInit {
   goLogin(): void {
     this.windowServe.clearStorage();
     this.windowServe.clearSessionStorage();
-    this.loginOutService.loginOut().then();
     this.message.success(this.translate.instant('system.message.logout'));
+    this.router.navigate([UrlRouteConstants.LOGIN]);
+    this.cdr.markForCheck();
+    // this.loginOutService.loginOut().then();
   }
 
   switchLang(lang: string) {

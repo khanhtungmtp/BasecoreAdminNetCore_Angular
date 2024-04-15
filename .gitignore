@@ -12,10 +12,11 @@
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
-
+*.appsettings
 # Mono auto generated files
 mono_crash.*
-
+src/API/Migrations
+*.Migrations
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

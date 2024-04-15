@@ -2,14 +2,49 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "type": "npm",
+            "script": "start",
+            "isBackground": true,
+            "options": {
+                "cwd": "${workspaceFolder}/src/SPA"
+            },
+            "presentation": {
+                "focus": true,
+                "panel": "dedicated"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": {
+                "owner": "typescript",
+                "source": "ts",
+                "applyTo": "closedDocuments",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/src/SPA"
+                ],
+                "pattern": "$tsc",
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": {
+                        "regexp": "(.*?)"
+                    },
+                    "endsPattern": {
+                        "regexp": "Compiled |Failed to compile."
+                    }
+                }
+            }
+        },
+        {
             "label": "build",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/API/API.csproj",
+                "${workspaceFolder}/src/API/API.csproj",
                 "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+                "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
         },
@@ -19,9 +54,11 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/API/API.csproj",
+                "${workspaceFolder}/src/API/API.csproj",
+                "--output", 
+                "D:/Publish/FolderProject/API", 
                 "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+                "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
         },
@@ -33,7 +70,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/API/API.csproj"
+                "${workspaceFolder}/src/API/API.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

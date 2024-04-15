@@ -31,7 +31,7 @@ export class ServerErrorInterceptor implements HttpInterceptor {
     if (error.status === 0 || error.status === 401) {
       apiError.statusCode = error.status;
       if (error.status === 401) {
-        apiError.message = error.error.message;
+        apiError.message = error.error?.message || 'error else 401';
         localStorage.clear();
         this.router.navigate([UrlRouteConstants.LOGIN]);
       }

@@ -252,7 +252,7 @@ export class FunctionUtility {
       const node = arr[i];
       node.children = [];
       map[node.id] = i; // use map to look-up the parents
-      if (node.parentId) {
+      if (node.parentId && node.parentId != "ROOT") {
         delete node['children'];
         // Ensure the parent node exists before attempting to access its children
         const parentNodeIndex = map[node.parentId];

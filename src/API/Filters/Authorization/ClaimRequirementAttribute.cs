@@ -26,8 +26,8 @@ public class ClaimRequirementAttribute(FunctionCode functionCode, CommandCode co
             return;
 
         // authorization
-        User? user = (User?)context.HttpContext.Items["User"];
-        if (user is null)
+        var user = (OperationResult<User>?)context.HttpContext.Items["User"];
+        if (user?.Data is null)
         {
             context.Result = new UnauthorizedObjectResult(new ErrorGlobalResponse
             {
@@ -43,7 +43,7 @@ public class ClaimRequirementAttribute(FunctionCode functionCode, CommandCode co
         // get roles where id 
         DataContext? _db = context.HttpContext.RequestServices.GetService(typeof(DataContext)) as DataContext;
         ArgumentNullException.ThrowIfNull(_db);
-        List<string>? roles = [.. _db.UserRoles.Where(x => x.UserId == user.Id).Select(x=>x.RoleId)];
+        List<string>? roles = [.. _db.UserRoles.Where(x => x.UserId == user.Data.Id).Select(x=>x.RoleId)];
 
         // get permission where roleID of user
         List<Permission>? permissions = [.. _db.Permissions.Where(x => roles.Contains(x.RoleId))];

@@ -152,11 +152,8 @@ export class NavBarComponent implements OnInit {
   getMenuByUser() {
     this.menuServices.getMenuByUserId(this.userProfile.id).subscribe({
       next: (res) => {
-        console.log('res: ', res);
         this.leftMenu = res;
         this.cdr.markForCheck();
-      },
-      error: () => {
       }
     })
   }

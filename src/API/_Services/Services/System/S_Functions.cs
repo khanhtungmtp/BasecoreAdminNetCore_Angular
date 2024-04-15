@@ -40,8 +40,11 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
             Id = function.Id,
             Name = function.Name,
             Url = function.Url,
+            Icon = function.Icon,
+            ParentId = function.ParentId,
+            SortOrder = function.SortOrder
         };
-        return OperationResult<FunctionVM>.Success(userVM, "Get function successfully.");
+        return OperationResult<FunctionVM>.Success(userVM, "Get function by id successfully.");
     }
 
     public async Task<OperationResult<PagingResult<FunctionVM>>> GetPagingAsync(string? filter, PaginationParam pagination, FunctionVM userVM)
@@ -55,7 +58,10 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
         {
             Id = x.Id,
             Name = x.Name,
-            Url = x.Url
+            Url = x.Url,
+            ParentId = x.ParentId,
+            SortOrder = x.SortOrder,
+            Icon = x.Icon
         }).ToListAsync();
         var resultPaging = PagingResult<FunctionVM>.Create(listFunctionVM, pagination.PageNumber, pagination.PageSize);
         return OperationResult<PagingResult<FunctionVM>>.Success(resultPaging, "Get function successfully.");
@@ -95,5 +101,11 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
         if (result)
             return OperationResult<string>.Success(function.Id, "Function deleted successfully.");
         return OperationResult<string>.BadRequest("Function delete failed.");
+    }
+
+    public async Task<OperationResult<List<KeyValuePair<string, string>>>> GetParentIdsAsync()
+    {
+        var data = await _repoStore.Functions.FindAll(true).Select(x => new KeyValuePair<string, string>(x.Id, x.Name)).ToListAsync();
+        return OperationResult<List<KeyValuePair<string, string>>>.Success(data, "Get functions successfully.");
     }
 }

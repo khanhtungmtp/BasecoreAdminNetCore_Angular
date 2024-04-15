@@ -1,10 +1,10 @@
 import { APP_INITIALIZER, ApplicationConfig, ErrorHandler, importProvidersFrom } from '@angular/core';
-import { RouteReuseStrategy, TitleStrategy, provideRouter, withComponentInputBinding, withHashLocation, withInMemoryScrolling, withPreloading } from '@angular/router';
+import { TitleStrategy, provideRouter, withComponentInputBinding, withHashLocation, withInMemoryScrolling, withPreloading } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideNzIcons } from './icons-provider';
-import { vi_VN, provideNzI18n, NZ_I18N, en_US } from 'ng-zorro-antd/i18n';
-import { DOCUMENT, registerLocaleData } from '@angular/common';
+import { provideNzI18n, NZ_I18N, en_US } from 'ng-zorro-antd/i18n';
+import { registerLocaleData } from '@angular/common';
 import vi from '@angular/common/locales/vi';
 import { FormsModule } from '@angular/forms';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -21,15 +21,13 @@ import { InitThemeService } from '@services/common/init-theme.service';
 import { ThemeSkinService } from '@services/common/theme-skin.service';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { NzModalModule } from 'ng-zorro-antd/modal';
-import { SimpleReuseStrategy } from '@services/common/reuse-strategy';
 import { NZ_ICONS } from 'ng-zorro-antd/icon';
 import { CustomPageTitleResolverService } from '@services/common/custom-page-title-resolver.service';
-import { ScrollService } from '@services/common/scroll.service';
-import { DashboardOutline, FormOutline, MenuFoldOutline, MenuUnfoldOutline } from '@ant-design/icons-angular/icons';
+import { DashboardOutline, FormOutline, MenuFoldOutline, MenuUnfoldOutline, DollarCircleOutline } from '@ant-design/icons-angular/icons';
 import { LoadAliIconCdnService } from '@services/common/load-ali-icon-cdn.service';
 import { SubLockedStatusService } from '@services/common/sub-locked-status.service';
 import { SubWindowWithService } from '@services/common/sub-window-with.service';
-const icons = [MenuFoldOutline, MenuUnfoldOutline, DashboardOutline, FormOutline];
+const icons = [MenuFoldOutline, MenuUnfoldOutline, DashboardOutline, FormOutline, DollarCircleOutline];
 registerLocaleData(vi);
 export function tokenGetter() {
   return localStorage.getItem(LocalStorageConstants.TOKEN);

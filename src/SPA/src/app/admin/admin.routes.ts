@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { SETTINGS_ROUTES } from './settings/settings.routes';
-import { BLANK_ROUTES } from './layouts/blank/blank.routes';
+import { SYSTEM_ROUTES } from './system/system.routes';
 
 export const ADMIN_ROUTES: Routes = [
   {
@@ -13,10 +12,10 @@ export const ADMIN_ROUTES: Routes = [
     }
   },
   {
-    path: 'settings',
-    children: SETTINGS_ROUTES,
+    path: 'system',
+    children: SYSTEM_ROUTES,
     data: {
-      title: 'Settings',
+      title: 'system',
       headerDisplay: "none"
     }
   }

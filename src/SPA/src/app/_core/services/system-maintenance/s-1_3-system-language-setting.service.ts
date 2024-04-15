@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '@env/environment';
 import { SystemLanguageSettingParam, System_Language, SystemLanguageDto } from '@models/system-maintenance/1_3-system-language-setting';
 import { OperationResult } from '@utilities/operation-result';
-import { Pagination, PaginationResult } from '@utilities/pagination-utility';
+import { Pagination, PagingResult } from '@utilities/pagination-utility';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +16,7 @@ export class S_1_3_SystemLanguageSettingService {
   getData(pagination: Pagination, param: SystemLanguageSettingParam) {
     let params = new HttpParams().appendAll({ ...pagination, ...param });
 
-    return this.http.get<PaginationResult<System_Language>>(this.apiUrl + 'GetData', { params })
+    return this.http.get<PagingResult<System_Language>>(this.apiUrl + 'GetData', { params })
   }
 
   getLanguages() {

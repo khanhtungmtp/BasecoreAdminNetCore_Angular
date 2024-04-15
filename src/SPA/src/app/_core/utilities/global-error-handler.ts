@@ -28,6 +28,7 @@ export class GlobalErrorHandler extends InjectBase implements ErrorHandler {
       // Unknown Error client
       console.log('Unknown Error client');
       console.log('error: ', error);
+      if (error.message)
       this.notification.error(`Error dev: ${error.message}`, error.message)
       // }
     }

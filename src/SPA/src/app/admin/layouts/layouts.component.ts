@@ -4,7 +4,6 @@ import { RouterOutlet } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
-import { HeaderComponent } from './header/header.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { Observable } from 'rxjs';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -29,7 +28,6 @@ import { Menu } from '@app/_core/models/common/types';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 
 const layoutsComponent = [
-  HeaderComponent,
   SidebarComponent
 ];
 

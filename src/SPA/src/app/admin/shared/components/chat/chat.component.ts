@@ -102,7 +102,6 @@ export class ChatComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
 
   ngOnDestroy(): void {
-    console.log('Customer service function is destroyed');
   }
 
   close(): void {
