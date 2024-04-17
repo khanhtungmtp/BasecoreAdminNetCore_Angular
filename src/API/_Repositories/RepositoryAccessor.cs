@@ -25,6 +25,7 @@ namespace API._Repositories
             Attachments = new Repository<Attachment, DataContext>(_dbContext);
             Users = new Repository<User, DataContext>(_dbContext);
             RefreshTokens = new Repository<RefreshToken, DataContext>(_dbContext);
+            SystemLanguages = new Repository<SystemLanguage, DataContext>(_dbContext);
         }
 
         public IRepository<User> Users { get; set; } = default!;
@@ -56,6 +57,8 @@ namespace API._Repositories
         public IRepository<Attachment> Attachments { get; set; } = default!;
 
         public IRepository<RefreshToken> RefreshTokens { get; set; } = default!;
+
+        public IRepository<SystemLanguage> SystemLanguages { get; set; } = default!;
 
         public async Task<bool> SaveChangesAsync()
         {

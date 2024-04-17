@@ -68,4 +68,5 @@ public class DataContext(DbContextOptions options) : IdentityDbContext<User>(opt
     public DbSet<Vote> Votes => Set<Vote>();
 public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<Attachment> Attachments => Set<Attachment>();
+    public DbSet<SystemLanguage> SystemLanguages => Set<SystemLanguage>();
 }

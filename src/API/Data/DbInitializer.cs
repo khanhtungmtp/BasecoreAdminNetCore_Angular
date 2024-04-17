@@ -152,6 +152,38 @@ public class DbInitializer(DataContext context,
             }
         }
 
+        // Checking if there are any languages already seeded
+        if (!_context.SystemLanguages.Any())
+        {
+            var languages = new List<SystemLanguage>
+            {
+                new()
+                {
+                    LanguageCode = "en_US",
+                    LanguageName = "English",
+                    UrlImage = "en.png",
+                    IsActive = true
+                },
+                new()
+                {
+                    LanguageCode = "vi_VN",
+                    LanguageName = "Vietnamese",
+                    UrlImage = "vn.png",
+                    IsActive = true
+                },
+                new()
+                {
+                    LanguageCode = "zh_TW",
+                    LanguageName = "繁體中文",
+                    UrlImage = "zh.png",
+                    IsActive = true
+                }
+            };
+
+            await _context.SystemLanguages.AddRangeAsync(languages);
+            await _context.SaveChangesAsync();
+        }
+
         await _context.SaveChangesAsync();
     }
 }

@@ -50,7 +50,7 @@ interface SearchParam {
   ]
 })
 export class FunctionComponent implements OnInit {
-  searchParam: Partial<SearchParam> = {};
+  filter: string = '';
   pagination: Pagination | undefined = <Pagination>{
     pageNumber: 1,
     pageSize: 10
@@ -60,20 +60,10 @@ export class FunctionComponent implements OnInit {
   tableConfig!: AntTableConfig;
   pageHeaderInfo: Partial<PageHeaderType> = {
     title: 'Function',
-    // desc: 'decs',
     breadcrumb: ['Homepage', 'System', 'Function']
   };
-  checkedCashArray: NzSafeAny[] = [
-    {
-      "id": "CONTENT",
-      "name": "Nội dung",
-      "url": "/admin/content",
-      "sortOrder": 1,
-      "parentId": "",
-      "icon": ""
-    }
-  ]; // Needs to be modified to the data type corresponding to the business
-  dataList: any = []; // Needs to be modified to the data type of the corresponding business
+  checkedCashArray: NzSafeAny[] = [];
+  dataList: any = [];
 
   private modalSrv = inject(NzModalService);
   private message = inject(NzMessageService);
@@ -112,7 +102,7 @@ export class FunctionComponent implements OnInit {
       pageSize: this.pagination?.pageSize as number,
       pageNumber: e?.pageIndex || this.pagination?.pageNumber as number
     }
-    this.functionService.getFunctionsPaging(this.searchParam.ruleName, _pagingParam).pipe(finalize(() => {
+    this.functionService.getFunctionsPaging(this.filter, _pagingParam).pipe(finalize(() => {
       this.tableLoading(false);
     })).subscribe((response => {
       if (response.succeeded) {
@@ -127,21 +117,19 @@ export class FunctionComponent implements OnInit {
 
   }
 
+  search(): void {
+    this.getDataList();
+  }
+
   /*Reset*/
   resetForm(): void {
-    this.searchParam = {};
+    this.filter = '';
     this.getDataList();
   }
 
   /*Expand*/
   toggleCollapse(): void {
     this.isCollapse = !this.isCollapse;
-  }
-
-  /*Check*/
-  check(name: string): void {
-    // skipLocationChange is set to true when navigating without recording the new state into history.
-    this.router.navigate(['default/page-demo/list/search-table/search-table-detail', name, 123]);
   }
 
   openModal(id?: string): void {

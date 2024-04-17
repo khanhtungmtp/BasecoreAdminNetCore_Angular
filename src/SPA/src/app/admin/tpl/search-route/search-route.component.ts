@@ -19,10 +19,10 @@ import { Menu } from '@app/_core/models/common/types';
 import { MenuStoreService } from '@app/_core/services/common/menu-store.service';
 import { ThemeService } from '@app/_core/services/common/theme.service';
 import { BasicConfirmModalComponent } from '@app/_core/utilities/base-modal';
+import { FunctionVM } from '@app/_core/models/system/functionvm';
 
 interface ResultItem {
   selItem: boolean;
-  isAliIcon: boolean;
   title: string;
   routePath: string;
   icon: string;
@@ -50,7 +50,7 @@ export class SearchRouteComponent extends BasicConfirmModalComponent implements 
   resultList: ResultItem[] = [];
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
   inputValue: string | null = null;
-  menuNavList: Menu[] = [];
+  menuNavList: FunctionVM[] = [];
   destroyRef = inject(DestroyRef);
 
   constructor(protected override modalRef: NzModalRef) {
@@ -108,14 +108,13 @@ export class SearchRouteComponent extends BasicConfirmModalComponent implements 
     this.modalRef.destroy();
   }
 
-  getResultItem(menu: Menu, fatherTitle: string = ''): ResultItem[] {
-    const fatherTitleTemp = fatherTitle === '' ? menu.menuName : `${fatherTitle} > ${menu.menuName}`;
+  getResultItem(menu: FunctionVM, fatherTitle: string = ''): ResultItem[] {
+    const fatherTitleTemp = fatherTitle === '' ? menu.name : `${fatherTitle} > ${menu.name}`;
     let resultItem: ResultItem = {
       title: fatherTitleTemp,
-      routePath: menu.path!,
+      routePath: menu.url!,
       selItem: false,
-      isAliIcon: !!menu.alIcon,
-      icon: menu.icon! || menu.alIcon!
+      icon: menu.icon!
     };
     if (menu.children && menu.children.length > 0) {
       let resultArrayTemp: ResultItem[] = [];

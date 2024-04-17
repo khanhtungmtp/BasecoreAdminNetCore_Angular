@@ -9,7 +9,6 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzNoAnimationModule } from 'ng-zorro-antd/core/no-animation';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
-import { Menu } from '@app/_core/models/common/types';
 import { SplitNavStoreService } from '@app/_core/services/common/split-nav-store.service';
 import { TabService } from '@app/_core/services/common/tab.service';
 import { ThemeService } from '@app/_core/services/common/theme.service';
@@ -47,9 +46,7 @@ export class NavBarComponent implements OnInit {
   private themesService = inject(ThemeService);
 
   routerPath = this.router.url;
-  menus: Menu[] = [];
-  menuss: FunctionVM[] = [];
-  copyMenus: Menu[] = [];
+  copyMenus: FunctionVM[] = [];
   authCodeArray: string[] = [];
 
   themesOptions$ = this.themesService.getThemesMode();
@@ -63,7 +60,7 @@ export class NavBarComponent implements OnInit {
   isOverMode = false;
   isCollapsed = false;
   isMixinMode = false;
-  leftMenuArray: Menu[] = [];
+  leftMenuArray: FunctionVM[] = [];
   leftMenu: FunctionVM[] = [];
 
   destroyRef = inject(DestroyRef);
@@ -102,11 +99,11 @@ export class NavBarComponent implements OnInit {
           // @ts-ignore
           this.routerPath = this.activatedRoute.snapshot['_routerState'].url;
           // Make a copyMenus to record the current menu status, because the sub-menu is not displayed in the top mode, but the theme is switched from the top mode to the sidebar mode, and the status of the menu in the current top mode must be reflected in the menu in the sidebar mode.
-          this.clickMenuItem(this.menus);
+          this.clickMenuItem(this.leftMenu);
           this.clickMenuItem(this.copyMenus);
           // It is a folded menu and not an over menu. It solves the bug of floating box menu when switching tabs when folding the left menu.
           if (this.isCollapsed && !this.isOverMode) {
-            this.closeMenuOpen(this.menus);
+            this.closeMenuOpen(this.leftMenu);
           }
 
           // Top menu mode, and not over mode, solves the bug of floating box menu when switching tabs in top mode
@@ -141,9 +138,9 @@ export class NavBarComponent implements OnInit {
       .getMenuArrayStore()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(menusArray => {
-        this.menus = menusArray;
-        this.copyMenus = this.cloneMenuArray(this.menus);
-        this.clickMenuItem(this.menus);
+        this.leftMenu = menusArray;
+        this.copyMenus = this.cloneMenuArray(this.leftMenu);
+        this.clickMenuItem(this.leftMenu);
         this.clickMenuItem(this.copyMenus);
         this.cdr.markForCheck();
       });
@@ -160,7 +157,7 @@ export class NavBarComponent implements OnInit {
 
   // Data source for left menu "auto-split menu" mode when setting blending mode
   setMixModeLeftMenu(): void {
-    this.menus.forEach(item => {
+    this.leftMenu.forEach(item => {
       if (item.selected) {
         this.splitNavStoreService.setSplitLeftNavArrayStore(item.children || []);
       }
@@ -168,9 +165,9 @@ export class NavBarComponent implements OnInit {
   }
 
   // Deep copy clone menu array
-  cloneMenuArray(sourceMenuArray: Menu[], target: Menu[] = []): Menu[] {
+  cloneMenuArray(sourceMenuArray: FunctionVM[], target: FunctionVM[] = []): FunctionVM[] {
     sourceMenuArray.forEach(item => {
-      const obj: Menu = { menuName: '', menuType: 'C', path: '', id: -1, fatherId: -1 };
+      const obj: FunctionVM = { id: '', name: '', menuType: 'C', url: '', parentId: '', sortOrder: 0, icon: '', children: [], newLinkFlag: false, open: false, selected: false };
       for (let i in item) {
         if (item.hasOwnProperty(i)) {
           // @ts-ignore
@@ -191,22 +188,22 @@ export class NavBarComponent implements OnInit {
   // Click the first-level menu in mixed mode to make the first submenu under the first-level menu selected.
   changTopNav(index: number): void {
     // The currently selected first-level menu object
-    const currentTopNav = this.menus[index];
+    const currentTopNav = this.leftMenu[index];
     let currentLeftNavArray = currentTopNav.children || [];
     // If there is a second-level menu under the first-level menu
     if (currentLeftNavArray.length > 0) {
       //Current left navigation array
       /*Added permission version*/
       // Get the authorized secondary menu collection (shown on the left)
-      currentLeftNavArray = currentLeftNavArray.filter(item => {
-        return this.authCodeArray.includes(item.code!);
-      });
+      // currentLeftNavArray = currentLeftNavArray.filter(item => {
+      //   return this.authCodeArray.includes(item.code!);
+      // });
       // If the first second-level menu, there is no third-level menu
       if (currentLeftNavArray.length > 0 && !currentLeftNavArray[0].children) {
-        this.router.navigateByUrl(currentLeftNavArray[0].path!);
+        this.router.navigateByUrl(currentLeftNavArray[0].url!);
       } else if (currentLeftNavArray.length > 0 && currentLeftNavArray[0].children) {
         // If there is a third-level menu, jump to the first third-level menu
-        this.router.navigateByUrl(currentLeftNavArray[0].children[0].path!);
+        this.router.navigateByUrl(currentLeftNavArray[0].children[0].url!);
       }
       /*Added permission version end*/
       /*The comment is the unauthorized version*/
@@ -222,11 +219,11 @@ export class NavBarComponent implements OnInit {
     this.splitNavStoreService.setSplitLeftNavArrayStore(currentLeftNavArray);
   }
 
-  flatMenu(menus: Menu[], routePath: string): void {
+  flatMenu(menus: FunctionVM[], routePath: string): void {
     menus.forEach(item => {
       item.selected = false;
       item.open = false;
-      if (routePath.includes(item.path) && !item.newLinkFlag) {
+      if (routePath.includes(item.url) && !item.newLinkFlag) {
         item.selected = true;
         item.open = true;
       }
@@ -236,7 +233,7 @@ export class NavBarComponent implements OnInit {
     });
   }
 
-  clickMenuItem(menus: Menu[]): void {
+  clickMenuItem(menus: FunctionVM[]): void {
     if (!menus) {
       return;
     }
@@ -254,7 +251,7 @@ export class NavBarComponent implements OnInit {
     currentMenu.open = true;
   }
 
-  closeMenuOpen(menus: Menu[]): void {
+  closeMenuOpen(menus: FunctionVM[]): void {
     menus.forEach(menu => {
       menu.open = false;
       if (menu.children && menu.children.length > 0) {
@@ -280,25 +277,25 @@ export class NavBarComponent implements OnInit {
       this.isCollapsed = isCollapsed;
       // menu expand
       if (!this.isCollapsed) {
-        this.menus = this.cloneMenuArray(this.copyMenus);
-        this.clickMenuItem(this.menus);
+        this.leftMenu = this.cloneMenuArray(this.copyMenus);
+        this.clickMenuItem(this.leftMenu);
         // In mixed mode, click the left menu data source, otherwise the menu with secondary menu will not open when the folded state changes to expanded.
         if (this.themesMode === 'mixin') {
           this.clickMenuItem(this.leftMenuArray);
         }
       } else {
         // Menu close
-        this.copyMenus = this.cloneMenuArray(this.menus);
-        this.closeMenuOpen(this.menus);
+        this.copyMenus = this.cloneMenuArray(this.leftMenu);
+        this.closeMenuOpen(this.leftMenu);
       }
       this.cdr.markForCheck();
     });
   }
 
   closeMenu(): void {
-    this.clickMenuItem(this.menus);
+    this.clickMenuItem(this.leftMenu);
     this.clickMenuItem(this.copyMenus);
-    this.closeMenuOpen(this.menus);
+    this.closeMenuOpen(this.leftMenu);
   }
 
   subAuth(): void {

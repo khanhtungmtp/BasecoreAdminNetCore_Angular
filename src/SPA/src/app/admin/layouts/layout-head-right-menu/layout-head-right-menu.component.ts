@@ -27,6 +27,9 @@ import { SystemLanguageDto } from '@app/_core/models/system-maintenance/1_3-syst
 import { LocalStorageConstants } from '@app/_core/constants/local-storage.constants';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { UrlRouteConstants } from '@app/_core/constants/url-route.constants';
+import { SystemLanguageService } from '@app/_core/services/system/system-language.service';
+import { KeyValuePair } from '@app/_core/utilities/key-value-pair';
+import { SystemLanguageVM } from '@app/_core/models/system/systemlanguage';
 
 @Component({
   selector: 'app-layout-head-right-menu',
@@ -38,7 +41,7 @@ import { UrlRouteConstants } from '@app/_core/constants/url-route.constants';
 })
 export class LayoutHeadRightMenuComponent implements OnInit {
   user!: UserPsd;
-  listLanguage: SystemLanguageDto[] = [];
+  listLanguage: SystemLanguageVM[] = [];
   currentLang: string = '';
   baseImage: string = "../../../../assets/images/lang/";
   private router = inject(Router);
@@ -51,7 +54,7 @@ export class LayoutHeadRightMenuComponent implements OnInit {
   private userInfoService = inject(UserInfoService);
   private accountService = inject(AccountService);
   private translate = inject(TranslateService);
-  private languageService = inject(S_1_3_SystemLanguageSettingService);
+  private languageService = inject(SystemLanguageService);
   private cdr = inject(ChangeDetectorRef);
 
   // lock screen
@@ -119,8 +122,9 @@ export class LayoutHeadRightMenuComponent implements OnInit {
 
   getLanguage() {
     this.languageService.getLanguages().subscribe({
-      next: (res: SystemLanguageDto[]) => {
-        this.listLanguage = res;
+      next: (res) => {
+        if (res?.data)
+          this.listLanguage = res.data;
       },
       error: (e) => {
         throw e
@@ -129,7 +133,7 @@ export class LayoutHeadRightMenuComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.getLanguage();
+    this.getLanguage();
     this.currentLang = localStorage.getItem(LocalStorageConstants.LANG) ?? 'en_US';
   }
 }

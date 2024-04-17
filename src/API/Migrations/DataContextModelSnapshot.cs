@@ -500,6 +500,29 @@ namespace API.Migrations
                     b.ToTable("Reports");
                 });
 
+            modelBuilder.Entity("API.Models.SystemLanguage", b =>
+                {
+                    b.Property<string>("LanguageCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LanguageName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UrlImage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("LanguageCode");
+
+                    b.ToTable("SystemLanguages");
+                });
+
             modelBuilder.Entity("API.Models.User", b =>
                 {
                     b.Property<string>("Id")

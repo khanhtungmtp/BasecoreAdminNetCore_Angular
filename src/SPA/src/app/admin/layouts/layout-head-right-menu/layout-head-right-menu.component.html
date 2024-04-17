@@ -117,7 +117,7 @@
          nzType="font-size"></i>
     </span>
     <nz-dropdown-menu #language="nzDropdownMenu">
-      <!-- <ul nz-menu
+      <ul nz-menu
           nzSelectable>
         @for (lang of listLanguage; track $index) {
         <li nz-menu-item
@@ -125,7 +125,7 @@
             (click)="switchLang(lang.languageCode)"><nz-avatar nzIcon="user"
                      nzSrc="{{baseImage + lang.urlImage}}"></nz-avatar>{{lang.languageName}}</li>
         }
-      </ul>-->
+      </ul>
     </nz-dropdown-menu>
   </div>
   <nz-dropdown-menu #noticeMenu="nzDropdownMenu">

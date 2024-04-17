@@ -19,5 +19,6 @@ public enum FunctionCode
     SYSTEM_USER,
     SYSTEM_ROLE,
     SYSTEM_FUNCTION,
+    SYSTEM_LANGUAGE,
     SYSTEM_PERMISSION,
 }

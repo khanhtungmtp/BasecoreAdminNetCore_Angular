@@ -39,10 +39,10 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     // url: GET : http:localhost:6001/api/functions
     [HttpGet]
     [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.VIEW)]
-    public async Task<IActionResult> GetAllPaging(string? filter, [FromQuery] PaginationParam pagination, [FromQuery] FunctionVM userVM)
+    public async Task<IActionResult> GetAllPaging(string? filter, [FromQuery] PaginationParam pagination)
     {
         filter ??= string.Empty;
-        return Ok(await _functionService.GetPagingAsync(filter, pagination, userVM));
+        return Ok(await _functionService.GetPagingAsync(filter, pagination));
     }
 
     // url: GET : http:localhost:6001/api/function/{id}

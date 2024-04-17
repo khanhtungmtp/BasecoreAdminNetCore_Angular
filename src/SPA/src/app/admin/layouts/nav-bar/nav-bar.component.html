@@ -6,7 +6,7 @@
       [nzMode]="(themesOptions$ | async)!.mode === 'side' || (themesOptions$ | async)!.mode === 'mixin' || (isOverMode$ | async) ? 'inline' : 'horizontal'"
       [nzNoAnimation]="(themesOptions$ | async)!.mode === 'top' && !isOverMode"
       [nzTheme]="isMixinMode && !(isOverMode$ | async) && !(isNightTheme$ | async) ? 'light' : isMixinMode && (isNightTheme$ | async) ? 'dark' : (themesOptions$ | async)!.theme">
-    <ng-container *ngTemplateOutlet="menuTpl; context: { $implicit: isMixinLeft ? leftMenuArray : menus }"></ng-container>
+    <ng-container *ngTemplateOutlet="menuTpl; context: { $implicit: isMixinLeft ? leftMenuArray : [] }"></ng-container>
     <ng-template #menuTpl
                  let-menus>
     <!-- Lặp qua mảng menu cấp độ cao nhất -->
@@ -15,23 +15,33 @@
       <!-- Kiểm tra nếu menu có menu con -->
       @if (menu.children && menu.children.length) {
       <ng-container>
-        <!-- Tạo một submenu với các menu con -->
         <li nz-submenu
-            [nzTitle]="menu.name">
-          <!-- Hiển thị icon nếu có -->
-          @if (menu.icon) {
-          <span>
+            [nzPaddingLeft]="(themesMode !== 'top' || isOverMode) && !isCollapsed ? 16 : 0"
+            [nzTitle]="titleTpl"
+            [(nzOpen)]="menu.open"
+            (nzOpenChange)="changeOpen(menu, menus)">
+          <ng-template #titleTpl>
+            @if (menu.icon) {
             <i nz-icon
                [nzType]="menu.icon"></i>
-          </span>
-        }
+            }
+            <span>{{ menu.name }}</span>
+            </ng-template>
+            <!-- Tạo một submenu với các menu con -->
           <ul>
             <!-- Lặp qua các menu con -->
             @for (child of menu.children; track child;) {
-            <li nz-menu-item
-                [routerLink]="[child.url]">
-              {{ child.name }}
-            </li>
+              <li nz-menu-item
+                  [nzPaddingLeft]="(themesMode !== 'top' || isOverMode) && !isCollapsed ? 32 : 0"
+                  [nzSelected]="child.selected">
+                <a (click)="changeRoute($event, child)">
+                  @if (child.icon) {
+                  <i nz-icon
+                    [nzType]="child.icon"></i>
+                  }
+                  <span>{{ child.name }}</span>
+                </a>
+              </li>
           }
           </ul>
           </li>
@@ -39,16 +49,16 @@
       }<!-- end if -->
       <!-- Nếu menu không có menu con, tạo một item đơn -->
       @if (!menu.children || !menu.children.length) {
-      <li nz-menu-item
-          [routerLink]="[menu.url]">
-        <!-- Hiển thị icon nếu có -->
-        @if (menu.icon) {
-        <span>
-          <i nz-icon
-             [nzType]="menu.icon"></i>
-        </span>
-      }
-        {{ menu.name }}
+        <li nz-menu-item
+            [nzPaddingLeft]="(themesMode !== 'top' || isOverMode) && !isCollapsed ? 16 : 0"
+            [nzSelected]="menu.selected">
+            <a (click)="changeRoute($event, menu)">
+              @if (menu.icon) {
+              <i nz-icon
+                 [nzType]="menu.icon"></i>
+              }
+            <span>{{ menu.name }}</span>
+            </a>
         </li>
     }<!-- end if menu child -->
     </ng-container>
@@ -62,45 +72,55 @@
     <!-- Lặp qua mảng menu cấp độ cao nhất -->
     @for (menu of leftMenu; track menu; let i = $index) {
     <ng-container>
-      <!-- Kiểm tra nếu menu có menu con -->
-      @if (menu.children && menu.children.length) {
-      <ng-container>
-        <!-- Tạo một submenu với các menu con -->
-        <li nz-submenu
-            [nzTitle]="menu.name">
-          <!-- Hiển thị icon nếu có -->
+    <!-- Kiểm tra nếu menu có menu con -->
+    @if (menu.children && menu.children.length) {
+    <ng-container>
+      <li nz-submenu
+          [nzPaddingLeft]="(themesMode !== 'top' || isOverMode) && !isCollapsed ? 16 : 0"
+          [nzTitle]="titleTpl"
+          [(nzOpen)]="menu.open"
+          (nzOpenChange)="changeOpen(menu, leftMenu)">
+        <ng-template #titleTpl>
           @if (menu.icon) {
-          <span>
-            <i nz-icon
-               [nzType]="menu.icon"></i>
-          </span>
+          <i nz-icon
+             [nzType]="menu.icon"></i>
           }
-          <ul>
-            <!-- Lặp qua các menu con -->
-            @for (child of menu.children; track child;) {
+          <span>{{ menu.name }}</span>
+          </ng-template>
+          <!-- Tạo một submenu với các menu con -->
+        <ul>
+          <!-- Lặp qua các menu con -->
+          @for (child of menu.children; track child;) {
             <li nz-menu-item
-                [routerLink]="[child.url]">
-              {{ child.name }}
+                [nzPaddingLeft]="(themesMode !== 'top' || isOverMode) && !isCollapsed ? 32 : 0"
+                [nzSelected]="child.selected">
+              <a (click)="changeRoute($event, child)">
+                @if (child.icon) {
+                <i nz-icon
+                  [nzType]="child.icon"></i>
+                }
+                <span>{{ child.name }}</span>
+              </a>
             </li>
-            }
+          }
           </ul>
           </li>
           </ng-container>
           }<!-- end if -->
-          <!-- Nếu menu không có menu con, tạo một item đơn -->
-          @if (!menu.children || !menu.children.length) {
-          <li nz-menu-item
-          [routerLink]="[menu.url]">
-        <!-- Hiển thị icon nếu có -->
-        @if (menu.icon) {
-        <span>
-          <i nz-icon
-             [nzType]="menu.icon"></i>
-        </span>
-        }
-        {{ menu.name }}
-        </li>
-      }<!-- end if menu child -->
+            <!-- Nếu menu không có menu con, tạo một item đơn -->
+            @if (!menu.children || !menu.children.length) {
+            <li nz-menu-item
+                [nzPaddingLeft]="(themesMode !== 'top' || isOverMode) && !isCollapsed ? 16 : 0"
+                [nzSelected]="menu.selected">
+              <a (click)="changeRoute($event, menu)">
+                @if (menu.icon) {
+                <i nz-icon
+                   [nzType]="menu.icon"></i>
+                }
+                <span>{{ menu.name }}</span>
+                </a>
+                </li>
+                }<!-- end if menu child -->
       </ng-container>
     }<!-- end for left menu  -->
     </ul>

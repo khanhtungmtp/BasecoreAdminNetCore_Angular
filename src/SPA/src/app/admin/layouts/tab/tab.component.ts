@@ -18,6 +18,7 @@ import { TabService, TabModel } from '@app/_core/services/common/tab.service';
 import { ThemeService } from '@app/_core/services/common/theme.service';
 import { fnStopMouseEvent } from '@app/_core/utilities/tools';
 import { MouseHoverShowDirective } from '@app/admin/shared/directives/mouse-hover-show.directive';
+import { FunctionVM } from '@app/_core/models/system/functionvm';
 
 @Component({
   selector: 'app-tab',
@@ -39,7 +40,7 @@ export class TabComponent implements OnInit {
   tabsSourceData$ = this.tabService.getTabArray$();
   themesOptions$ = this.themesService.getThemesMode();
   isNightTheme$ = this.themesService.getIsNightTheme();
-  leftMenuArray$: Observable<Menu[]> = this.splitNavStoreService.getSplitLeftNavArrayStore();
+  leftMenuArray$: Observable<FunctionVM[]> = this.splitNavStoreService.getSplitLeftNavArrayStore();
   isOverMode$ = this.themesService.getIsOverMode();
   isCollapsed$ = this.themesService.getIsCollapsed();
   destroyRef = inject(DestroyRef);

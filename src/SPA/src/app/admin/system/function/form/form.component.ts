@@ -108,10 +108,10 @@ export class FormComponent implements OnInit {
 
       apiCall.subscribe({
         next: result => {
-          const message = isAdding ? 'System.Message.CreateOKMsg' : 'System.Message.UpdateOKMsg';
+          const message = isAdding ? 'system.message.createOKMsg' : 'system.message.updateOKMsg';
           const isSuccess = result.succeeded || result;
 
-          this.notification[isSuccess ? 'success' : 'error'](this.translateService.instant(message), this.translateService.instant('System.Caption.' + (isSuccess ? 'Success' : 'Error')));
+          this.notification[isSuccess ? 'success' : 'error'](this.translateService.instant(message), this.translateService.instant('system.caption.' + (isSuccess ? 'success' : 'error')));
 
           if (isSuccess) {
             // Đóng modal và gửi kèm dữ liệu

@@ -35,7 +35,7 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
         Function? function = await _repoStore.Functions.FindByIdAsync(id);
         if (function is null)
             return OperationResult<FunctionVM>.NotFound("Function not found.");
-        FunctionVM userVM = new()
+        FunctionVM functionVM = new()
         {
             Id = function.Id,
             Name = function.Name,
@@ -44,10 +44,10 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
             ParentId = function.ParentId,
             SortOrder = function.SortOrder
         };
-        return OperationResult<FunctionVM>.Success(userVM, "Get function by id successfully.");
+        return OperationResult<FunctionVM>.Success(functionVM, "Get function by id successfully.");
     }
 
-    public async Task<OperationResult<PagingResult<FunctionVM>>> GetPagingAsync(string? filter, PaginationParam pagination, FunctionVM userVM)
+    public async Task<OperationResult<PagingResult<FunctionVM>>> GetPagingAsync(string? filter, PaginationParam pagination)
     {
         var query = _repoStore.Functions.FindAll(true);
         if (!string.IsNullOrWhiteSpace(filter))

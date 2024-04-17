@@ -21,13 +21,13 @@ export class MenuStoreService extends BaseService {
     super()
   }
   baseUrl: string = environment.apiUrl;
-  private menuArray$ = new BehaviorSubject<Menu[]>([]);
+  private menuArray$ = new BehaviorSubject<FunctionVM[]>([]);
 
-  setMenuArrayStore(menuArray: Menu[]): void {
+  setMenuArrayStore(menuArray: FunctionVM[]): void {
     this.menuArray$.next(menuArray);
   }
 
-  getMenuArrayStore(): Observable<Menu[]> {
+  getMenuArrayStore(): Observable<FunctionVM[]> {
     return this.menuArray$.asObservable();
   }
 
