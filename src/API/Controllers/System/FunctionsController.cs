@@ -20,12 +20,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     public async Task<IActionResult> PostFunction(FunctionCreateRequest request)
     {
         var result = await _functionService.CreateAsync(request);
-        if (result.Succeeded)
-        {
-            return CreatedAtAction(nameof(GetById), new { id = result.Data }, request);
-        }
-        else
-            return BadRequest(result);
+        return HandleResult(result);
     }
 
     // url: GET : http:localhost:6001/api/functions/parentids
@@ -69,6 +64,15 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     public async Task<IActionResult> DeleteFunction(string id)
     {
         var result = await _functionService.DeleteAsync(id);
+        return HandleResult(result);
+    }
+
+    // url: DELETE : http:localhost:6001/api/function/{ids}
+    [HttpDelete("DeleteRangeFunction")]
+    [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.DELETE)]
+    public async Task<IActionResult> DeleteRangeFunction([FromBody] List<string> ids)
+    {
+        var result = await _functionService.DeleteRangeAsync(ids);
         return HandleResult(result);
     }
 

@@ -95,7 +95,7 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
         // remove command in function
         List<CommandInFunction>? commands = await _repoStore.CommandInFunctions.FindAll(x => x.FunctionId == id).ToListAsync();
         // if (commands.Count > 0)
-        _repoStore.CommandInFunctions.RemoveMultiple(commands);
+        _repoStore.CommandInFunctions.RemoveMany(commands);
 
         bool result = await _repoStore.SaveChangesAsync();
         if (result)
@@ -103,9 +103,30 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
         return OperationResult<string>.BadRequest("Function delete failed.");
     }
 
-    public async Task<OperationResult<List<KeyValuePair<string, string>>>> GetParentIdsAsync()
+    public async Task<OperationResult<List<FunctionVM>>> GetParentIdsAsync()
     {
-        var data = await _repoStore.Functions.FindAll(true).Select(x => new KeyValuePair<string, string>(x.Id, x.Name)).ToListAsync();
-        return OperationResult<List<KeyValuePair<string, string>>>.Success(data, "Get functions successfully.");
+        var query = _repoStore.Functions.FindAll(true);
+        var listFunctionVM = await query.Select(x => new FunctionVM()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            ParentId = x.ParentId,
+            SortOrder = x.SortOrder,
+            Icon = x.Icon
+        }).ToListAsync();
+        return OperationResult<List<FunctionVM>>.Success(listFunctionVM, "Get Parent successfully.");
+    }
+
+    public async Task<OperationResult> DeleteRangeAsync(List<string> ids)
+    {
+        if (ids.Count == 0) return OperationResult.NotFound("List function not found.");
+        var entitiesToDelete = await _repoStore.Functions.FindAll(entity => ids.Contains(entity.Id)).ToListAsync();
+        if (entitiesToDelete.Count == 0)
+            return OperationResult.NotFound("List function empty.");
+
+        _repoStore.Functions.RemoveMany(entitiesToDelete);
+        await _repoStore.SaveChangesAsync();
+        return OperationResult.Success("Delete functions successfully.");
+
     }
 }

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
-import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormControl, FormsModule } from '@angular/forms';
+import { FormGroup, FormBuilder, ReactiveFormsModule, FormControl, FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { MessageConstants, CaptionConstants } from '@constants/message.enum';
@@ -16,10 +16,11 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzNotificationModule } from 'ng-zorro-antd/notification';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, NzFormModule, ReactiveFormsModule, NzTabsModule, NzGridModule, NzButtonModule, NzInputModule, NzWaveModule, NzCheckboxModule, NzIconModule, RouterLink, NzNotificationModule, TranslateModule],
+  imports: [FormsModule, NzFormModule, ReactiveFormsModule, NzAlertModule, NzTabsModule, NzGridModule, NzButtonModule, NzInputModule, NzWaveModule, NzCheckboxModule, NzIconModule, RouterLink, NzNotificationModule, TranslateModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.less'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,6 +35,8 @@ export class LoginComponent extends InjectBase implements OnInit {
     password: new FormControl(''),
     remember: new FormControl(true),
   });
+
+  isCapsLockOn: boolean = false;
 
   user: UserLoginParam = <UserLoginParam>{
   };
@@ -50,13 +53,23 @@ export class LoginComponent extends InjectBase implements OnInit {
     });
   }
 
+  onKeyUp(event: KeyboardEvent): void {
+    if (event.getModifierState && event.getModifierState('CapsLock')) {
+      this.isCapsLockOn = true; // Caps Lock is on.
+    } else {
+      this.isCapsLockOn = false; // Caps Lock is off.
+    }
+  }
+
   login(): void {
     if (this.validateForm.valid) {
       this.user.userName = this.validateForm.value.userName as string
       this.user.password = this.validateForm.value.password as string
       this.spinnerService.show();
       this.authService.login(this.user).subscribe({
-        next: () => {
+        next: (res) => {
+          console.log('res: ', res);
+
           this.notification.success(MessageConstants.LOGGED_IN, CaptionConstants.SUCCESS);
           this.spinnerService.hide();
           this.router.navigate([UrlRouteConstants.DASHBOARD]);

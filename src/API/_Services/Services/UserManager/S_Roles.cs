@@ -33,8 +33,8 @@ public class S_Roles(IRepositoryAccessor repoStore) : BaseServices(repoStore), I
         }
         var existingPermissions = _repoStore.Permissions.FindAll(x => x.RoleId == roleId);
 
-        _repoStore.Permissions.RemoveMultiple(existingPermissions);
-        _repoStore.Permissions.AddMultiple(newPermissions.Distinct(new MyPermissionComparer()));
+        _repoStore.Permissions.RemoveMany(existingPermissions);
+        _repoStore.Permissions.AddMany(newPermissions.Distinct(new MyPermissionComparer()));
         bool result = await _repoStore.SaveChangesAsync();
         if (result)
             return OperationResult<string>.Success("Save permission successfully");

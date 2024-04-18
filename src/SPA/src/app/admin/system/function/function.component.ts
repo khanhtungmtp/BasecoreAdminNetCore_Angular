@@ -1,6 +1,5 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, TemplateRef, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild, TemplateRef, ChangeDetectorRef, inject, DestroyRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { FunctionService } from '@app/_core/services/system/function.service';
 import { Pagination, PaginationParam } from '@app/_core/utilities/pagination-utility';
 import { AntTableComponent, AntTableConfig, SortFile } from '@app/admin/shared/components/ant-table/ant-table.component';
@@ -20,13 +19,10 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { finalize } from 'rxjs';
-import { FormComponent } from './form/form.component';
+import { FunctionFormComponent } from './function-form/function-form.component';
 import { NzNotificationCustomService } from '@app/_core/services/nz-notificationCustom.service';
+import { NzSpinnerCustomService } from '@app/_core/services/common/nz-spinner.service';
 
-interface SearchParam {
-  ruleName: string;
-  desc: string;
-}
 
 @Component({
   selector: 'app-function',
@@ -51,7 +47,7 @@ interface SearchParam {
 })
 export class FunctionComponent implements OnInit {
   filter: string = '';
-  pagination: Pagination | undefined = <Pagination>{
+  pagination: Pagination = <Pagination>{
     pageNumber: 1,
     pageSize: 10
   }
@@ -67,10 +63,14 @@ export class FunctionComponent implements OnInit {
 
   private modalSrv = inject(NzModalService);
   private message = inject(NzMessageService);
-  private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
-  private functionService = inject(FunctionService);
+  private dataService = inject(FunctionService);
   private notification = inject(NzNotificationCustomService)
+  protected spinnerService = inject(NzSpinnerCustomService);
+  destroyRef = inject(DestroyRef);
+  ngOnInit(): void {
+    this.initTable();
+  }
 
   // Triggered when the leftmost checkbox is selected
   selectedChecked(e: any): void {
@@ -99,44 +99,38 @@ export class FunctionComponent implements OnInit {
     /*-----The actual business request http interface is as follows------*/
     this.tableConfig.loading = true;
     const _pagingParam: PaginationParam = {
-      pageSize: this.pagination?.pageSize as number,
-      pageNumber: e?.pageIndex || this.pagination?.pageNumber as number
+      pageSize: e?.pageSize || this.pagination.pageSize,
+      pageNumber: this.filter === '' ? (e?.pageIndex || this.pagination.pageNumber) : 1,
     }
-    this.functionService.getFunctionsPaging(this.filter, _pagingParam).pipe(finalize(() => {
+    this.dataService.getFunctionsPaging(this.filter, _pagingParam).pipe(finalize(() => {
       this.tableLoading(false);
     })).subscribe((response => {
-      if (response.succeeded) {
-        this.dataList = response.data?.result;
-        this.pagination = response.data?.pagination;
-        this.tableConfig.total = this.pagination?.totalCount as number;
-        this.tableConfig.pageIndex = this.pagination?.pageNumber as number;
-        this.tableLoading(false);
-        this.checkedCashArray = [...this.checkedCashArray];
-      }
+      this.dataList = response.result;
+      this.pagination = response.pagination;
+      this.tableConfig.total = this.pagination.totalCount;
+      this.tableConfig.pageIndex = this.pagination.pageNumber;
+      this.checkedCashArray = [...this.checkedCashArray];
     }));
 
   }
 
   search(): void {
+    this.notification.success('Success', 'Search success')
     this.getDataList();
   }
 
   /*Reset*/
   resetForm(): void {
+    this.notification.success('Success', 'Reset success')
     this.filter = '';
     this.getDataList();
-  }
-
-  /*Expand*/
-  toggleCollapse(): void {
-    this.isCollapse = !this.isCollapse;
   }
 
   openModal(id?: string): void {
     const isEditMode = !!id;
     const modal = this.modalSrv.create({
       nzTitle: isEditMode ? 'Function Edit' : 'Function Add',
-      nzContent: FormComponent,
+      nzContent: FunctionFormComponent,
       nzMaskClosable: false,
       nzData: id
     });
@@ -147,19 +141,18 @@ export class FunctionComponent implements OnInit {
         this.getDataList();
       }
     });
-  }
 
-  del(id: string): void {
+  }
+  deleteRow(id: string): void {
     this.modalSrv.confirm({
       nzTitle: 'Are you sure you want to delete it? ',
       nzContent: 'Cannot be recovered after deletion',
       nzOnOk: () => {
         this.tableLoading(true);
         /*The comment is the simulation interface call*/
-        this.functionService.deleteFunction(id).subscribe({
+        this.dataService.delete(id).subscribe({
           next: (res) => {
-            if (res?.succeeded)
-              this.notification.success('Success', res.message)
+            this.notification.success('Success', `The item '${res}' has been successfully deleted`)
             if (this.dataList.length === 1) {
               this.tableConfig.pageIndex--;
             }
@@ -175,31 +168,31 @@ export class FunctionComponent implements OnInit {
     });
   }
 
-  allDel(): void {
+  deleteItemChecked(): void {
     if (this.checkedCashArray.length > 0) {
       this.modalSrv.confirm({
         nzTitle: 'Are you sure you want to delete it? ',
         nzContent: 'Cannot be recovered after deletion',
         nzOnOk: () => {
-          const tempArrays: number[] = [];
+          const ids: string[] = [];
           this.checkedCashArray.forEach(item => {
-            tempArrays.push(item.id);
+            ids.push(item.id);
           });
           this.tableLoading(true);
-          // The comment is the call to the simulated interface
-          // this.dataService.delFireSys(tempArrays).subscribe(() => {
-          //   if (this.dataList.length === 1) {
-          //     this.tableConfig.pageIndex--;
-          //   }
-          //   this.getDataList();
-          //   this.checkedCashArray = [];
-          // }, error => this.tableLoading(false));
-          setTimeout(() => {
-            this.message.info(`mảng id (hỗ trợ lưu phân trang):${JSON.stringify(tempArrays)}`);
-            this.getDataList();
-            this.checkedCashArray = [];
-            this.tableLoading(false);
-          }, 1000);
+          this.dataService.deleteRange(ids).subscribe({
+            next: (res) => {
+              console.log('res: ', res);
+              if (res) this.notification.success('Success', "Delete success")
+              if (this.dataList.length === 1) {
+                this.tableConfig.pageIndex--;
+              }
+              this.getDataList();
+              this.checkedCashArray = [];
+            },
+            error: () => {
+              this.tableLoading(false)
+            }
+          })
         }
       });
     } else {
@@ -225,43 +218,31 @@ export class FunctionComponent implements OnInit {
     this.tableConfig = {
       headers: [
         {
-          title: 'Not displayed by default',
-          // width: 130,
-          field: 'noShow',
-          show: false
-        },
-        {
           title: 'Id',
-          // width: 130,
           field: 'id',
           showSort: true
         },
         {
           title: 'Name',
-          // width: 230,
           field: 'name',
           showSort: true
         },
         {
           title: 'Url',
-          // width: 200,
           field: 'url',
           tdClassList: ['operate-text']
         },
         {
           title: 'Seq.',
-          field: 'sortOrder',
-          // width: 80
+          field: 'sortOrder'
         },
         {
           title: 'Icon',
-          field: 'icon',
-          // width: 100
+          field: 'icon'
         },
         {
           title: 'Operation',
           tdTemplate: this.operationTpl,
-          // width: 120,/
           fixed: true,
           fixedDir: 'right'
         }
@@ -274,7 +255,4 @@ export class FunctionComponent implements OnInit {
     };
   }
 
-  ngOnInit(): void {
-    this.initTable();
-  }
 }

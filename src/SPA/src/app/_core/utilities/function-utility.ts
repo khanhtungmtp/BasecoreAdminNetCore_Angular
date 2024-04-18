@@ -246,24 +246,24 @@ export class FunctionUtility {
 
 
   UnflatteringForLeftMenu = <T extends TreeNode>(arr: T[]): T[] => {
-    const map: Record<string, number> = {};
+    const map: Record<string, T> = {}; // Change map to Record<string, T>
     const roots: T[] = [];
-    for (let i = 0; i < arr.length; i++) {
-      const node = arr[i];
-      node.children = [];
-      map[node.id] = i; // use map to look-up the parents
-      if (node.parentId && node.parentId != "ROOT") {
-        delete node['children'];
-        // Ensure the parent node exists before attempting to access its children
-        const parentNodeIndex = map[node.parentId];
-        if (parentNodeIndex !== undefined && arr[parentNodeIndex]) { // Check if the parent ID exists in the map and the parent node is defined
-          if (!arr[parentNodeIndex].children) {
-            arr[parentNodeIndex].children = [];
-          }
-          arr[parentNodeIndex]?.children?.push(node);
+
+    // First pass: Collect nodes into a map
+    for (const node of arr) {
+      node.children = []; // Initialize children array
+      map[node.id] = node; // Store node in the map
+    }
+
+    // Second pass: Build tree structure
+    for (const node of arr) {
+      if (node.parentId && node.parentId !== "ROOT") {
+        const parentNode = map[node.parentId];
+        if (parentNode) {
+          parentNode?.children?.push(node); // Add node to its parent's children array
         }
       } else {
-        roots.push(node);
+        roots.push(node); // Add node to roots if it has no parent or its parent is "ROOT"
       }
     }
     return roots;

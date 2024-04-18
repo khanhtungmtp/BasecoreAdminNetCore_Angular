@@ -7,6 +7,7 @@ import { environment } from '@env/environment';
 import { BehaviorSubject, Observable, catchError, map } from 'rxjs';
 import { BaseService } from '../platform/baseservice';
 import { OperationResult } from '@app/_core/utilities/operation-result';
+import { BaseHttpService } from '../base-http.service';
 
 //Menu store service
 @Injectable({
@@ -16,7 +17,7 @@ export class MenuStoreService extends BaseService {
   /**
    *
    */
-  constructor(private http: HttpClient,
+  constructor(private httpBase: BaseHttpService,
     private ultility: FunctionUtility,) {
     super()
   }
@@ -32,13 +33,13 @@ export class MenuStoreService extends BaseService {
   }
 
   getMenuByUserId(userId: string) {
-    return this.http.get<OperationResult<FunctionVM[]>>(`${this.baseUrl}Users/${userId}/menu`).pipe(map(response => {
-      if (!response.data) {
+    return this.httpBase.get<FunctionVM[]>(`Users/${userId}/menu`).pipe(map(response => {
+      if (response.length === 0) {
         // Handle the undefined case, e.g., by returning an empty array or throwing an error
         console.error('Received undefined data');
         return [];
       }
-      return this.ultility.UnflatteringForLeftMenu(response.data);
+      return this.ultility.UnflatteringForLeftMenu(response);
     }));
   }
 }

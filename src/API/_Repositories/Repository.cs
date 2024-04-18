@@ -23,12 +23,12 @@ public class Repository<T, DBContext> : IRepository<T> where T : class where DBC
         await _dbSet.AddAsync(entity);
     }
 
-    public void AddMultiple(IEnumerable<T> entities)
+    public void AddMany(IEnumerable<T> entities)
     {
         _dbSet.AddRange(entities);
     }
 
-    public async Task AddMultipleAsync(IEnumerable<T> entities)
+    public async Task AddManyAsync(IEnumerable<T> entities)
     {
         await _context.Set<T>().AddRangeAsync(entities);
     }
@@ -63,7 +63,7 @@ public class Repository<T, DBContext> : IRepository<T> where T : class where DBC
         Remove(FindByIdAsync(id));
     }
 
-    public void RemoveMultiple(IEnumerable<T> entities)
+    public void RemoveMany(IEnumerable<T> entities)
     {
         _dbSet.RemoveRange(entities);
     }
@@ -73,7 +73,7 @@ public class Repository<T, DBContext> : IRepository<T> where T : class where DBC
         _dbSet.Update(entity);
     }
 
-    public void UpdateMultiple(List<T> entities)
+    public void UpdateMany(List<T> entities)
     {
         _dbSet.UpdateRange(entities);
     }

@@ -7,6 +7,7 @@ import { NzTableQueryParams, NzTableSize, NzTableModule } from 'ng-zorro-antd/ta
 
 import { MapPipe } from '../../pipes/map.pipe';
 import { TableFiledPipe } from '../../pipes/table-filed.pipe';
+import { ContextPipePipe } from './context-pipe.pipe';
 export interface TableHeader {
   title: string; // header name
   field?: string; // Field
@@ -58,7 +59,7 @@ export interface SortFile {
   providers: [{ provide: AntTableComponentToken, useExisting: AntTableComponent }],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [NzTableModule, NzResizableModule, NgClass, NgTemplateOutlet, MapPipe, TableFiledPipe]
+  imports: [NzTableModule, NzResizableModule, NgClass, NgTemplateOutlet, MapPipe, TableFiledPipe, ContextPipePipe]
 })
 export class AntTableComponent implements OnInit, OnChanges {
   _dataList!: NzSafeAny[];

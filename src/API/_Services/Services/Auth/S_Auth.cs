@@ -19,7 +19,7 @@ public class S_Auth(IRepositoryAccessor repoStore, UserManager<User> userManager
         var userInDb = _repoStore.Users.FirstOrDefault(u => u.UserName == request.UserName);
 
         if (userInDb is null)
-            return OperationResult<AuthResponse>.NotFound("Wrong username or password");
+            return OperationResult<AuthResponse>.BadRequest("Wrong username or password");
 
         bool isPasswordValid = await _userManager.CheckPasswordAsync(userInDb, request.Password);
 

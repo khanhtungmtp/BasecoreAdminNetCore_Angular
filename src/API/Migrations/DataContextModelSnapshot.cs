@@ -514,6 +514,9 @@ namespace API.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
                     b.Property<string>("UrlImage")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

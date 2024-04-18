@@ -21,7 +21,7 @@
         }
       </ng-template>
     </nz-form-control>
-    </nz-form-item>
+  </nz-form-item>
   <nz-form-item>
     <nz-form-label [nzSpan]="5"
                    nzRequired>Name</nz-form-label>
@@ -42,35 +42,35 @@
         }
       </ng-template>
     </nz-form-control>
-    </nz-form-item>
-    <nz-form-item>
-      <nz-form-label [nzSpan]="5"
-                     nzRequired>Url</nz-form-label>
-      <nz-form-control [nzSpan]="15"
-                       nzHasFeedback
-                       nzValidatingTip="Validating..."
-                       [nzErrorTip]="urlErrorTpl">
-        <input nz-input
-               formControlName="url"
-               placeholder="url" />
-        <ng-template #urlErrorTpl
-                     let-control>
-          @if (control.errors?.['required']) {
-          Please input your url!
-          }
-          @if (control.errors?.['duplicated']) {
-          The url is redundant!
-          }
-        </ng-template>
-      </nz-form-control>
-    </nz-form-item>
-    <nz-form-item>
-      <nz-form-label [nzSpan]="5"
-                     nzRequired>Icon</nz-form-label>
-      <nz-form-control [nzSpan]="15"
-                       nzHasFeedback
-                       nzValidatingTip="Validating...">
-        <input nz-input
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label [nzSpan]="5"
+                   nzRequired>Url</nz-form-label>
+    <nz-form-control [nzSpan]="15"
+                     nzHasFeedback
+                     nzValidatingTip="Validating..."
+                     [nzErrorTip]="urlErrorTpl">
+      <input nz-input
+             formControlName="url"
+             placeholder="url" />
+      <ng-template #urlErrorTpl
+                   let-control>
+        @if (control.errors?.['required']) {
+        Please input your url!
+        }
+        @if (control.errors?.['duplicated']) {
+        The url is redundant!
+        }
+      </ng-template>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label [nzSpan]="5"
+                   nzRequired>Icon</nz-form-label>
+    <nz-form-control [nzSpan]="15"
+                     nzHasFeedback
+                     nzValidatingTip="Validating...">
+      <input nz-input
              formControlName="icon"
              placeholder="icon" />
     </nz-form-control>
@@ -81,16 +81,14 @@
                    nzRequired>ParentId</nz-form-label>
     <nz-form-control [nzSpan]="15"
                      nzErrorTip="Please select your parent!">
-      <nz-select id="parentId"
-                 formControlName="parentId"
-                 nzPlaceHolder="Select a option">
-                  <nz-option nzValue="ROOT"
-                             nzLabel="Parent"></nz-option>
-                 @for (parentId of listParentId; track parentId.key) {
-                    <nz-option nzValue="{{parentId.key}}"
-                               nzLabel="{{parentId.value}}"></nz-option>
-                 }
-      </nz-select>
+      <nz-tree-select [nzNodes]="nodes"
+                      formControlName="parentId"
+                      nzVirtualHeight="300px"
+                      [nzDefaultExpandAll]="true"
+                      nzShowSearch
+                      nzPlaceHolder="Please select"
+                      [nzDropdownMatchSelectWidth]="false">
+      </nz-tree-select>
     </nz-form-control>
   </nz-form-item>
   <nz-form-item>
@@ -108,6 +106,7 @@
           nzType="default"
           (click)="handleCancel()">Cancel</button>
   <button nz-button
-          nzType="primary" [disabled]="!dataForm.valid"
+          nzType="primary"
+          [disabled]="!dataForm.valid"
           (click)="submitForm()">Save</button>
 </div>

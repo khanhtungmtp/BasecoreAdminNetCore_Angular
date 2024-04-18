@@ -10,7 +10,7 @@
 "configurations": [
     {
         "name": "SPA Launch",
-        "type": "chrome",
+        "type": "msedge",
         "request": "launch",
         "preLaunchTask": "npm: start",
         "url": "http://localhost:8200",

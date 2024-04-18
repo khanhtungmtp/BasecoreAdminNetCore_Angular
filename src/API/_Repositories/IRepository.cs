@@ -15,14 +15,14 @@ public interface IRepository<T> where T : class
 
     void Add(T entity);
     Task AddAsync(T entity);
-    void AddMultiple(IEnumerable<T> entities);
-    Task AddMultipleAsync(IEnumerable<T> entities);
+    void AddMany(IEnumerable<T> entities);
+    Task AddManyAsync(IEnumerable<T> entities);
     void Update(T entity);
-    void UpdateMultiple(List<T> entities);
+    void UpdateMany(List<T> entities);
     void Remove(T entity);
 
     void Remove(object id);
-    void RemoveMultiple(IEnumerable<T> entities);
+    void RemoveMany(IEnumerable<T> entities);
     bool All(Expression<Func<T, bool>> predicate);
 
     Task<bool> AllAsync(Expression<Func<T, bool>> predicate);

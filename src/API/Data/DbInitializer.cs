@@ -63,27 +63,27 @@ public class DbInitializer(DataContext context,
         {
             _context.Functions.AddRange(new List<Function>
                 {
-                    new() {Id = "DASHBOARD", Name = "DASHBOARD", ParentId = "ROOT", SortOrder = 0,Url = "/admin/dashboard"  },
+                    new() {Id = "DASHBOARD", Name = "DASHBOARD", ParentId = "ROOT", SortOrder = 0,Url = "/admin/dashboard",Icon="dashboard"  },
 
-                    new() {Id = "CONTENT",Name = "Nội dung",ParentId = "ROOT",SortOrder = 1,Url = "/admin/content" },
+                    new() {Id = "CONTENT",Name = "Nội dung",ParentId = "ROOT",SortOrder = 1,Url = "/admin/content",Icon="container" },
 
-                    new() {Id = "CONTENT_CATEGORY",Name = "Danh mục",ParentId ="CONTENT",Url = "/admin/content/category"  },
-                    new() {Id = "CONTENT_Forum",Name = "Bài viết",ParentId = "CONTENT",SortOrder = 2,Url = "/admin/content/kb" },
-                    new() {Id = "CONTENT_COMMENT",Name = "Trang",ParentId = "CONTENT",SortOrder = 3,Url = "/admin/content/comment" },
-                    new() {Id = "CONTENT_REPORT",Name = "Báo xấu",ParentId = "CONTENT",SortOrder = 3,Url = "/admin/content/report" },
+                    new() {Id = "CONTENT_CATEGORY",Name = "Danh mục",ParentId ="CONTENT",SortOrder = 2,Url = "/admin/content/category",Icon="folder"  },
+                    new() {Id = "CONTENT_Forum",Name = "Bài viết",ParentId = "CONTENT",SortOrder = 3,Url = "/admin/content/kb",Icon="form" },
+                    new() {Id = "CONTENT_COMMENT",Name = "Trang",ParentId = "CONTENT",SortOrder = 4,Url = "/admin/content/comment",Icon="message" },
+                    new() {Id = "CONTENT_REPORT",Name = "Báo xấu",ParentId = "CONTENT",SortOrder = 5,Url = "/admin/content/report",Icon="line-chart" },
 
-                    new() {Id = "STATISTIC",Name = "Thống kê", ParentId = "ROOT", SortOrder = 2,Url = "/statistic" },
+                    new() {Id = "STATISTIC",Name = "Thống kê", ParentId = "ROOT", SortOrder = 2,Url = "/statistic", Icon="pie-chart" },
 
-                    new() {Id = "STATISTIC_MONTHLY_NEWMEMBER",Name = "Đăng ký từng tháng",ParentId = "STATISTIC",SortOrder = 1,Url = "/admin/statistic/monthly-register"},
-                    new() {Id = "STATISTIC_MONTHLY_NEWKB",Name = "Bài đăng hàng tháng",ParentId = "STATISTIC",SortOrder = 2,Url = "/admin/statistic/monthly-newkb"},
-                    new() {Id = "STATISTIC_MONTHLY_COMMENT",Name = "Comment theo tháng",ParentId = "STATISTIC",SortOrder = 3,Url = "/admin/statistic/monthly-comment" },
+                    new() {Id = "STATISTIC_MONTHLY_NEWMEMBER",Name = "Đăng ký từng tháng",ParentId = "STATISTIC",SortOrder = 1,Url = "/admin/statistic/monthly-register",Icon="bell"},
+                    new() {Id = "STATISTIC_MONTHLY_NEWKB",Name = "Bài đăng hàng tháng",ParentId = "STATISTIC",SortOrder = 2,Url = "/admin/statistic/monthly-newkb",Icon="read"},
+                    new() {Id = "STATISTIC_MONTHLY_COMMENT",Name = "Comment theo tháng",ParentId = "STATISTIC",SortOrder = 3,Url = "/admin/statistic/monthly-comment", Icon="message" },
 
-                    new() {Id = "SYSTEM", Name = "Hệ thống", ParentId = "ROOT", SortOrder = 3,Url = "/system" },
+                    new() {Id = "SYSTEM", Name = "Hệ thống", ParentId = "ROOT", SortOrder = 3,Url = "/system", Icon="setting" },
 
-                    new() {Id = "SYSTEM_USER", Name = "Người dùng",ParentId = "SYSTEM",Url = "/admin/system/user"},
-                    new() {Id = "SYSTEM_ROLE", Name = "Nhóm quyền",ParentId = "SYSTEM",Url = "/admin/system/role"},
-                    new() {Id = "SYSTEM_FUNCTION", Name = "Chức năng",ParentId = "SYSTEM",Url = "/admin/system/function"},
-                    new() {Id = "SYSTEM_PERMISSION", Name = "Quyền hạn",ParentId = "SYSTEM",Url = "/admin/system/permission"},
+                    new() {Id = "SYSTEM_USER", Name = "Người dùng",ParentId = "SYSTEM",Url = "/admin/system/user", Icon="usergroup-add"},
+                    new() {Id = "SYSTEM_ROLE", Name = "Nhóm quyền",ParentId = "SYSTEM",Url = "/admin/system/role", Icon="team"},
+                    new() {Id = "SYSTEM_FUNCTION", Name = "Chức năng",ParentId = "SYSTEM",Url = "/admin/system/function", Icon="folder-open"},
+                    new() {Id = "SYSTEM_PERMISSION", Name = "Quyền hạn",ParentId = "SYSTEM",Url = "/admin/system/permission", Icon="unlock"},
                 });
             await _context.SaveChangesAsync();
         }

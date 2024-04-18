@@ -22,13 +22,10 @@ import { LockWidgetService } from '@app/admin/tpl/lock-widget/lock-widget.servic
 import { LoginInOutService } from '@app/_core/services/auth/login-in-out.service';
 import { SearchRouteService } from '@app/admin/tpl/search-route/search-route.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { S_1_3_SystemLanguageSettingService } from '@app/_core/services/system-maintenance/s-1_3-system-language-setting.service';
-import { SystemLanguageDto } from '@app/_core/models/system-maintenance/1_3-system-language-setting';
 import { LocalStorageConstants } from '@app/_core/constants/local-storage.constants';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { UrlRouteConstants } from '@app/_core/constants/url-route.constants';
 import { SystemLanguageService } from '@app/_core/services/system/system-language.service';
-import { KeyValuePair } from '@app/_core/utilities/key-value-pair';
 import { SystemLanguageVM } from '@app/_core/models/system/systemlanguage';
 
 @Component({
@@ -101,13 +98,13 @@ export class LayoutHeadRightMenuComponent implements OnInit {
     this.searchRouteService.show(modalOptions);
   }
 
-  goLogin(): void {
+  logOut(): void {
     this.windowServe.clearStorage();
     this.windowServe.clearSessionStorage();
     this.message.success(this.translate.instant('system.message.logout'));
     this.router.navigate([UrlRouteConstants.LOGIN]);
+    this.loginOutService.loginOut().then();
     this.cdr.markForCheck();
-    // this.loginOutService.loginOut().then();
   }
 
   switchLang(lang: string) {
@@ -116,15 +113,10 @@ export class LayoutHeadRightMenuComponent implements OnInit {
     this.message.info(this.translate.instant('system.caption.switchSuccessful'));
   }
 
-  goPage(path: string): void {
-    this.router.navigateByUrl(`/default/page-demo/personal/${path}`);
-  }
-
   getLanguage() {
     this.languageService.getLanguages().subscribe({
       next: (res) => {
-        if (res?.data)
-          this.listLanguage = res.data;
+        this.listLanguage = res;
       },
       error: (e) => {
         throw e

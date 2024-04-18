@@ -68,7 +68,7 @@
     <ng-template #operationTpl
                  let-id="id">
       <span class="operate-text operate-custom"
-             (click)="del(id)"><span nz-icon
+             (click)="deleteRow(id)"><span nz-icon
                   nzType="delete" class="oprerate-delete"
                   nzTheme="outline"></span></span>
       <span class="operate-text operate-custom"
@@ -76,6 +76,7 @@
                   nzType="edit"
                   nzTheme="outline"></span></span>
     </ng-template>
+      <app-water-mark />
   </app-card-table-wrap>
 </div>
 
@@ -90,7 +91,7 @@
   </button>
   <button nz-button
           nzType="default"
-          (click)="allDel()">
+          (click)="deleteItemChecked()">
     <i nz-icon
        nzType="delete"></i>
     delete

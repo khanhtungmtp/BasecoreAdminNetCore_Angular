@@ -5,7 +5,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
-import { KeyValuePair } from '@app/_core/utilities/key-value-pair';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { FunctionService } from '@app/_core/services/system/function.service';
@@ -13,16 +12,18 @@ import { FunctionVM } from '@app/_core/models/system/functionvm';
 import { NzSpinnerCustomService } from '@app/_core/services/common/nz-spinner.service';
 import { NzNotificationCustomService } from '@app/_core/services/nz-notificationCustom.service';
 import { TranslateService } from '@ngx-translate/core';
+import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
+import { FunctionUtility } from '@app/_core/utilities/function-utility';
 
 @Component({
-  selector: 'app-form',
+  selector: 'app-function-form',
   standalone: true,
-  imports: [NzModalModule, ReactiveFormsModule, NzFormModule, NzInputModule, NzButtonModule, NzSelectModule, NzInputNumberModule],
-  templateUrl: './form.component.html',
-  styleUrl: './form.component.less'
+  imports: [NzModalModule, ReactiveFormsModule, NzTreeSelectModule, NzFormModule, NzInputModule, NzButtonModule, NzSelectModule, NzInputNumberModule],
+  templateUrl: './function-form.component.html',
+  styleUrl: './function-form.component.less'
 })
-export class FormComponent implements OnInit {
-
+export class FunctionFormComponent implements OnInit {
+  nodes: any[] = [];
   dataForm: FormGroup<{
     id: FormControl<string | null>;
     name: FormControl<string | null>;
@@ -41,7 +42,7 @@ export class FormComponent implements OnInit {
 
   title: string = '';
   titleBtnActionForm: string = '';
-  listParentId: KeyValuePair[] | undefined = [];
+  listParentId: FunctionVM[] | undefined = [];
   itemFunction: FunctionVM = <FunctionVM>{};
 
   constructor(private fb: FormBuilder, private modal: NzModalRef,
@@ -49,6 +50,7 @@ export class FormComponent implements OnInit {
     private spinService: NzSpinnerCustomService,
     private notification: NzNotificationCustomService,
     private translateService: TranslateService,
+    private ultility: FunctionUtility,
     private modalRef: NzModalRef,
     @Inject(NZ_MODAL_DATA) public id: string) {
     this.initForm();
@@ -79,17 +81,38 @@ export class FormComponent implements OnInit {
   getParentIds(): void {
     this.functionService.getParentIds().subscribe({
       next: (res) => {
-        this.listParentId = res.data;
+        this.listParentId = this.ultility.UnflatteringForLeftMenu(res);
+        const rootParent: any = {
+          "id": "ROOT",
+          "name": "ROOT",
+          "url": "",
+          "sortOrder": 0,
+          "parentId": "ROOT",
+          "icon": "branches",
+          "children": []
+        }
+        this.listParentId.unshift(rootParent);
+        this.nodes = this.mapTreeNodes(this.listParentId);
       }
     })
+  }
+
+  // map response to tree format ng zorror
+  mapTreeNodes(nodes: any[]): any[] {
+    return nodes.map(node => ({
+      title: node.name,
+      key: node.id,
+      icon: node.icon,
+      children: this.mapTreeNodes(node.children || []),
+      isLeaf: node.children.length === 0
+    }));
   }
 
   getById(): void {
     this.spinService.show();
     this.functionService.getById(this.id).subscribe({
       next: (res) => {
-        if (res.succeeded && res.data)
-          this.itemFunction = res.data;
+        this.itemFunction = res;
         this.dataForm.patchValue(this.itemFunction);
         this.dataForm.get('id')?.disable();
       }
@@ -98,8 +121,6 @@ export class FormComponent implements OnInit {
 
   submitForm(): void {
     if (this.dataForm.valid) {
-      console.log(this.dataForm.value);
-      // Gửi dữ liệu form
       const formValue = this.dataForm.value as FunctionVM;
       const isAdding = !this.id;
       const apiCall = isAdding ? this.functionService.add(formValue) : this.functionService.edit(this.id, <FunctionVM>{ ...formValue, id: this.id });
@@ -109,12 +130,11 @@ export class FormComponent implements OnInit {
       apiCall.subscribe({
         next: result => {
           const message = isAdding ? 'system.message.createOKMsg' : 'system.message.updateOKMsg';
-          const isSuccess = result.succeeded || result;
+          const isSuccess = result != '';
 
-          this.notification[isSuccess ? 'success' : 'error'](this.translateService.instant(message), this.translateService.instant('system.caption.' + (isSuccess ? 'success' : 'error')));
+          this.notification[isSuccess ? 'success' : 'error'](this.translateService.instant('system.caption.' + (isSuccess ? 'success' : 'error')), this.translateService.instant(message));
 
           if (isSuccess) {
-            // Đóng modal và gửi kèm dữ liệu
             this.modalRef.destroy(result);
           }
           this.spinService.hide();

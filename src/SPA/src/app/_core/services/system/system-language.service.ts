@@ -1,39 +1,34 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { FunctionVM } from '@app/_core/models/system/functionvm';
 import { SystemLanguageVM } from '@app/_core/models/system/systemlanguage';
-import { KeyValuePair } from '@app/_core/utilities/key-value-pair';
-import { OperationResult } from '@app/_core/utilities/operation-result';
 import { PaginationParam, PagingResult } from '@app/_core/utilities/pagination-utility';
-import { environment } from '@env/environment';
+import { BaseHttpService } from '../base-http.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SystemLanguageService {
-  baseUrl: string = environment.apiUrl + 'SystemLanguages';
-  constructor(private http: HttpClient) {
+  constructor(private httpBase: BaseHttpService,) {
   }
-  getLanguagesPaging(filter: string = '', pagination: PaginationParam) {
-    const params = new HttpParams()
-      .appendAll({ ...pagination, filter });
 
-    return this.http.get<OperationResult<PagingResult<SystemLanguageVM>>>(`${this.baseUrl}`, { params });
+  getLanguagesPaging(filter: string = '', pagination: PaginationParam) {
+    const params = { ...pagination, filter };
+
+    return this.httpBase.get<PagingResult<SystemLanguageVM>>('SystemLanguages', params);
   }
 
   getLanguages() {
-    return this.http.get<OperationResult<SystemLanguageVM[]>>(this.baseUrl + '/GetLanguages');
+    return this.httpBase.get<SystemLanguageVM[]>('SystemLanguages/GetLanguages');
   }
 
   add(model: SystemLanguageVM) {
-    return this.http.post<OperationResult<string>>(`${this.baseUrl}`, model);
+    return this.httpBase.post<string>('SystemLanguages', model);
   }
 
   edit(id: string, model: SystemLanguageVM) {
-    return this.http.put<OperationResult<string>>(`${this.baseUrl}/${id}`, model);
+    return this.httpBase.put<string>(`${id}`, model);
   }
 
-  deleteFunction(id: string) {
-    return this.http.delete<OperationResult<string>>(`${this.baseUrl}/${id}`);
+  delete(id: string) {
+    return this.httpBase.delete<string>(`${id}`);
   }
 }
