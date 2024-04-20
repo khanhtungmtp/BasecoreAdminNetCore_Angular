@@ -7,7 +7,15 @@ public class UserVM
     public string Email { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
+    public Gender Gender { get; set; }
+    public bool IsActive { get; set; }
     public DateTime DateOfBirth { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime? UpdatedDate { get; set; }
+}
+
+public enum Gender
+{
+    Male,
+    Female
 }

@@ -11,4 +11,10 @@ public class SystemConstants
     {
         public const string Admin = "Admin";
     }
+
+    public enum Gender
+    {
+        Male,
+        Female
+    }
 }

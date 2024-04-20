@@ -1,0 +1,139 @@
+<form nz-form
+      [formGroup]="addEditForm">
+  <nz-form-item>
+    <nz-form-label nzFor="sex"
+                   nzRequired
+                   [nzSm]="4"
+                   [nzXs]="24">User Name</nz-form-label>
+    <nz-form-control [nzErrorTip]="combineTpl"
+                     [nzSm]="18"
+                     [nzXs]="24">
+      <input id="userName"
+             formControlName="userName"
+             nz-input
+             placeholder="User name" />
+    </nz-form-control>
+  </nz-form-item>
+  @if (!isEdit) {
+  <nz-form-item>
+    <nz-form-label nzFor="roleId"
+                   nzRequired
+                   [nzSm]="4"
+                   [nzXs]="24">Password</nz-form-label>
+    <nz-form-control nzExtra="The initial password for a new user is: a123456"
+                     [nzErrorTip]="combineTpl"
+                     [nzSm]="18"
+                     [nzXs]="24">
+      <input formControlName="password"
+             nz-input
+             placeholder="password"
+             [type]="'password'" />
+    </nz-form-control>
+  </nz-form-item>
+  }
+  <nz-form-item>
+    <nz-form-label nzFor="sex"
+                   nzRequired
+                   [nzSm]="4"
+                   [nzXs]="24">Gender</nz-form-label>
+    <nz-form-control [nzErrorTip]="combineTpl"
+                     [nzSm]="18"
+                     [nzXs]="24">
+      <nz-radio-group formControlName="gender">
+        <label nz-radio
+               [nzValue]="1">Male</label>
+        <label nz-radio
+               [nzValue]="0">Female</label>
+      </nz-radio-group>
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item>
+    <nz-form-label nzFor="available"
+                   nzRequired
+                   [nzSm]="4"
+                   [nzXs]="24">Is Active</nz-form-label>
+    <nz-form-control [nzErrorTip]="combineTpl"
+                     [nzSm]="18"
+                     [nzXs]="24">
+      <nz-switch formControlName="isActive"
+                 nzCheckedChildren="Active"
+                 nzUnCheckedChildren="Disable"></nz-switch>
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item>
+    <nz-form-label nzFor="phoneNumber"
+                   nzRequired
+                   [nzSm]="4"
+                   [nzXs]="24">Phone number</nz-form-label>
+    <nz-form-control [nzErrorTip]="combineTpl"
+                     [nzSm]="18"
+                     [nzXs]="24">
+      <input id="phoneNumber"
+             formControlName="phoneNumber"
+             maxlength="11"
+             nz-input
+             placeholder="0966258369" />
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item>
+    <nz-form-label nzFor="email"
+                   nzRequired
+                   [nzSm]="4"
+                   [nzXs]="24">Email</nz-form-label>
+    <nz-form-control [nzErrorTip]="combineTpl"
+                     [nzSm]="18"
+                     [nzXs]="24">
+      <input id="email"
+             formControlName="email"
+             nz-input
+             placeholder="Email" />
+    </nz-form-control>
+  </nz-form-item>
+
+  <!-- <nz-form-item>
+    <nz-form-label nzFor="departmentId"
+                   nzRequired
+                   [nzSm]="4"
+                   [nzXs]="24">DepartmentId</nz-form-label>
+    <nz-form-control [nzErrorTip]="combineTpl"
+                     [nzSm]="18"
+                     [nzXs]="24">
+      <nz-tree-select formControlName="departmentId"
+                      nzPlaceHolder="Please select"
+                      nzShowSearch
+                      [nzDropdownMatchSelectWidth]="true"
+                      [nzNodes]="deptNodes"></nz-tree-select>
+    </nz-form-control>
+  </nz-form-item> -->
+
+  <nz-form-item>
+    <nz-form-label nzFor="roleId"
+                   nzRequired
+                   [nzSm]="4"
+                   [nzXs]="24">User role</nz-form-label>
+    <nz-form-control [nzErrorTip]="combineTpl"
+                     [nzSm]="18"
+                     [nzXs]="24">
+      <nz-select formControlName="roleId"
+                 nzMode="multiple"
+                 nzPlaceHolder="Role">
+        @for (option of roleOptions; track option) {
+        <nz-option [nzLabel]="option.label"
+                   [nzValue]="option.value"></nz-option>
+        }
+      </nz-select>
+    </nz-form-control>
+  </nz-form-item>
+</form>
+<ng-template #combineTpl
+             let-control>
+  @if (control.hasError('message')) {
+  {{ control.errors.message }}
+  }
+  @if (control.hasError('required')) {
+  Required fields
+  }
+</ng-template>

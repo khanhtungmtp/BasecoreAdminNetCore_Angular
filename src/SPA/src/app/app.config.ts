@@ -139,7 +139,7 @@ export const appConfig: ApplicationConfig = {
       // DI-based interceptors must be explicitly enabled.
       withInterceptorsFromDi(),
     ),
-    { provide: HTTP_INTERCEPTORS, useClass: ServerErrorInterceptor, multi: true },
+    // { provide: HTTP_INTERCEPTORS, useClass: ServerErrorInterceptor, multi: true },
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
     ...APPINIT_PROVIDES,
     // { provide: RouteReuseStrategy, useClass: SimpleReuseStrategy, deps: [DOCUMENT, ScrollService] }, // Reuse tab

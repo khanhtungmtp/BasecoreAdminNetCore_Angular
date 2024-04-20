@@ -76,9 +76,10 @@ import { NzGraphModule } from 'ng-zorro-antd/graph';
 import { NzCronExpressionModule } from 'ng-zorro-antd/cron-expression';
 import { NzQRCodeModule } from 'ng-zorro-antd/qr-code';
 import { NzWaterMarkModule } from 'ng-zorro-antd/water-mark';
-
+import { NzHighlightModule } from 'ng-zorro-antd/core/highlight';
 @NgModule({
   exports: [
+    NzHighlightModule,
     NzAffixModule,
     NzAlertModule,
     NzAnchorModule,

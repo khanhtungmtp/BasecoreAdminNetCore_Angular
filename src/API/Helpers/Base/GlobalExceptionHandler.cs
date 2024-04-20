@@ -12,8 +12,8 @@ public class GlobalExceptionHandler(IHostEnvironment env) : IExceptionHandler
     {
         Logger logger = LogManager.GetLogger("applog");
         ErrorGlobalResponse? result;
-        string? detail = _env.IsDevelopment() ? ex.StackTrace?.ToString() : "Oops, an error occurred."; // show only development
-        string? message = _env.IsDevelopment() && ex.GetType().Name == "SqlException" ? ex.Message?.ToString() : "Oops, an error occurred."; // show only development
+        string? detail = _env.IsDevelopment() ? ex.StackTrace?.ToString() : "Sorry, there is an error on server."; // show only development
+        string? message = _env.IsDevelopment() && ex.GetType().Name == "SqlException" ? ex.Message?.ToString() : "Sorry, there is an error on server."; // show only development
 
         result = new ErrorGlobalResponse
         {

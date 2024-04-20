@@ -1,13 +1,14 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { environment } from '@env/environment';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import * as qs from 'qs';
+import qs from 'qs';
 import { HttpCustomConfig, OperationResult } from '../utilities/operation-result';
+import { Router } from '@angular/router';
+import { NzSpinnerCustomService } from './common/nz-spinner.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,8 @@ export class BaseHttpService {
   uri: string;
   http = inject(HttpClient);
   message = inject(NzMessageService);
+  router = inject(Router);
+  spinnerService = inject(NzSpinnerCustomService);
 
   protected constructor() {
     this.uri = !environment.production ? environment.apiUrl : '/site/api';
@@ -27,7 +30,8 @@ export class BaseHttpService {
     let reqPath = this.getUrl(path, config);
     const params = new HttpParams({ fromString: qs.stringify(param) });
     return this.http.get<OperationResult>(reqPath, { params }).pipe(
-      map(response => this.handleResponse(response))
+      map(response => this.handleResponse(response)),
+      catchError(this.handleError)
     );
   }
 
@@ -46,7 +50,8 @@ export class BaseHttpService {
 
     // Sử dụng http.delete với RequestOptions bao gồm cả params và body
     return this.http.delete<OperationResult>(reqPath, options).pipe(
-      map(response => this.handleResponse(response))
+      map(response => this.handleResponse(response)),
+      catchError(this.handleError)
     );
   }
 
@@ -54,7 +59,8 @@ export class BaseHttpService {
     config = config || { needSuccessInfo: false };
     let reqPath = this.getUrl(path, config);
     return this.http.post<OperationResult>(reqPath, param).pipe(
-      map(response => this.handleResponse(response))
+      map(response => this.handleResponse(response)),
+      catchError(this.handleError)
     );
   }
 
@@ -62,23 +68,9 @@ export class BaseHttpService {
     config = config || { needSuccessInfo: false };
     let reqPath = this.getUrl(path, config);
     return this.http.put<OperationResult>(reqPath, param).pipe(
-      map(response => this.handleResponse(response))
+      map(response => this.handleResponse(response)),
+      catchError(this.handleError)
     );
-  }
-
-  private handleResponse<T>(response: OperationResult<T>): T | boolean {
-    if (response.succeeded) {
-      // Kiểm tra nếu có dữ liệu, trả về dữ liệu đó
-      if (response.data !== undefined) {
-        return response.data;
-      }
-      // Nếu không có dữ liệu nhưng vẫn thành công, log hoặc thực hiện một hành động nào đó
-      else {
-        return true;
-      }
-    } else {
-      throw new Error(response.message);
-    }
   }
 
   downLoadWithBlob(path: string, param?: NzSafeAny, config?: HttpCustomConfig): Observable<NzSafeAny> {
@@ -97,6 +89,31 @@ export class BaseHttpService {
     }
     return reqPath;
   }
+
+
+  private handleError(error: any) {
+    console.error('An error occurred baseServices:', error);
+
+    // Tiếp tục truyền lỗi tới global error handler
+    return throwError(() => error);
+  }
+
+  // handle success
+  private handleResponse<T>(response: OperationResult<T>): T | boolean {
+    if (response.succeeded) {
+      // Kiểm tra nếu có dữ liệu, trả về dữ liệu đó
+      if (response.data !== undefined) {
+        return response.data;
+      }
+      // Nếu không có dữ liệu nhưng vẫn thành công, log hoặc thực hiện một hành động nào đó
+      else {
+        return true;
+      }
+    } else {
+      throw response.message;
+    }
+  }
+
 
   // resultHandle<T>(config: HttpCustomConfig): (observable: Observable<ActionResult<T>>) => Observable<T> {
   //   return (observable: Observable<ActionResult<T>>) => {

@@ -1,13 +1,14 @@
 ﻿using API.Models;
 using Microsoft.AspNetCore.Identity;
+using static API.Helpers.Constants.SystemConstants;
 namespace API.Data;
 public class DbInitializer(DataContext context,
   UserManager<User> userManager,
-  RoleManager<IdentityRole> roleManager)
+  RoleManager<SystemRole> roleManager)
 {
     private readonly DataContext _context = context;
     private readonly UserManager<User> _userManager = userManager;
-    private readonly RoleManager<IdentityRole> _roleManager = roleManager;
+    private readonly RoleManager<SystemRole> _roleManager = roleManager;
     private readonly string AdminRoleName = "Admin";
     private readonly string UserRoleName = "Member";
 
@@ -17,13 +18,13 @@ public class DbInitializer(DataContext context,
 
         if (!_roleManager.Roles.Any())
         {
-            await _roleManager.CreateAsync(new IdentityRole
+            await _roleManager.CreateAsync(new SystemRole
             {
                 Id = AdminRoleName,
                 Name = AdminRoleName,
                 NormalizedName = AdminRoleName.ToUpper(),
             });
-            await _roleManager.CreateAsync(new IdentityRole
+            await _roleManager.CreateAsync(new SystemRole
             {
                 Id = UserRoleName,
                 Name = UserRoleName,
@@ -42,6 +43,8 @@ public class DbInitializer(DataContext context,
                 Id = Guid.NewGuid().ToString(),
                 UserName = "admin",
                 FullName = "Quản trị",
+                Gender = Gender.Male,
+                IsActive = true,
                 DateOfBirth = new DateTime(1997, 01, 23),
                 PhoneNumber = "0338716085",
                 Email = "khanhtungmtp@gmail.com",
@@ -80,7 +83,7 @@ public class DbInitializer(DataContext context,
 
                     new() {Id = "SYSTEM", Name = "Hệ thống", ParentId = "ROOT", SortOrder = 3,Url = "/system", Icon="setting" },
 
-                    new() {Id = "SYSTEM_USER", Name = "Người dùng",ParentId = "SYSTEM",Url = "/admin/system/user", Icon="usergroup-add"},
+                    new() {Id = "SYSTEM_USER", Name = "Người dùng",ParentId = "SYSTEM",Url = "/admin/system/user-manager", Icon="usergroup-add"},
                     new() {Id = "SYSTEM_ROLE", Name = "Nhóm quyền",ParentId = "SYSTEM",Url = "/admin/system/role", Icon="team"},
                     new() {Id = "SYSTEM_FUNCTION", Name = "Chức năng",ParentId = "SYSTEM",Url = "/admin/system/function", Icon="folder-open"},
                     new() {Id = "SYSTEM_PERMISSION", Name = "Quyền hạn",ParentId = "SYSTEM",Url = "/admin/system/permission", Icon="unlock"},

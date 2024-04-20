@@ -14,4 +14,5 @@ public interface I_User
     Task<OperationResult<List<FunctionVM>>> GetMenuByUserPermission(string userId);
     Task<OperationResult<User>> GetByIdAsync(string id);
     Task<OperationResult<PagingResult<ForumQuickVM>>> GetForumByUserId(string userId, PaginationParam pagination);
+    Task<OperationResult> DeleteRangeAsync(List<string> ids);
 }

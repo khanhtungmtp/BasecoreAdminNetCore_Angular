@@ -33,7 +33,7 @@ public static class AuthenticationConfig
 
         //2. Setup idetntity
         services.AddIdentityCore<User>()
-           .AddRoles<IdentityRole>() // Nếu bạn muốn sử dụng Roles
+           .AddRoles<SystemRole>() // Nếu bạn muốn sử dụng Roles
            .AddEntityFrameworkStores<DataContext>() // Set up EF stores
            .AddSignInManager<SignInManager<User>>() // Thêm SignInManager nếu bạn cần nó
            .AddDefaultTokenProviders(); // Thêm token providers nếu bạn muốn sử dụng function như là đặt lại mật khẩu

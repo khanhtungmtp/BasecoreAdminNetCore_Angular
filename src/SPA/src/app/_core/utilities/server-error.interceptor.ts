@@ -31,7 +31,7 @@ export class ServerErrorInterceptor implements HttpInterceptor {
     if (error.status === 0 || error.status === 401) {
       apiError.statusCode = error.status;
       if (error.status === 401) {
-        apiError.message = error.error?.message || 'error else 401';
+        apiError.message = error.error?.message || 'Session expired, please log in again.';
         localStorage.clear();
         this.router.navigate([UrlRouteConstants.LOGIN]);
       }
@@ -49,7 +49,7 @@ export class ServerErrorInterceptor implements HttpInterceptor {
 
     } else {
       apiError.statusCode = error.status;
-      apiError.message = error.error != null ? error.error.message : error.message;
+      apiError.message = error.error.message ?? error.message;
     }
 
     this.spinnerService.hide();

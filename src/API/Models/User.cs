@@ -1,6 +1,7 @@
 ﻿using API.Models.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using static API.Helpers.Constants.SystemConstants;
 
 namespace API.Models;
 public class User : IdentityUser, IDateTracking
@@ -28,6 +29,9 @@ public class User : IdentityUser, IDateTracking
     public int? NumberOfVotes { get; set; }
 
     public int? NumberOfReports { get; set; }
+    public Gender Gender { get; set; }
+    public bool IsActive { get; set; }
+    public DateTime LastLoginTime { get; set; }
     public string? RefreshToken { get; set; }
     public DateTime RefreshTokenExpiryTime { get; set; }
     public string? CreatedBy { get; set; }

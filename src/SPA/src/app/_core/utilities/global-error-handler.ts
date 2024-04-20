@@ -1,36 +1,65 @@
-import { Injectable, ErrorHandler } from "@angular/core";
-import { InjectBase } from './inject-base-app';
-import { ErrorService } from '@services/error.service';
+import { Injectable, ErrorHandler, inject } from "@angular/core";
 import { HttpErrorResponse } from "@angular/common/http";
 import { ErrorGlobalResponse } from "@models/base/error-global-response";
+import { UrlRouteConstants } from "../constants/url-route.constants";
+import { NzSpinnerCustomService } from "../services/common/nz-spinner.service";
+import { NzNotificationCustomService } from "../services/nz-notificationCustom.service";
+import { Router } from "@angular/router";
 
 @Injectable({
   providedIn: "root",
 })
-export class GlobalErrorHandler extends InjectBase implements ErrorHandler {
-  constructor(private errorService: ErrorService) {
-    super();
-  }
+export class GlobalErrorHandler implements ErrorHandler {
+  private notification = inject(NzNotificationCustomService);
+  private spinnerService = inject(NzSpinnerCustomService);
+  private router = inject(Router);
 
   handleError(error: any) {
-    let message: ErrorGlobalResponse = <ErrorGlobalResponse>{};
-    if (error instanceof HttpErrorResponse || error.type === 'HttpErrorResponse') {
-      // Xử lý lỗi từ phía server
-      console.log('error Server', error);
-      message = this.errorService.getServerErrorMessage(error);
-      this.notification.error('Error: ' + message.statusCode.toString(), message.message)
-    } else if (error instanceof ErrorEvent) {
-      // Xử lý lỗi từ phía client
-      console.log('error Client', error);
-      this.notification.error('Error: ' + error.error, error.message)
+    console.log('error global: ', error);
+    let apiError: ErrorGlobalResponse = <ErrorGlobalResponse>{
+      message: 'An error occurred while connecting to the server',
+      statusCode: error.status,
+      type: error.name
+    };
+
+    if (error instanceof HttpErrorResponse) {
+      if (error.status === 0) {
+        apiError.message = "Cannot connect to the server";
+      } else if (error.status === 401) {
+        apiError.message = error.error?.message || 'Session expired, please log in again.';
+        localStorage.clear();
+        this.router.navigate([UrlRouteConstants.LOGIN]);
+      } else if (error.error) {
+        apiError = {
+          message: error.error.message || apiError.message,
+          statusCode: error.error.status || apiError.statusCode,
+          type: error.error.type || apiError.type
+        };
+      } else {
+        apiError.message = error.message;
+      }
     } else {
-      // Xử lý lỗi không xác định được | loi da custom response apiError
-      // Unknown Error client
-      console.log('Unknown Error client');
-      console.log('error: ', error);
-      if (error.message)
-      this.notification.error(`Error dev: ${error.message}`, error.message)
-      // }
+      // Lỗi client-side hoặc lỗi mạng
+      // custom exception error APIError
+      if (error.error?.errors) {
+        apiError = {
+          message: error.error.errors.join(','),
+          statusCode: error.error.status,
+          type: error.error.type
+        }
+        console.log('errors dev: uncorect field parameter: ', error);
+        return;
+      } else {
+        console.log('errors dev:', error);
+        apiError = {
+          message: error.error?.message ?? error.message,
+          statusCode: error?.status ?? 400,
+          type: error?.name ?? 'Error dev'
+        }
+      }
     }
+
+    this.spinnerService.hide();
+    this.notification.error('Error: ' + apiError.statusCode, apiError.message)
   }
 }

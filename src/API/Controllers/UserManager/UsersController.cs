@@ -63,12 +63,12 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
     // url: GET : http:localhost:6001/api/user
     [HttpGet]
     [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
-    public async Task<IActionResult> GetPaging(string? filter, [FromQuery] PaginationParam pagination, [FromQuery] UserVM userVM)
+    public async Task<IActionResult> GetPaging([FromQuery] PaginationParam pagination, [FromQuery] UserVM userVM)
     {
         var user = _userManager.Users;
         if (user is null)
             return NotFound(OperationResult.NotFound("User not found"));
-        if (!string.IsNullOrWhiteSpace(filter))
+        if (!string.IsNullOrWhiteSpace(userVM.DateOfBirth))
         {
             bool isDate = DateTime.TryParse(filter, out DateTime filterDate);
             user = user.Where(x => x.FullName.Contains(filter) || x.Email != null && x.Email.Contains(filter) || (isDate && x.DateOfBirth.Date == filterDate.Date));

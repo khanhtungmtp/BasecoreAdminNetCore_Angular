@@ -9,10 +9,10 @@ using ViewModels.Forum;
 using ViewModels.System;
 
 namespace API._Services.Services.UserManager;
-public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager, RoleManager<IdentityRole> rolesManager) : BaseServices(repoStore), I_User
+public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager, RoleManager<SystemRole> rolesManager) : BaseServices(repoStore), I_User
 {
     private readonly UserManager<User> _userManager = userManager;
-    private readonly RoleManager<IdentityRole> _rolesManager = rolesManager;
+    private readonly RoleManager<SystemRole> _rolesManager = rolesManager;
 
     public async Task<OperationResult<User>> GetByIdAsync(string userId)
     {
@@ -73,6 +73,18 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
             .ThenBy(x => x.SortOrder)
             .ToListAsync();
         return OperationResult<List<FunctionVM>>.Success(data, "Get data successfully.");
+    }
+
+    public async Task<OperationResult> DeleteRangeAsync(List<string> ids)
+    {
+        if (ids.Count == 0) return OperationResult.NotFound("List users not found.");
+        var entitiesToDelete = await _repoStore.Users.FindAll(entity => ids.Contains(entity.Id)).ToListAsync();
+        if (entitiesToDelete.Count == 0)
+            return OperationResult.NotFound("List users empty.");
+
+        _repoStore.Users.RemoveMany(entitiesToDelete);
+        await _repoStore.SaveChangesAsync();
+        return OperationResult.Success("Delete users successfully.");
     }
 
 }
