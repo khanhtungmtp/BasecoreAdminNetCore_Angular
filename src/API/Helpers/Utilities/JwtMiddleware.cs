@@ -7,10 +7,10 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace API.Helpers.Utilities;
 
-public class JwtMiddleware(RequestDelegate next, IOptions<AppSetting> appSettings)
+public class JwtMiddleware(RequestDelegate next, IConfiguration configuration)
 {
     private readonly RequestDelegate _next = next;
-    private readonly AppSetting _appSetting = appSettings.Value;
+    private readonly IConfiguration _configuration = configuration;
 
     public async Task Invoke(HttpContext context, I_User userService)
     {
@@ -25,7 +25,7 @@ public class JwtMiddleware(RequestDelegate next, IOptions<AppSetting> appSetting
     private async Task AttachUserToContext(HttpContext context, I_User userService, string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_appSetting.SecretKey);
+        var key = Encoding.UTF8.GetBytes(_configuration.GetSection("JwtSetting").GetSection("securityKey").Value!);
         tokenHandler.ValidateToken(token, new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
@@ -37,7 +37,7 @@ public class JwtMiddleware(RequestDelegate next, IOptions<AppSetting> appSetting
         }, out SecurityToken validatedToken);
 
         var jwtToken = (JwtSecurityToken)validatedToken;
-        var userId = jwtToken.Claims.First(x => x.Type == "Id").Value;
+        var userId = jwtToken.Claims.First(x => x.Type == "nameid").Value;
 
         //Attach user to context on successful JWT validation
         context.Items["User"] = await userService.GetByIdAsync(userId);

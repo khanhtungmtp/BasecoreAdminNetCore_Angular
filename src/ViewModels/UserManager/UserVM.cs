@@ -10,6 +10,7 @@ public class UserVM
     public Gender Gender { get; set; }
     public bool IsActive { get; set; }
     public DateTime DateOfBirth { get; set; }
+    public List<string> Roles { get; set; } = [];
     public DateTime CreatedDate { get; set; }
     public DateTime? UpdatedDate { get; set; }
 }

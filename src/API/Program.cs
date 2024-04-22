@@ -13,9 +13,10 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
     builder.Host.UseNLog();
-builder.Services.AddCors();
+    builder.Services.AddCors();
     // Add services to the container.
     builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("AppSettings"));
+    builder.Services.Configure<JwtSetting>(builder.Configuration.GetSection("JWTSetting"));
     // redirect fluent validation exceptions to the global error handler
     builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
      options.InvalidModelStateResponseFactory = actionContext =>
@@ -31,7 +32,7 @@ builder.Services.AddCors();
          {
              TrackId = trackId,
              StatusCode = (int)HttpStatusCode.BadRequest,
-             Type ="ValidatorError",
+             Type = "ValidatorError",
              Message = ReasonPhrases.GetReasonPhrase((int)HttpStatusCode.BadRequest),
              Errors = errors,
              Instance = $"{context.Request.Method} {context.Request.Path}",
@@ -78,7 +79,7 @@ builder.Services.AddCors();
     app.UseAuthorization();
     app.MapControllers();
     app.UseExceptionHandler();
-    app.UseMiddleware<JwtMiddleware>();
+    // app.UseMiddleware<JwtMiddleware>();
     // seeding inittial Data
     DataSeeder.SeedDatabase(app);
     app.Run();

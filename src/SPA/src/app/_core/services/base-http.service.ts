@@ -21,7 +21,7 @@ export class BaseHttpService {
   spinnerService = inject(NzSpinnerCustomService);
 
   protected constructor() {
-    this.uri = !environment.production ? environment.apiUrl : '/site/api';
+    this.uri = !environment.production ? environment.apiUrl : 'https://localhost:6001/api/';
   }
 
   // Modify your service methods
@@ -92,7 +92,7 @@ export class BaseHttpService {
 
 
   private handleError(error: any) {
-    console.error('An error occurred baseServices:', error);
+    console.log('An error occurred baseServices:', error);
 
     // Tiếp tục truyền lỗi tới global error handler
     return throwError(() => error);

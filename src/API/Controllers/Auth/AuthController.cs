@@ -1,4 +1,5 @@
 using API._Services.Interfaces.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ViewModels.Auth;
 namespace API.Controllers.Auth;
@@ -20,6 +21,17 @@ public class AuthController(I_Auth authService) : ControllerBase
                 return Unauthorized(result);
             return BadRequest(result);
         }
+        return Ok(result);
+    }
+
+    [AllowAnonymous]
+    [HttpPost("refresh-token")]
+    public async Task<ActionResult<AuthResponse>> RefreshToken(TokenRequest request)
+    {
+        var result = await _authService.RefreshTokenAsync(request);
+        if (!result.Succeeded)
+            return BadRequest(result);
+
         return Ok(result);
     }
 }

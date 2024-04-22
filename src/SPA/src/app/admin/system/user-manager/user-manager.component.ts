@@ -55,7 +55,7 @@ import { Pagination, PaginationParam } from '@app/_core/utilities/pagination-uti
 })
 export class UserManagerComponent implements OnInit {
   @ViewChild('operationTpl', { static: true }) operationTpl!: TemplateRef<any>;
-  @ViewChild('availableFlag', { static: true }) availableFlag!: TemplateRef<NzSafeAny>;
+  @ViewChild('isActiveFlag', { static: true }) isActiveFlag!: TemplateRef<NzSafeAny>;
   searchParam: Partial<UserVM> = {};
   filter: string = '';
   pagination: Pagination = <Pagination>{
@@ -92,11 +92,6 @@ export class UserManagerComponent implements OnInit {
 
   getDataList(e?: NzTableQueryParams): void {
     this.tableConfig.loading = true;
-    const params: SearchCommonVO<any> = {
-      pageSize: this.tableConfig.pageSize!,
-      pageNum: e?.pageIndex || this.tableConfig.pageIndex!,
-      filters: this.searchParam
-    };
 
     const _pagingParam: PaginationParam = {
       pageSize: e?.pageSize || this.pagination.pageSize,
@@ -303,7 +298,7 @@ export class UserManagerComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.availableOptions = [...MapPipe.transformMapToArray(MapSet.available, MapKeyType.Boolean)];
+    this.availableOptions = [...MapPipe.transformMapToArray(MapSet.isActive, MapKeyType.Boolean)];
     this.initTable();
   }
 
@@ -320,13 +315,13 @@ export class UserManagerComponent implements OnInit {
           title: 'Is active',
           width: 100,
           field: 'isActive',
-          tdTemplate: this.availableFlag
+          tdTemplate: this.isActiveFlag
         },
         {
           title: 'Gender',
           width: 70,
           field: 'gender',
-          pipe: 'sex'
+          pipe: 'gender'
         },
         {
           title: 'Phone Number',
@@ -350,10 +345,9 @@ export class UserManagerComponent implements OnInit {
           pipe: 'date:yyyy-MM-dd HH:mm'
         },
         {
-          title: 'Creation time',
+          title: 'Roles',
           width: 100,
-          field: 'createdDate',
-          pipe: 'date:yyyy-MM-dd HH:mm'
+          field: 'roles',
         },
         {
           title: 'Operation',

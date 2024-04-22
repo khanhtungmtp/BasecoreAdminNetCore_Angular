@@ -192,12 +192,12 @@
     </button>
   </ng-template>
 
-  <ng-template #availableFlag
-               let-available="available"
+  <ng-template #isActiveFlag
+               let-isActive="isActive"
                let-id="id">
     <nz-switch nzCheckedChildren="enable"
                nzUnCheckedChildren="Disable"
-               [ngModel]="available"
+               [ngModel]="isActive"
                [nzControl]="true"
                [nzDisabled]="true"></nz-switch>
   </ng-template>

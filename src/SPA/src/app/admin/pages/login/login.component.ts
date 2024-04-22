@@ -68,8 +68,6 @@ export class LoginComponent extends InjectBase implements OnInit {
       this.spinnerService.show();
       this.authService.login(this.user).subscribe({
         next: (res) => {
-          console.log('res: ', res);
-
           this.notification.success(MessageConstants.LOGGED_IN, CaptionConstants.SUCCESS);
           this.spinnerService.hide();
           this.router.navigate([UrlRouteConstants.DASHBOARD]);

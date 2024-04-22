@@ -1,18 +1,16 @@
 import { Injectable, ErrorHandler, inject } from "@angular/core";
 import { HttpErrorResponse } from "@angular/common/http";
 import { ErrorGlobalResponse } from "@models/base/error-global-response";
-import { UrlRouteConstants } from "../constants/url-route.constants";
 import { NzSpinnerCustomService } from "../services/common/nz-spinner.service";
 import { NzNotificationCustomService } from "../services/nz-notificationCustom.service";
-import { Router } from "@angular/router";
-
+import { environment } from '@env/environment';
 @Injectable({
   providedIn: "root",
 })
 export class GlobalErrorHandler implements ErrorHandler {
   private notification = inject(NzNotificationCustomService);
   private spinnerService = inject(NzSpinnerCustomService);
-  private router = inject(Router);
+  isProduct: boolean = environment.production
 
   handleError(error: any) {
     console.log('error global: ', error);
@@ -25,19 +23,19 @@ export class GlobalErrorHandler implements ErrorHandler {
     if (error instanceof HttpErrorResponse) {
       if (error.status === 0) {
         apiError.message = "Cannot connect to the server";
-      } else if (error.status === 401) {
-        apiError.message = error.error?.message || 'Session expired, please log in again.';
-        localStorage.clear();
-        this.router.navigate([UrlRouteConstants.LOGIN]);
-      } else if (error.error) {
+      }
+      else if (error.error) {
         apiError = {
-          message: error.error.message || apiError.message,
-          statusCode: error.error.status || apiError.statusCode,
+          message: this.isProduct ? "Sorry, there is an error on server." : error.error.message || apiError.message,
+          statusCode: error.error.statusCode || apiError.statusCode,
           type: error.error.type || apiError.type
         };
+        console.log('errors servers include error.error:', apiError);
       } else {
-        apiError.message = error.message;
+        apiError.message = this.isProduct ? "Sorry, there is an error on server." : error.message;
+        console.log('errors servers:', apiError);
       }
+
     } else {
       // Lỗi client-side hoặc lỗi mạng
       // custom exception error APIError
@@ -47,15 +45,15 @@ export class GlobalErrorHandler implements ErrorHandler {
           statusCode: error.error.status,
           type: error.error.type
         }
-        console.log('errors dev: uncorect field parameter: ', error);
+        console.log('errors dev: uncorect field parameter: ', apiError);
         return;
       } else {
-        console.log('errors dev:', error);
         apiError = {
           message: error.error?.message ?? error.message,
           statusCode: error?.status ?? 400,
           type: error?.name ?? 'Error dev'
         }
+        console.log('errors dev:', apiError);
       }
     }
 

@@ -22,21 +22,21 @@ export const enum MapKeyType {
 }
 
 export const MapSet = {
-  sex: {
-    0: '女',
-    1: '男'
+  gender: {
+    0: 'Female',
+    1: 'Male'
   },
-  available: {
-    true: '可用',
-    false: '禁用'
+  isActive: {
+    true: 'Enable',
+    false: 'Disable'
   },
   isOrNot: {
-    true: '是',
-    false: '否'
+    true: 'Yes',
+    false: 'No'
   },
   visible: {
-    true: '展示',
-    false: '隐藏'
+    true: 'visible',
+    false: 'hide'
   }
 };
 

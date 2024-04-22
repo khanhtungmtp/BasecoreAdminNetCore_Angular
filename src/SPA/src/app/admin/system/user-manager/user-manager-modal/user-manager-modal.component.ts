@@ -92,20 +92,17 @@ export class UserManagerModalComponent implements OnInit {
     this.addEditForm = this.fb.group({
       userName: [null, [Validators.required]],
       password: ['a123456', [Validators.required, this.validatorsService.passwordValidator()]],
-      gender: [1],
+      gender: [0],
       isActive: [true],
       phoneNumber: [null, [this.validatorsService.mobileValidator()]],
       email: [null, [this.validatorsService.emailValidator()]],
-      roleId: [null, [Validators.required]],
-      departmentId: [null, [Validators.required]],
-      departmentName: [null]
+      roleId: [null, [Validators.required]]
     });
   }
 
   async ngOnInit(): Promise<void> {
     this.initForm();
     this.isEdit = !!this.nzModalData;
-    // await Promise.all([this.getRoleList(), this.getDepartmentList()]);
     await Promise.all([this.getRoleList()]);
     if (this.isEdit) {
       this.addEditForm.patchValue(this.nzModalData);

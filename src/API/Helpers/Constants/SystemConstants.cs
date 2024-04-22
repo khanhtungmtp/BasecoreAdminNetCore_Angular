@@ -5,6 +5,7 @@ public class SystemConstants
     public class Claims
     {
         public const string Permissions = "permissions";
+        public const string Id = "Id";
     }
 
     public class Roles

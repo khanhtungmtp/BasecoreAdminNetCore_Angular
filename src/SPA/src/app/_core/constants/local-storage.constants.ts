@@ -6,5 +6,6 @@ export const LocalStorageConstants = {
   ROLE_ALL: 'BaseAdmin_Role_All',
   ROLE_LANG: 'BaseAdmin_Role_Lang',
   LANG: "BaseAdmin_Language",
-  URL_ROUTE: "BaseAdmin_Url_Route"
+  URL_ROUTE: "BaseAdmin_Url_Route",
+  ThemeOptionsKey: "ThemeOptionsKey"
 } as const;

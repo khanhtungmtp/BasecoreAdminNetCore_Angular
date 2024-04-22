@@ -20,7 +20,7 @@ export function isIdCard(value: string): boolean {
 
 /** Whether it is a mobile phone number */
 export function isMobile(value: string): boolean {
-  return /^(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\\b$/.test(value);
+  return /^(03|05|07|08|09|01(2|6|8|9))[0-9]{8}\b$/.test(value);
 }
 
 /** Whether the email address */

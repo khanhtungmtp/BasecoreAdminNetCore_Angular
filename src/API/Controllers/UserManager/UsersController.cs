@@ -6,7 +6,6 @@ using API.Helpers.Utilities;
 using API.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ViewModels.UserManager;
 
 namespace API.Controllers.UserManager;
@@ -31,12 +30,23 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
             DateOfBirth = request.DateOfBirth
         };
         IdentityResult? result = await _userManager.CreateAsync(user, request.Password);
-        if (result.Succeeded)
+        if (!result.Succeeded)
         {
-            return CreatedAtAction(nameof(GetById), new { id = user.Id }, request);
+            return BadRequest(OperationResult.BadRequest(result.Errors));
+        }
+        if (request.Roles is null)
+        {
+            await _userManager.AddToRoleAsync(user, "User");
         }
         else
-            return BadRequest(OperationResult.BadRequest(result.Errors));
+        {
+            foreach (string? role in request.Roles)
+            {
+                await _userManager.AddToRoleAsync(user, role);
+            }
+        }
+
+        return Ok(OperationResult.Success("Create user successfully"));
     }
 
     // url: PUT : http:localhost:6001/api/user/{id}
@@ -63,29 +73,9 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
     // url: GET : http:localhost:6001/api/user
     [HttpGet]
     [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
-    public async Task<IActionResult> GetPaging([FromQuery] PaginationParam pagination, [FromQuery] UserVM userVM)
+    public async Task<IActionResult> GetPaging([FromQuery] PaginationParam pagination, [FromQuery] UserSearchRequest userSearchRequest)
     {
-        var user = _userManager.Users;
-        if (user is null)
-            return NotFound(OperationResult.NotFound("User not found"));
-        if (!string.IsNullOrWhiteSpace(userVM.DateOfBirth))
-        {
-            bool isDate = DateTime.TryParse(filter, out DateTime filterDate);
-            user = user.Where(x => x.FullName.Contains(filter) || x.Email != null && x.Email.Contains(filter) || (isDate && x.DateOfBirth.Date == filterDate.Date));
-        }
-        // more request search...
-        var listUserVM = await user.Select(x => new UserVM()
-        {
-            Id = x.Id,
-            FullName = x.FullName,
-            UserName = x.UserName ?? string.Empty,
-            Email = x.Email ?? string.Empty,
-            PhoneNumber = x.PhoneNumber ?? string.Empty,
-            DateOfBirth = x.DateOfBirth,
-            CreatedDate = x.CreatedDate
-        }).ToListAsync();
-        var resultPaging = PagingResult<UserVM>.Create(listUserVM, pagination.PageNumber, pagination.PageSize);
-        return Ok(OperationResult<PagingResult<UserVM>>.Success(resultPaging, "Get Users Successfully"));
+        return Ok(await _user.GetPaging(pagination, userSearchRequest));
     }
 
     // url: GET : http:localhost:6001/api/user/{id}
@@ -93,21 +83,8 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
     [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
     public async Task<IActionResult> GetById(string id)
     {
-        var user = await _userManager.FindByIdAsync(id);
-        if (user is null)
-            return NotFound(OperationResult.NotFound("User not found"));
-        var userVM = new UserVM()
-        {
-            Id = user.Id,
-            UserName = user.UserName ?? string.Empty,
-            FullName = user.FullName ?? string.Empty,
-            Email = user.Email ?? string.Empty,
-            PhoneNumber = user.PhoneNumber ?? string.Empty,
-            DateOfBirth = user.DateOfBirth,
-            CreatedDate = user.CreatedDate
-
-        };
-        return Ok(OperationResult<UserVM>.Success(userVM, "Get Users Successfully"));
+        var user = await _user.GetByIdAsync(id);
+        return HandleResult(user);
     }
 
     // url: PUT : http:localhost:6001/api/user/{id}/change-password
@@ -193,7 +170,7 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
         if (request.RoleNames.Length == 0)
             return BadRequest(OperationResult.BadRequest("Role names cannot empty"));
         if (request.RoleNames.Length == 1 && request.RoleNames[0] == SystemConstants.Roles.Admin)
-            return BadRequest((OperationResult.BadRequest($"Cannot remove {SystemConstants.Roles.Admin} role")));
+            return BadRequest(OperationResult.BadRequest($"Cannot remove {SystemConstants.Roles.Admin} role"));
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
             return NotFound(OperationResult.NotFound($"Cannot found user with id: {userId}"));

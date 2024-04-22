@@ -8,11 +8,10 @@ import { registerLocaleData } from '@angular/common';
 import vi from '@angular/common/locales/vi';
 import { FormsModule } from '@angular/forms';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HttpClient, provideHttpClient, withInterceptors, withInterceptorsFromDi } from '@angular/common/http';
 import { JwtModule } from '@auth0/angular-jwt';
 import { environment } from '@env/environment';
 import { LocalStorageConstants } from '@constants/local-storage.constants';
-import { ServerErrorInterceptor } from '@utilities/server-error.interceptor';
 import { GlobalErrorHandler } from '@utilities/global-error-handler';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -27,6 +26,7 @@ import { DashboardOutline, FormOutline, MenuFoldOutline, MenuUnfoldOutline, Doll
 import { LoadAliIconCdnService } from '@services/common/load-ali-icon-cdn.service';
 import { SubLockedStatusService } from '@services/common/sub-locked-status.service';
 import { SubWindowWithService } from '@services/common/sub-window-with.service';
+import { RefreshTokenInterceptor } from './_core/services/auth/refreshtoken.interceptor';
 const icons = [MenuFoldOutline, MenuUnfoldOutline, DashboardOutline, FormOutline, DollarCircleOutline];
 registerLocaleData(vi);
 export function tokenGetter() {
@@ -136,6 +136,7 @@ export const appConfig: ApplicationConfig = {
         },
       })
     ), provideAnimationsAsync(), provideHttpClient(
+      withInterceptors([RefreshTokenInterceptor]),
       // DI-based interceptors must be explicitly enabled.
       withInterceptorsFromDi(),
     ),

@@ -99,8 +99,13 @@ export class LayoutHeadRightMenuComponent implements OnInit {
   }
 
   logOut(): void {
+    // Lưu giữ giá trị của key mà không muốn xóa
+    const savedThemeOptionsKeyOld = localStorage.getItem(LocalStorageConstants.ThemeOptionsKey);
     this.windowServe.clearStorage();
     this.windowServe.clearSessionStorage();
+    if (savedThemeOptionsKeyOld) {
+      localStorage.setItem(LocalStorageConstants.ThemeOptionsKey, savedThemeOptionsKeyOld);
+    }
     this.message.success(this.translate.instant('system.message.logout'));
     this.router.navigate([UrlRouteConstants.LOGIN]);
     this.loginOutService.loginOut().then();

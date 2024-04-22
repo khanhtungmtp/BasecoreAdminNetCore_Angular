@@ -1,12 +1,15 @@
 using API._Repositories;
 using API._Services.Interfaces.UserManager;
 using API.Helpers.Base;
+using API.Helpers.Constants;
 using API.Helpers.Utilities;
 using API.Models;
+using LinqKit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ViewModels.Forum;
 using ViewModels.System;
+using ViewModels.UserManager;
 
 namespace API._Services.Services.UserManager;
 public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager, RoleManager<SystemRole> rolesManager) : BaseServices(repoStore), I_User
@@ -14,12 +17,24 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
     private readonly UserManager<User> _userManager = userManager;
     private readonly RoleManager<SystemRole> _rolesManager = rolesManager;
 
-    public async Task<OperationResult<User>> GetByIdAsync(string userId)
+    public async Task<OperationResult<UserVM>> GetByIdAsync(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
-            return OperationResult<User>.NotFound("User not found.");
-        return OperationResult<User>.Success(user, "Get User Successfully.");
+            return OperationResult<UserVM>.NotFound("User not found.");
+        var userVM = new UserVM()
+        {
+            Id = user.Id,
+            FullName = user.FullName,
+            UserName = user.UserName ?? string.Empty,
+            Email = user.Email ?? string.Empty,
+            PhoneNumber = user.PhoneNumber ?? string.Empty,
+            DateOfBirth = user.DateOfBirth,
+            IsActive = user.IsActive,
+            Gender = (Gender)user.Gender,
+            Roles = [.. _userManager.GetRolesAsync(user).Result]
+        };
+        return OperationResult<UserVM>.Success(userVM, "Get User Successfully.");
     }
 
     public async Task<OperationResult<PagingResult<ForumQuickVM>>> GetForumByUserId(string userId, PaginationParam pagination)
@@ -44,6 +59,68 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
         }).ToListAsync();
         var result = PagingResult<ForumQuickVM>.Create(totalRecords, pagination.PageNumber, pagination.PageSize);
         return OperationResult<PagingResult<ForumQuickVM>>.Success(result, "Get forums by user id successfully.");
+    }
+
+    public async Task<OperationResult<PagingResult<UserVM>>> GetPaging(PaginationParam pagination, UserSearchRequest userSearchRequest)
+    {
+        // Khởi tạo mệnh đề predicate với giá trị true cho phép áp dụng "và" logic
+        var predicate = PredicateBuilder.New<User>(true);
+
+        // Kiểm tra và áp dụng các điều kiện lọc khác từ `UserSearchRequest`
+        if (!string.IsNullOrWhiteSpace(userSearchRequest.UserName))
+        {
+            predicate = predicate.And(u => u.UserName != null && u.UserName.Contains(userSearchRequest.UserName));
+        }
+
+        if (!string.IsNullOrWhiteSpace(userSearchRequest.Email))
+        {
+            predicate = predicate.And(u => u.Email != null && u.Email.Contains(userSearchRequest.Email));
+        }
+
+        if (!string.IsNullOrWhiteSpace(userSearchRequest.PhoneNumber))
+        {
+            predicate = predicate.And(u => u.PhoneNumber != null && u.PhoneNumber.Contains(userSearchRequest.PhoneNumber));
+        }
+
+        if (!string.IsNullOrWhiteSpace(userSearchRequest.FullName))
+        {
+            predicate = predicate.And(u => u.FullName.Contains(userSearchRequest.FullName));
+        }
+
+        if (userSearchRequest.Gender.HasValue)
+        {
+            predicate = predicate.And(u => u.Gender == (SystemConstants.Gender)userSearchRequest.Gender.Value);
+        }
+
+        if (userSearchRequest.IsActive.HasValue)
+        {
+            predicate = predicate.And(u => u.IsActive == userSearchRequest.IsActive.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(userSearchRequest.DateOfBirth))
+        {
+            bool isDate = DateTime.TryParse(userSearchRequest.DateOfBirth, out DateTime filterDate);
+            if (isDate)
+            {
+                predicate = predicate.And(u => u.DateOfBirth.Date == filterDate.Date);
+            }
+        }
+        var users = _userManager.Users.Where(predicate);
+
+        var listUserVM = await users.Select(x => new UserVM()
+        {
+            Id = x.Id,
+            FullName = x.FullName,
+            UserName = x.UserName ?? string.Empty,
+            Email = x.Email ?? string.Empty,
+            PhoneNumber = x.PhoneNumber ?? string.Empty,
+            DateOfBirth = x.DateOfBirth,
+            IsActive = x.IsActive,
+            Gender = (Gender)x.Gender,
+            Roles = _userManager.GetRolesAsync(x).Result.ToList()
+        }).ToListAsync();
+        var resultPaging = PagingResult<UserVM>.Create(listUserVM, pagination.PageNumber, pagination.PageSize);
+        return OperationResult<PagingResult<UserVM>>.Success(resultPaging, "Get Users Successfully");
     }
 
     public async Task<OperationResult<List<FunctionVM>>> GetMenuByUserPermission(string userId)
@@ -86,5 +163,6 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
         await _repoStore.SaveChangesAsync();
         return OperationResult.Success("Delete users successfully.");
     }
+
 
 }

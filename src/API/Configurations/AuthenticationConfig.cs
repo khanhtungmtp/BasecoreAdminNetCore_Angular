@@ -10,26 +10,43 @@ public static class AuthenticationConfig
     public static void AddAuthenticationConfigufation(this IServiceCollection services, IConfiguration configuration)
     {
         // These will eventually be moved to a secrets file, but for alpha development appsettings is fine
-        string? secretKey = configuration["AppSettings:SecretKey"];
-        ArgumentNullException.ThrowIfNull(secretKey);
-        var secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
+        var JWTSetting = configuration.GetSection("JWTSetting");
         // add autentication
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-       .AddJwtBearer(opt =>
+        services.AddAuthentication(opt =>
         {
+            opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        }).AddJwtBearer(opt =>
+        {
+            opt.SaveToken = true;
+            opt.RequireHttpsMetadata = false;
             opt.TokenValidationParameters = new TokenValidationParameters
             {
-                //tự cấp token
                 ValidateIssuer = false,
                 ValidateAudience = false,
-
-                //ký vào token
+                ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
-
-                ClockSkew = TimeSpan.Zero
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JWTSetting.GetSection("securityKey").Value!)),
+                // Allow to use seconds for expiration of token
+                // Required only when token lifetime less than 5 minutes
+                // THIS ONE
+                ClockSkew = TimeSpan.Zero,
+            };
+            // lắng nghe khi authen failed
+            opt.Events = new JwtBearerEvents
+            {
+                OnAuthenticationFailed = context =>
+                {
+                    if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                    {
+                        context.Response.Headers.Append("Token-Expired", "true");
+                    }
+                    return Task.CompletedTask;
+                }
             };
         });
+        services.AddAuthorization();
 
         //2. Setup idetntity
         services.AddIdentityCore<User>()

@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Claims;
 using API.Data;
 using API.Helpers.Base;
 using API.Helpers.Constants;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.WebUtilities;
+using ViewModels.UserManager;
 
 namespace API.Filters.Authorization;
 
@@ -20,14 +22,15 @@ public class ClaimRequirementAttribute(FunctionCode functionCode, CommandCode co
     {
         var httpContext = context.HttpContext;
         string? trackId = Guid.NewGuid().ToString();
+        string? userId = context.HttpContext.User.Claims
+               .SingleOrDefault(c => c.Type == SystemConstants.Claims.Id)?.Value;
         // skip authorization if action is decorated with [AllowAnonymous] attribute
         var allowAnonymous = context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any();
         if (allowAnonymous)
             return;
 
         // authorization
-        var user = (OperationResult<User>?)context.HttpContext.Items["User"];
-        if (user?.Data is null)
+        if (userId is null)
         {
             context.Result = new UnauthorizedObjectResult(new ErrorGlobalResponse
             {
@@ -43,7 +46,7 @@ public class ClaimRequirementAttribute(FunctionCode functionCode, CommandCode co
         // get roles where id 
         DataContext? _db = context.HttpContext.RequestServices.GetService(typeof(DataContext)) as DataContext;
         ArgumentNullException.ThrowIfNull(_db);
-        List<string>? roles = [.. _db.UserRoles.Where(x => x.UserId == user.Data.Id).Select(x=>x.RoleId)];
+        List<string>? roles = [.. _db.UserRoles.Where(x => x.UserId == userId).Select(x => x.RoleId)];
 
         // get permission where roleID of user
         List<Permission>? permissions = [.. _db.Permissions.Where(x => roles.Contains(x.RoleId))];
