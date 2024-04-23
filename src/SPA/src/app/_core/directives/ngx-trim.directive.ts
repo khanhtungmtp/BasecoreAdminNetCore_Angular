@@ -1,24 +1,12 @@
-import {
-  Directive,
-  ElementRef,
-  forwardRef,
-  HostListener,
-  Renderer2,
-} from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Directive, ElementRef, HostListener, Renderer2 } from '@angular/core';
 
-const TRIM_VALUE_ACCESSOR = {
-  provide: NG_VALUE_ACCESSOR,
-  useExisting: forwardRef(() => NgxTrimInputDirective),
-  multi: true,
-};
 @Directive({
-  selector: '[NgxTrimInput]',
-  providers: [TRIM_VALUE_ACCESSOR],
+  selector: '[ngxTrim]',
+  standalone: true
 })
-export class NgxTrimInputDirective implements ControlValueAccessor {
-  _onChange: (value: any) => void = () => { };
-  _onTouched: () => any = () => { };
+export class NgxTrimDirective {
+  private _onChange: (value: any) => void;
+  private _onTouched: () => any;
 
   constructor(private renderer: Renderer2, private elementRef: ElementRef) { }
 
@@ -38,10 +26,17 @@ export class NgxTrimInputDirective implements ControlValueAccessor {
   }
 
   @HostListener('blur', ['$event'])
-  _onBlur(event: Event) {
+  private _onBlur(event: Event): void {
     const element = event.target as HTMLInputElement;
     const val = element.value.replace(/\s+/g, ' ').trim();
     this.writeValue(val);
-    this._onChange(val);
+    if (this._onChange) this._onChange(val);
+  }
+
+  @HostListener('input', ['$event'])
+  private _onInput(event: Event): void {
+    const element = event.target as HTMLInputElement;
+    const val = element.value;
+    if (this._onChange) this._onChange(val); // Call onChange on each input event
   }
 }

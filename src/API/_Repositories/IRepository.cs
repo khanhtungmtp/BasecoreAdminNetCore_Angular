@@ -1,7 +1,9 @@
 using System.Linq.Expressions;
+using static API.Configurations.DependencyInjectionConfig;
 
 namespace API._Repositories;
 
+[DependencyInjection(ServiceLifetime.Scoped)]
 public interface IRepository<T> where T : class
 {
     Task<T> FindByIdAsync(object id);

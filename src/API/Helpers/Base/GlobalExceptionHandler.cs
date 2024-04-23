@@ -1,6 +1,7 @@
 using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
-using NLog;
+using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace API.Helpers.Base;
 
@@ -10,7 +11,6 @@ public class GlobalExceptionHandler(IHostEnvironment env) : IExceptionHandler
 
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception ex, CancellationToken cancellationToken)
     {
-        Logger logger = LogManager.GetLogger("applog");
         ErrorGlobalResponse? result;
         string? detail = _env.IsDevelopment() ? ex.StackTrace?.ToString() : "Sorry, there is an error on server."; // show only development
         string? message = _env.IsDevelopment() && ex.GetType().Name == "SqlException" ? ex.Message?.ToString() : "Sorry, there is an error on server."; // show only development
@@ -25,9 +25,18 @@ public class GlobalExceptionHandler(IHostEnvironment env) : IExceptionHandler
             Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
         };
 
-        // Logging the exception
-        logger.Log(NLog.LogLevel.Error, $"{DateTime.UtcNow} - Path: {httpContext?.Request?.Path}  ==> Error: {detail ?? "Details suppressed"}{Environment.NewLine}==> Inner: {ex?.InnerException}");
-
+        // Logging the exception with Serilog
+        Log.Error(ex, "GlobalExceptionHandler error: {Message}", ex.Message);
+        if (httpContext.Response.StatusCode == (int)HttpStatusCode.BadRequest)
+        {
+            var badObjectResult = httpContext.Features.Get<IExceptionHandlerFeature>()?.Error;
+            if (badObjectResult != null)
+            {
+                // Ghi log chi tiết lỗi từ BadObjectResult, thí dụ như content của nó
+                Log.Error("A bad request occurred: {Error} with content: {Content}",
+                            ex.Message, badObjectResult.ToString());
+            }
+        }
         // Write the response
         if (httpContext is not null)
         {

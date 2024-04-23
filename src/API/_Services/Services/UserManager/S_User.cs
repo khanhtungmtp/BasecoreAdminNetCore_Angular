@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using API._Repositories;
 using API._Services.Interfaces.UserManager;
 using API.Helpers.Base;
@@ -63,10 +64,46 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
 
     public async Task<OperationResult<PagingResult<UserVM>>> GetPaging(PaginationParam pagination, UserSearchRequest userSearchRequest)
     {
-        // Khởi tạo mệnh đề predicate với giá trị true cho phép áp dụng "và" logic
+        // Tạo mệnh đề predicate
+        var predicate = BuildUserSearchPredicate(userSearchRequest);
+
+        // Thực hiện truy vấn
+        var usersQuery = await _userManager.Users.AsNoTracking().Where(predicate).ToListAsync();
+
+        // Tạo list UserVM từ pagedUsers và lấy roles cho mỗi user
+        var listUserVM = new List<UserVM>();
+
+        foreach (var user in usersQuery)
+        {
+            var roles = await _userManager.GetRolesAsync(user); // Lấy roles dựa trên user hiện tại
+
+            var userVM = new UserVM
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                UserName = user.UserName ?? string.Empty,
+                Email = user.Email ?? string.Empty,
+                PhoneNumber = user.PhoneNumber ?? string.Empty,
+                DateOfBirth = user.DateOfBirth,
+                IsActive = user.IsActive,
+                Gender = (Gender)user.Gender,
+                Roles = [.. roles] // Lưu tên của roles vào UserVM
+            };
+
+            listUserVM.Add(userVM);
+        }
+
+        // Tạo đối tượng PagingResult<UserVM> từ listUserVM
+        var resultPaging = PagingResult<UserVM>.Create(listUserVM, pagination.PageNumber, pagination.PageSize);
+
+        // Trả về kết quả
+        return OperationResult<PagingResult<UserVM>>.Success(resultPaging, "Get Users Successfully");
+    }
+
+    private Expression<Func<User, bool>> BuildUserSearchPredicate(UserSearchRequest userSearchRequest)
+    {
         var predicate = PredicateBuilder.New<User>(true);
 
-        // Kiểm tra và áp dụng các điều kiện lọc khác từ `UserSearchRequest`
         if (!string.IsNullOrWhiteSpace(userSearchRequest.UserName))
         {
             predicate = predicate.And(u => u.UserName != null && u.UserName.Contains(userSearchRequest.UserName));
@@ -105,22 +142,8 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
                 predicate = predicate.And(u => u.DateOfBirth.Date == filterDate.Date);
             }
         }
-        var users = _userManager.Users.Where(predicate);
 
-        var listUserVM = await users.Select(x => new UserVM()
-        {
-            Id = x.Id,
-            FullName = x.FullName,
-            UserName = x.UserName ?? string.Empty,
-            Email = x.Email ?? string.Empty,
-            PhoneNumber = x.PhoneNumber ?? string.Empty,
-            DateOfBirth = x.DateOfBirth,
-            IsActive = x.IsActive,
-            Gender = (Gender)x.Gender,
-            Roles = _userManager.GetRolesAsync(x).Result.ToList()
-        }).ToListAsync();
-        var resultPaging = PagingResult<UserVM>.Create(listUserVM, pagination.PageNumber, pagination.PageSize);
-        return OperationResult<PagingResult<UserVM>>.Success(resultPaging, "Get Users Successfully");
+        return predicate;
     }
 
     public async Task<OperationResult<List<FunctionVM>>> GetMenuByUserPermission(string userId)

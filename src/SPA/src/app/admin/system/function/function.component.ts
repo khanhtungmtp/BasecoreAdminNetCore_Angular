@@ -181,7 +181,6 @@ export class FunctionComponent implements OnInit {
           this.tableLoading(true);
           this.dataService.deleteRange(ids).subscribe({
             next: (res) => {
-              console.log('res: ', res);
               if (res) this.notification.success('Success', "Delete success")
               if (this.dataList.length === 1) {
                 this.tableConfig.pageIndex--;

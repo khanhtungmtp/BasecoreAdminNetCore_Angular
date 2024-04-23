@@ -1,11 +1,10 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { environment } from '@env/environment';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import qs from 'qs';
 import { HttpCustomConfig, OperationResult } from '../utilities/operation-result';
 import { Router } from '@angular/router';
 import { NzSpinnerCustomService } from './common/nz-spinner.service';
@@ -24,19 +23,33 @@ export class BaseHttpService {
     this.uri = !environment.production ? environment.apiUrl : 'https://localhost:6001/api/';
   }
 
+  private removeEmptyProperties(obj: any): any {
+    const newObj: any = {};
+    Object.keys(obj).forEach(key => {
+      if (obj[key] !== null && obj[key] !== undefined && obj[key] !== '') {
+        newObj[key] = obj[key];
+      }
+    });
+    return newObj;
+  }
+
   // Modify your service methods
   get<T>(path: string, param?: NzSafeAny, config?: HttpCustomConfig): Observable<T> {
-    config = config || { needSuccessInfo: false };
+    config = config || { needSuccessInfo: false, typeAction: 'view' };
     let reqPath = this.getUrl(path, config);
-    const params = new HttpParams({ fromString: qs.stringify(param) });
+
+    // Loại bỏ các thuộc tính có giá trị là rỗng hoặc null từ tham số param
+    const filteredParams = param ? this.removeEmptyProperties(param) : {};
+    const params = new HttpParams({ fromObject: filteredParams });
     return this.http.get<OperationResult>(reqPath, { params }).pipe(
+      tap(() => this.handleSuccessNotification(config)),
       map(response => this.handleResponse(response)),
       catchError(this.handleError)
     );
   }
 
   delete<T>(path: string, body?: NzSafeAny, queryParams?: NzSafeAny, config?: HttpCustomConfig): Observable<T> {
-    config = config || { needSuccessInfo: false };
+    config = config || { needSuccessInfo: true, typeAction: 'delete' };
     let reqPath = this.getUrl(path, config);
 
     // Chuyển đổi queryParams thành HttpParams
@@ -50,36 +63,39 @@ export class BaseHttpService {
 
     // Sử dụng http.delete với RequestOptions bao gồm cả params và body
     return this.http.delete<OperationResult>(reqPath, options).pipe(
+      tap(() => this.handleSuccessNotification(config)),
       map(response => this.handleResponse(response)),
       catchError(this.handleError)
     );
   }
 
   post<T>(path: string, param?: NzSafeAny, config?: HttpCustomConfig): Observable<T> {
-    config = config || { needSuccessInfo: false };
+    config = config || { needSuccessInfo: false, typeAction: 'add' };
     let reqPath = this.getUrl(path, config);
     return this.http.post<OperationResult>(reqPath, param).pipe(
+      tap(() => this.handleSuccessNotification(config)),
       map(response => this.handleResponse(response)),
       catchError(this.handleError)
     );
   }
 
   put<T>(path: string, param?: NzSafeAny, config?: HttpCustomConfig): Observable<T> {
-    config = config || { needSuccessInfo: false };
+    config = config || { needSuccessInfo: false, typeAction: 'edit' };
     let reqPath = this.getUrl(path, config);
     return this.http.put<OperationResult>(reqPath, param).pipe(
+      tap(() => this.handleSuccessNotification(config)),
       map(response => this.handleResponse(response)),
       catchError(this.handleError)
     );
   }
 
   downLoadWithBlob(path: string, param?: NzSafeAny, config?: HttpCustomConfig): Observable<NzSafeAny> {
-    config = config || { needSuccessInfo: false };
+    config = config || { needSuccessInfo: false, typeAction: 'download' };
     let reqPath = this.getUrl(path, config);
     return this.http.post(reqPath, param, {
       responseType: 'blob',
       headers: new HttpHeaders().append('Content-Type', 'application/json')
-    });
+    }).pipe(tap(() => this.handleSuccessNotification(config)));
   }
 
   getUrl(path: string, config: HttpCustomConfig): string {
@@ -114,29 +130,26 @@ export class BaseHttpService {
     }
   }
 
+  // Hàm mới để xử lý thông báo thành công
+  private handleSuccessNotification(config: HttpCustomConfig): void {
+    if (config.needSuccessInfo) {
+      switch (config.typeAction) {
+        case 'download':
+          this.message.success('Downloaded successfully');
+          break;
+        case 'add':
+          this.message.success('Created successfully');
+          break;
+        case 'edit':
+          this.message.success('Updated successfully');
+          break;
+        case 'delete':
+          this.message.success('Deleted successfully');
+          break;
+        default:
+          break;
+      }
+    }
+  }
 
-  // resultHandle<T>(config: HttpCustomConfig): (observable: Observable<ActionResult<T>>) => Observable<T> {
-  //   return (observable: Observable<ActionResult<T>>) => {
-  //     return observable.pipe(
-  //       filter(item => {
-  //         return this.handleFilter(item, !!config.needSuccessInfo);
-  //       }),
-  //       map(item => {
-  //         if (item.code !== 0) {
-  //           throw new Error(item.msg);
-  //         }
-  //         return item.data;
-  //       })
-  //     );
-  //   };
-  // }
-
-  // handleFilter<T>(item: ActionResult<T>, needSuccessInfo: boolean): boolean {
-  //   if (item.code !== 0) {
-  //     this.message.error(item.msg);
-  //   } else if (needSuccessInfo) {
-  //     this.message.success('Successful operation');
-  //   }
-  //   return true;
-  // }
 }

@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { BaseHttpService } from '../base-http.service';
 import { PaginationParam, PagingResult } from '@app/_core/utilities/pagination-utility';
 import { UserVM } from '@app/_core/models/user-manager/uservm';
+import { UserSearchRequest } from './../../models/user-manager/usersearchrequest';
 
 @Injectable({
   providedIn: 'root'
@@ -9,8 +10,8 @@ import { UserVM } from '@app/_core/models/user-manager/uservm';
 export class UserManagerService {
   httpBase = inject(BaseHttpService);
 
-  getUsersPaging(filter: string = '', pagination: PaginationParam) {
-    const params = { ...pagination, filter };
+  getUsersPaging(pagination: PaginationParam, request: UserSearchRequest) {
+    const params = { ...pagination, ...request };
     return this.httpBase.get<PagingResult<UserVM>>('Users', params);
   }
 
@@ -19,15 +20,15 @@ export class UserManagerService {
   }
 
   add(model: UserVM) {
-    return this.httpBase.post<string>('Users', model);
+    return this.httpBase.post<string>('Users', model, { needSuccessInfo: true, typeAction: 'add' });
   }
 
   edit(id: string, model: UserVM) {
-    return this.httpBase.put<string>(`Users/${id}`, model);
+    return this.httpBase.put<string>(`Users/${id}`, model, { needSuccessInfo: true, typeAction: 'add' });
   }
 
   delete(id: string) {
-    return this.httpBase.delete<string>(`Users/${id}`);
+    return this.httpBase.delete<string>(`Users/${id}`, { needSuccessInfo: true });
   }
 
   deleteRange(ids: string[]) {

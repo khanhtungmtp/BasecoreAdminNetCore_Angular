@@ -2,17 +2,22 @@ using System.Net;
 using API.Configurations;
 using API.Data;
 using API.Helpers.Base;
-using API.Helpers.Utilities;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using NLog.Web;
+using Serilog;
+using Serilog.Exceptions;
+
 using ViewModels.UserManager.Validator;
 try
 {
     var builder = WebApplication.CreateBuilder(args);
-    builder.Host.UseNLog();
+    Log.Logger = new LoggerConfiguration()
+                    .ReadFrom.Configuration(builder.Configuration)
+                    .Enrich.WithExceptionDetails()
+                    .CreateLogger();
+    builder.Host.UseSerilog(Log.Logger);
     builder.Services.AddCors();
     // Add services to the container.
     builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("AppSettings"));
@@ -27,8 +32,7 @@ try
 
          var modelState = actionContext.ModelState.Values;
          var errors = modelState.SelectMany(x => x.Errors).Select(x => x.ErrorMessage);
-
-         return new BadRequestObjectResult(new ErrorGlobalResponse
+         var objectError = new ErrorGlobalResponse
          {
              TrackId = trackId,
              StatusCode = (int)HttpStatusCode.BadRequest,
@@ -36,7 +40,12 @@ try
              Message = ReasonPhrases.GetReasonPhrase((int)HttpStatusCode.BadRequest),
              Errors = errors,
              Instance = $"{context.Request.Method} {context.Request.Path}",
-         });
+         };
+         // Logging the objectError with Serilog
+         Log.Error("Validation error on request {TrackId}: {ObjectError}", trackId, objectError);
+
+         return new BadRequestObjectResult(objectError);
+
      }).AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
@@ -81,15 +90,15 @@ try
     app.UseExceptionHandler();
     // app.UseMiddleware<JwtMiddleware>();
     // seeding inittial Data
-    DataSeeder.SeedDatabase(app);
+    // DataSeeder.SeedDatabase(app);
     app.Run();
 }
-catch
+catch (Exception ex)
 {
-    throw;
+    Log.Fatal(ex, "Unhandled exception");
 }
 finally
 {
-    // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-    NLog.LogManager.Shutdown();
+    Log.Information("Shut down complete");
+    Log.CloseAndFlush();
 }

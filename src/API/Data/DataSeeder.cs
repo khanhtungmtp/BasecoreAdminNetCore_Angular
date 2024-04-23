@@ -1,3 +1,5 @@
+using Serilog;
+
 namespace API.Data;
 
 public static class DataSeeder
@@ -10,18 +12,15 @@ public static class DataSeeder
         {
             Directory.CreateDirectory(logPath);
         }
-        var logger = NLog.LogManager.GetLogger("applog");
         try
         {
-            logger.Log(NLog.LogLevel.Info, "Seeding data...");
             var services = scope.ServiceProvider;
             var dbInitializer = services.GetRequiredService<DbInitializer>();
             dbInitializer.Seed().Wait();
-            logger.Log(NLog.LogLevel.Info, "Seeding done!");
         }
         catch (Exception ex)
         {
-            logger.Log(NLog.LogLevel.Error, $"An error occurred while seeding the database.: {ex}");
+            Log.Error(ex, "DataSeeder error: {Message}", ex.Message);
         }
     }
 }

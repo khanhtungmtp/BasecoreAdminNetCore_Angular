@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ActionCode } from '@app/_core/constants/actionCode';
-import { OptionsInterface, SearchCommonVO } from '@app/_core/models/common/types';
+import { OptionsInterface } from '@app/_core/models/common/types';
 import { ModalBtnStatus } from '@app/_core/utilities/base-modal';
 import { AntTableComponent, AntTableConfig } from '@app/admin/shared/components/ant-table/ant-table.component';
 import { CardTableWrapComponent } from '@app/admin/shared/components/card-table-wrap/card-table-wrap.component';
@@ -26,9 +26,9 @@ import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { finalize } from 'rxjs';
 import { UserManagerModalService } from './user-manager-modal/user-manager-modal.service';
 import { UserVM } from '@app/_core/models/user-manager/uservm';
-import { DepartmentTreeComponent } from './department-tree/department-tree.component';
 import { UserManagerService } from '@app/_core/services/user-manager/user-manager.service';
 import { Pagination, PaginationParam } from '@app/_core/utilities/pagination-utility';
+import { NzNotificationCustomService } from '@app/_core/services/nz-notificationCustom.service';
 
 @Component({
   selector: 'app-user-manager',
@@ -36,10 +36,10 @@ import { Pagination, PaginationParam } from '@app/_core/utilities/pagination-uti
   standalone: true,
   imports: [
     PageHeaderComponent,
-    DepartmentTreeComponent,
     NzGridModule,
     NzCardModule,
     FormsModule,
+    ReactiveFormsModule,
     NzFormModule,
     NzInputModule,
     NzSelectModule,
@@ -56,8 +56,7 @@ import { Pagination, PaginationParam } from '@app/_core/utilities/pagination-uti
 export class UserManagerComponent implements OnInit {
   @ViewChild('operationTpl', { static: true }) operationTpl!: TemplateRef<any>;
   @ViewChild('isActiveFlag', { static: true }) isActiveFlag!: TemplateRef<NzSafeAny>;
-  searchParam: Partial<UserVM> = {};
-  filter: string = '';
+  searchParams!: FormGroup;
   pagination: Pagination = <Pagination>{
     pageNumber: 1,
     pageSize: 10
@@ -71,7 +70,7 @@ export class UserManagerComponent implements OnInit {
   checkedCashArray: UserVM[] = [];
   ActionCode = ActionCode;
   isCollapse = true;
-  availableOptions: OptionsInterface[] = [];
+  isActiveOptions: OptionsInterface[] = [];
   destroyRef = inject(DestroyRef);
 
   private dataService = inject(UserManagerService);
@@ -80,25 +79,52 @@ export class UserManagerComponent implements OnInit {
   private modalService = inject(UserManagerModalService);
   private router = inject(Router);
   private message = inject(NzMessageService);
+  private fb = inject(FormBuilder);
+  private notification = inject(NzNotificationCustomService);
+
+  ngOnInit(): void {
+    this.isActiveOptions = [...MapPipe.transformMapToArray(MapSet.isActive, MapKeyType.Boolean)];
+    this.initSearchParam();
+    this.initTable();
+  }
+
+  initSearchParam() {
+    this.searchParams = this.fb.group({
+      userName: [''],
+      email: [''],
+      phoneNumber: [''],
+      fullName: [''],
+      gender: [null],
+      isActive: [null]
+    });
+  }
+
+  searchForm(): void {
+    this.getDataList(undefined, true);
+  }
 
   selectedChecked(e: UserVM[]): void {
     this.checkedCashArray = [...e];
   }
 
   resetForm(): void {
-    this.searchParam = {};
+    this.notification.success('Success', 'Reset successfully');
+    this.searchParams.reset();
     this.getDataList();
   }
 
-  getDataList(e?: NzTableQueryParams): void {
+  getDataList(e?: NzTableQueryParams, isSearch?: boolean): void {
     this.tableConfig.loading = true;
 
     const _pagingParam: PaginationParam = {
       pageSize: e?.pageSize || this.pagination.pageSize,
-      pageNumber: this.filter === '' ? (e?.pageIndex || this.pagination.pageNumber) : 1,
+      pageNumber: e?.pageIndex || this.pagination.pageNumber
     }
+
+    const searchParamsValue = this.searchParams.value;
+
     this.dataService
-      .getUsersPaging(this.filter, _pagingParam)
+      .getUsersPaging(_pagingParam, searchParamsValue)
       .pipe(
         finalize(() => {
           this.tableLoading(false);
@@ -106,6 +132,8 @@ export class UserManagerComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(response => {
+        if (isSearch)
+          this.notification.success('Success', 'Searched successfully');
         this.dataList = response.result;
         this.pagination = response.pagination;
         this.tableConfig.total = this.pagination.totalCount;
@@ -287,20 +315,11 @@ export class UserManagerComponent implements OnInit {
     this.tableConfig.pageSize = e;
   }
 
-  searchDeptIdUser(departmentId: number): void {
-    // this.searchParam.departmentId = departmentId;
-    this.getDataList();
-  }
-
   /*Expand*/
   toggleCollapse(): void {
     this.isCollapse = !this.isCollapse;
   }
 
-  ngOnInit(): void {
-    this.availableOptions = [...MapPipe.transformMapToArray(MapSet.isActive, MapKeyType.Boolean)];
-    this.initTable();
-  }
 
   private initTable(): void {
     this.tableConfig = {

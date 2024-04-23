@@ -15,7 +15,6 @@ import { UserInfoService } from '@app/_core/services/common/userInfo.service';
 import { WindowService } from '@app/_core/services/common/window.service';
 import { ScreenLessHiddenDirective } from '@app/admin/shared/directives/screen-less-hidden.directive';
 import { ToggleFullscreenDirective } from '@app/admin/shared/directives/toggle-fullscreen.directive';
-import { AccountService, UserPsd } from '@app/_core/services/auth/account.service';
 import { ModalBtnStatus } from '@app/_core/utilities/base-modal';
 import { ChangePasswordService } from '@app/admin/pages/change-password/change-password.service';
 import { LockWidgetService } from '@app/admin/tpl/lock-widget/lock-widget.service';
@@ -37,7 +36,6 @@ import { SystemLanguageVM } from '@app/_core/models/system/systemlanguage';
   imports: [NgTemplateOutlet, ScreenLessHiddenDirective, NzToolTipModule, NzAvatarModule, NzIconModule, NzButtonModule, ToggleFullscreenDirective, NzDropDownModule, NzBadgeModule, NzMenuModule, HomeNoticeComponent, TranslateModule]
 })
 export class LayoutHeadRightMenuComponent implements OnInit {
-  user!: UserPsd;
   listLanguage: SystemLanguageVM[] = [];
   currentLang: string = '';
   baseImage: string = "../../../../assets/images/lang/";
@@ -49,7 +47,6 @@ export class LayoutHeadRightMenuComponent implements OnInit {
   private searchRouteService = inject(SearchRouteService);
   private message = inject(NzMessageService);
   private userInfoService = inject(UserInfoService);
-  private accountService = inject(AccountService);
   private translate = inject(TranslateService);
   private languageService = inject(SystemLanguageService);
   private cdr = inject(ChangeDetectorRef);
@@ -69,23 +66,23 @@ export class LayoutHeadRightMenuComponent implements OnInit {
 
   // change Password
   changePassword(): void {
-    this.changePasswordModalService.show({ nzTitle: this.translate.instant('system.caption.changePassword') }).subscribe(({ modalValue, status }) => {
-      if (status === ModalBtnStatus.Cancel) {
-        return;
-      }
-      this.userInfoService.getUserInfo().subscribe(res => {
-        this.user = {
-          id: res.userId,
-          oldPassword: modalValue.oldPassword,
-          newPassword: modalValue.newPassword
-        };
-      });
-      this.accountService.editAccountPsd(this.user).subscribe(() => {
-        this.loginOutService.loginOut().then();
-        this.message.success(this.translate.instant('system.message.changePasswordOKMsg'));
-      });
-    });
-  }
+     //   this.changePasswordModalService.show({ nzTitle: this.translate.instant('system.caption.changePassword') }).subscribe(({ modalValue, status }) => {
+     //     if (status === ModalBtnStatus.Cancel) {
+     //       return;
+     //     }
+     //     this.userInfoService.getUserInfo().subscribe(res => {
+     //       this.user = {
+     //         id: res.userId,
+     //         oldPassword: modalValue.oldPassword,
+     //         newPassword: modalValue.newPassword
+     //       };
+     //     });
+     //     this.accountService.editAccountPsd(this.user).subscribe(() => {
+     //       this.loginOutService.loginOut().then();
+     //       this.message.success(this.translate.instant('system.message.changePasswordOKMsg'));
+     //     });
+     //   });
+   }
 
   showSearchModal(): void {
     const modalOptions: ModalOptions = {

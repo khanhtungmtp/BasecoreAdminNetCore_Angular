@@ -29,7 +29,7 @@ public class User : IdentityUser, IDateTracking
     public int? NumberOfVotes { get; set; }
 
     public int? NumberOfReports { get; set; }
-    public Gender Gender { get; set; }
+    public Gender Gender { get; set; } // 0, male (nam), 1, female
     public bool IsActive { get; set; }
     public DateTime LastLoginTime { get; set; }
     public string? RefreshToken { get; set; }

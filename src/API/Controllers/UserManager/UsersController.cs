@@ -10,9 +10,10 @@ using ViewModels.UserManager;
 
 namespace API.Controllers.UserManager;
 
-public class UsersController(UserManager<User> userManager, I_User user) : BaseController
+public class UsersController(UserManager<User> userManager, I_User user, RoleManager<SystemRole> rolesManager) : BaseController
 {
     private readonly UserManager<User> _userManager = userManager;
+    private readonly RoleManager<SystemRole> _rolesManager = rolesManager;
     private readonly I_User _user = user;
 
     // url: POST : http://localhost:6001/api/user
@@ -26,17 +27,18 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
             UserName = request.UserName,
             FullName = request.FullName,
             Email = request.Email,
+            IsActive = request.IsActive,
             PhoneNumber = request.PhoneNumber,
+            Gender = (SystemConstants.Gender)request.Gender,
             DateOfBirth = request.DateOfBirth
         };
         IdentityResult? result = await _userManager.CreateAsync(user, request.Password);
         if (!result.Succeeded)
-        {
             return BadRequest(OperationResult.BadRequest(result.Errors));
-        }
+
         if (request.Roles is null)
         {
-            await _userManager.AddToRoleAsync(user, "User");
+            await _userManager.AddToRoleAsync(user, "Member");
         }
         else
         {
@@ -52,21 +54,80 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
     // url: PUT : http:localhost:6001/api/user/{id}
     [HttpPut("{id}")]
     [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.UPDATE)]
-    public async Task<IActionResult> PutUser(string id, [FromBody] UserCreateRequest request)
+    public async Task<IActionResult> PutUser(string id, [FromBody] UserPutRequest request)
     {
         var user = await _userManager.FindByIdAsync(id);
         if (user is null)
             return NotFound(OperationResult.NotFound("User not found"));
+
         user.FullName = request.FullName;
-        user.PasswordHash = request.Password;
+        if (!string.IsNullOrWhiteSpace(request.Password))
+        {
+            // Remove the current password and add the new one.
+            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var passwordResult = await _userManager.ResetPasswordAsync(user, resetToken, request.Password);
+            if (!passwordResult.Succeeded)
+                return BadRequest(OperationResult.BadRequest(passwordResult.Errors));
+        }
+
         user.Email = request.Email;
+        user.Gender = (SystemConstants.Gender)request.Gender;
         user.PhoneNumber = request.PhoneNumber;
         user.DateOfBirth = request.DateOfBirth;
+        user.IsActive = request.IsActive;
         user.UpdatedDate = DateTime.Now;
 
+        if (!string.IsNullOrWhiteSpace(request.Password))
+        {
+            // Remove the current password and add the new one.
+            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var passwordResult = await _userManager.ResetPasswordAsync(user, resetToken, request.Password);
+            if (!passwordResult.Succeeded)
+                return BadRequest(OperationResult.BadRequest(passwordResult.Errors));
+        }
         var result = await _userManager.UpdateAsync(user);
         if (result.Succeeded)
+        {
+            // Update roles if specified
+            if (request.Roles is not null && request.Roles.Any())
+            {
+                var currentRoles = await _userManager.GetRolesAsync(user);
+                var rolesToAdd = request.Roles.Except(currentRoles);
+                var rolesToRemove = currentRoles.Except(request.Roles);
+
+                foreach (var role in rolesToRemove)
+                {
+                    var removeResult = await _userManager.RemoveFromRoleAsync(user, role);
+                    if (!removeResult.Succeeded)
+                    {
+                        return BadRequest(OperationResult.BadRequest(removeResult.Errors));
+                    }
+                }
+
+                foreach (var role in rolesToAdd)
+                {
+                    if (!await _rolesManager.RoleExistsAsync(role))
+                    {
+                        // Optionally create the role if it doesn't exist
+                        await _rolesManager.CreateAsync(new SystemRole()
+                        {
+                            Id = role,
+                            Name = role,
+                            NormalizedName = role.ToUpper(),
+                        });
+                    }
+
+                    var addResult = await _userManager.AddToRoleAsync(user, role);
+                    if (!addResult.Succeeded)
+                    {
+                        return BadRequest(OperationResult.BadRequest(addResult.Errors));
+                    }
+                }
+            }
+
             return Ok(OperationResult<string>.Success(user.UserName ?? string.Empty, "Update user successfully"));
+        }
+
         return BadRequest(OperationResult.BadRequest(result.Errors));
     }
 
@@ -118,7 +179,6 @@ public class UsersController(UserManager<User> userManager, I_User user) : BaseC
                 UserName = user.UserName ?? string.Empty,
                 FullName = user.FullName ?? string.Empty,
                 DateOfBirth = user.DateOfBirth,
-                CreatedDate = user.CreatedDate,
                 Email = user.Email ?? string.Empty,
                 PhoneNumber = user.PhoneNumber ?? string.Empty
             };

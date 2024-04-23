@@ -16,7 +16,8 @@
         <nz-card class="m-b-10"
                  nzHoverable
                  [nzBodyStyle]="{ 'padding-bottom': 0 }">
-          <form nz-form>
+          <form nz-form
+                [formGroup]="searchParams">
             <div nz-row
                  [nzGutter]="{ xs: 8, sm: 16, md: 24 }">
               <div nz-col
@@ -31,8 +32,7 @@
                   <nz-form-control>
                     <input name="userName"
                            nz-input
-                           placeholder="Please enter a user name"
-                           [(ngModel)]="searchParam.userName" />
+                           placeholder="Please enter a user name" formControlName="userName" />
                   </nz-form-control>
                 </nz-form-item>
               </div>
@@ -47,10 +47,10 @@
                 <nz-form-item>
                   <nz-form-label [nzFor]="">Phone number</nz-form-label>
                   <nz-form-control>
-                    <input name="mobile"
+                    <input name="phoneNumber"
                            nz-input
                            placeholder="Please enter a phone number"
-                           [(ngModel)]="searchParam.phoneNumber" />
+                           formControlName="phoneNumber" />
                   </nz-form-control>
                 </nz-form-item>
               </div>
@@ -70,8 +70,8 @@
                     <nz-select name="isActive"
                                nzAllowClear
                                nzPlaceHolder="drop down selection"
-                               [(ngModel)]="searchParam.isActive">
-                      @for (item of availableOptions; track item) {
+                               formControlName="isActive">
+                      @for (item of isActiveOptions; track item) {
                       <nz-option [nzLabel]="item.label"
                                  [nzValue]="item.value"></nz-option>
                       }
@@ -93,7 +93,7 @@
                     <input name="email"
                            nz-input
                            placeholder="Please enter a email"
-                           [(ngModel)]="searchParam.email" />
+                           formControlName="email" />
                   </nz-form-control>
                 </nz-form-item>
               </div>
@@ -119,7 +119,7 @@
                    [nzXXl]="8">
                 <button nz-button
                         [nzType]="'primary'"
-                        (click)="getDataList()">
+                        (click)="searchForm()">
                   <i nz-icon
                      nzType="search"></i>
                   Search

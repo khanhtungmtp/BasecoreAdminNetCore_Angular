@@ -9,6 +9,5 @@ export interface UserVM {
   isActive: boolean;
   roles: string[];
   lastLoginTime: Date | string | null;
-  createdDate: Date | string;
 }
 

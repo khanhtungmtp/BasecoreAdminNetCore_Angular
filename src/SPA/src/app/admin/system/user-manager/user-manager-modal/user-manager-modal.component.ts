@@ -1,17 +1,16 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { OptionsInterface } from '@app/_core/models/common/types';
-import { User } from '@app/_core/services/auth/account.service';
-import { DepartmentService } from '@app/_core/services/system/department.service';
+import { UserVM } from '@app/_core/models/user-manager/uservm';
 import { RoleService } from '@app/_core/services/user-manager/role.service';
 import { ValidatorsService } from '@app/_core/services/validators/validators.service';
 import { fnCheckForm } from '@app/_core/utilities/tools';
-import { fnAddTreeDataGradeAndLeaf, fnFlatDataHasParentToTree } from '@app/_core/utilities/treeTableTools';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzInputModule } from 'ng-zorro-antd/input';
-import { NZ_MODAL_DATA, NzModalRef } from 'ng-zorro-antd/modal';
+import { NZ_MODAL_DATA, NzModalModule, NzModalRef } from 'ng-zorro-antd/modal';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
@@ -24,21 +23,20 @@ import { Observable, of } from 'rxjs';
   templateUrl: './user-manager-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [FormsModule, NzFormModule, ReactiveFormsModule, NzGridModule, NzInputModule, NzRadioModule, NzSwitchModule, NzTreeSelectModule, NzSelectModule]
+  imports: [FormsModule, NzDatePickerModule, NzFormModule, ReactiveFormsModule, NzGridModule, NzInputModule, NzRadioModule, NzSwitchModule, NzTreeSelectModule, NzSelectModule, NzModalModule]
 
 })
 export class UserManagerModalComponent implements OnInit {
   addEditForm!: FormGroup;
-  readonly nzModalData: User = inject(NZ_MODAL_DATA);
   roleOptions: OptionsInterface[] = [];
   isEdit = false;
   value?: string;
   deptNodes: NzTreeNodeOptions[] = [];
 
+  readonly nzModalData: UserVM = inject(NZ_MODAL_DATA);
   private fb = inject(FormBuilder);
   private validatorsService = inject(ValidatorsService);
   private roleService = inject(RoleService);
-  private deptService = inject(DepartmentService);
 
   constructor(private modalRef: NzModalRef) { }
 
@@ -71,32 +69,17 @@ export class UserManagerModalComponent implements OnInit {
     });
   }
 
-  // getDepartmentList(): Promise<void> {
-  //   return new Promise<void>(resolve => {
-  //     this.deptService.getDepts({ pageNum: 0, pageSize: 0 }).subscribe(({ list }) => {
-  //       list.forEach(item => {
-  //         // @ts-ignore
-  //         item.title = item.departmentName;
-  //         // @ts-ignore
-  //         item.key = item.id;
-  //       });
-
-  //       const target = fnAddTreeDataGradeAndLeaf(fnFlatDataHasParentToTree(list));
-  //       this.deptNodes = target;
-  //       resolve();
-  //     });
-  //   });
-  // }
-
   initForm(): void {
     this.addEditForm = this.fb.group({
       userName: [null, [Validators.required]],
-      password: ['a123456', [Validators.required, this.validatorsService.passwordValidator()]],
+      fullName: [null, [Validators.required]],
+      password: ['@@User123', [Validators.required, this.validatorsService.passwordValidator()]],
       gender: [0],
       isActive: [true],
+      dateOfBirth: [null],
       phoneNumber: [null, [this.validatorsService.mobileValidator()]],
       email: [null, [this.validatorsService.emailValidator()]],
-      roleId: [null, [Validators.required]]
+      roles: [null, [Validators.required]]
     });
   }
 
@@ -106,6 +89,7 @@ export class UserManagerModalComponent implements OnInit {
     await Promise.all([this.getRoleList()]);
     if (this.isEdit) {
       this.addEditForm.patchValue(this.nzModalData);
+      this.addEditForm.controls['userName'].disable();
       this.addEditForm.controls['password'].disable();
     }
   }
