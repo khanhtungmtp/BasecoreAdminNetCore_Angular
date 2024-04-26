@@ -11,7 +11,7 @@ namespace API._Services.Interfaces.UserManager;
 public interface I_User
 {
     // GetMenuByUserPermission
-    Task<OperationResult<List<FunctionVM>>> GetMenuByUserPermission(string userId);
+    Task<OperationResult<List<MenuVM>>> GetMenuByUserPermission(string userId);
     Task<OperationResult<UserVM>> GetByIdAsync(string id);
     Task<OperationResult<PagingResult<UserVM>>> GetPaging(PaginationParam pagination, UserSearchRequest userSearchRequest);
     Task<OperationResult<PagingResult<ForumQuickVM>>> GetForumByUserId(string userId, PaginationParam pagination);

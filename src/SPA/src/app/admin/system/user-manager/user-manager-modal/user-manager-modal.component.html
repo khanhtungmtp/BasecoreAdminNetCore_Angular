@@ -67,12 +67,12 @@
     <nz-form-label nzFor="dateOfBirth"
                    nzRequired
                    [nzSm]="4"
-                   [nzXs]="24">Date of birth</nz-form-label>
+                   [nzXs]="24" nzInputReadOnly="true">Date of birth</nz-form-label>
     <nz-form-control [nzErrorTip]="combineTpl"
                      [nzSm]="18"
                      [nzXs]="24">
       <nz-date-picker formControlName="dateOfBirth"
-                      aria-autocomplete="none"></nz-date-picker>
+                      nzInputReadOnly="true"></nz-date-picker>
     </nz-form-control>
   </nz-form-item>
 
@@ -148,4 +148,11 @@
   @if (control.hasError('required')) {
   Required fields
   }
+  @if (errorMessage) {
+  {{ errorMessage }}
+  }
 </ng-template>
+@if (errorMessage) {
+<nz-alert nzType="error"
+          nzMessage="{{errorMessage}}"></nz-alert>
+}

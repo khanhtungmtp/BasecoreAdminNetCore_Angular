@@ -116,7 +116,6 @@ export class BaseHttpService {
 
   // handle success
   private handleResponse<T>(response: OperationResult<T>): T | boolean {
-    console.log('response: ', response);
     if (response.succeeded) {
       // Kiểm tra nếu có dữ liệu, trả về dữ liệu đó
       if (response.data !== undefined) {

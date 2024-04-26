@@ -164,7 +164,7 @@ export class ModalWrapService {
       nzMaskClosable: false,
       nzFooter: [
         {
-          label: 'confirm',
+          label: 'Save changes',
           type: 'primary',
           show: true,
           onClick: this.confirmCallback.bind(this)

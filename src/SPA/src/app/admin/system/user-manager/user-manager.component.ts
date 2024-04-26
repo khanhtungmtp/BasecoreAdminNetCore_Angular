@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { ActionCode } from '@app/_core/constants/actionCode';
 import { OptionsInterface } from '@app/_core/models/common/types';
 import { ModalBtnStatus } from '@app/_core/utilities/base-modal';
@@ -28,12 +27,14 @@ import { UserManagerModalService } from './user-manager-modal/user-manager-modal
 import { UserVM } from '@app/_core/models/user-manager/uservm';
 import { UserManagerService } from '@app/_core/services/user-manager/user-manager.service';
 import { Pagination, PaginationParam } from '@app/_core/utilities/pagination-utility';
+import { NzRadioModule } from 'ng-zorro-antd/radio';
 
 @Component({
   selector: 'app-user-manager',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
+    NzRadioModule,
     PageHeaderComponent,
     NzGridModule,
     NzCardModule,
@@ -68,15 +69,15 @@ export class UserManagerComponent implements OnInit {
   dataList: UserVM[] = [];
   checkedCashArray: UserVM[] = [];
   ActionCode = ActionCode;
-  isCollapse = true;
+  isCollapse: boolean = true;
   isActiveOptions: OptionsInterface[] = [];
+  genderOptions: OptionsInterface[] = [];
   destroyRef = inject(DestroyRef);
 
   private dataService = inject(UserManagerService);
   private modalSrv = inject(NzModalService);
   private cdr = inject(ChangeDetectorRef);
   private modalService = inject(UserManagerModalService);
-  private router = inject(Router);
   private message = inject(NzMessageService);
   private fb = inject(FormBuilder);
 
@@ -108,6 +109,7 @@ export class UserManagerComponent implements OnInit {
   resetForm(): void {
     this.message.success('Reset successfully');
     this.searchParams.reset();
+    this.tableConfig.pageSize = 10;
     this.getDataList();
   }
 
@@ -116,7 +118,7 @@ export class UserManagerComponent implements OnInit {
 
     const _pagingParam: PaginationParam = {
       pageSize: e?.pageSize || this.pagination.pageSize,
-      pageNumber: e?.pageIndex || this.pagination.pageNumber
+      pageNumber: isSearch ? 1 : e?.pageIndex || this.pagination.pageNumber
     }
 
     const searchParamsValue = this.searchParams.value;
@@ -140,11 +142,6 @@ export class UserManagerComponent implements OnInit {
       });
   }
 
-  // Setting permissions
-  setRole(id: number): void {
-    this.router.navigate(['/default/system/role-manager/set-role'], { queryParams: { id: id } });
-  }
-
   // Trigger table change detection
   tableChangeDectction(): void {
     // Changing the reference triggers change detection.
@@ -159,7 +156,7 @@ export class UserManagerComponent implements OnInit {
 
   addModal(): void {
     this.modalService
-      .show({ nzTitle: 'New' })
+      .show({ nzTitle: 'New user' })
       .pipe(
         finalize(() => {
           this.tableLoading(false);
@@ -171,7 +168,7 @@ export class UserManagerComponent implements OnInit {
           return;
         }
         this.tableLoading(true);
-        this.handleAddData(res.modalValue);
+        this.getDataList();
       });
   }
 
@@ -187,47 +184,20 @@ export class UserManagerComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(res => {
         this.modalService
-          .show({ nzTitle: 'Edit' }, res)
+          .show({ nzTitle: 'Edit user' }, res)
           .pipe(
             finalize(() => {
               this.tableLoading(false);
             }),
             takeUntilDestroyed(this.destroyRef)
           )
-          .subscribe(({ modalValue, status }) => {
+          .subscribe(({ status }) => {
             if (status === ModalBtnStatus.Cancel) {
               return;
             }
-            modalValue.id = id;
             this.tableLoading(true);
-            this.handleEditData(modalValue, id);
+            this.getDataList();
           });
-      });
-  }
-
-  handleAddData(param: UserVM): void {
-    this.dataService.add(param)
-      .pipe(
-        finalize(() => {
-          this.tableLoading(false);
-        }),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe(() => {
-        this.getDataList();
-      });
-  }
-
-  handleEditData(param: UserVM, id: string): void {
-    this.dataService.edit(id, param)
-      .pipe(
-        finalize(() => {
-          this.tableLoading(false);
-        }),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe(() => {
-        this.getDataList();
       });
   }
 
@@ -245,7 +215,7 @@ export class UserManagerComponent implements OnInit {
         }),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(res => {
+      .subscribe(() => {
         this.getDataList();
       });
   }
@@ -317,7 +287,6 @@ export class UserManagerComponent implements OnInit {
   toggleCollapse(): void {
     this.isCollapse = !this.isCollapse;
   }
-
 
   private initTable(): void {
     this.tableConfig = {

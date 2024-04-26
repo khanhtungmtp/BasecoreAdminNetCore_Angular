@@ -125,7 +125,7 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
                 }
             }
 
-            return Ok(OperationResult<string>.Success(user.UserName ?? string.Empty, "Update user successfully"));
+            return Ok(OperationResult<string>.Success(user.Id ?? string.Empty, "Update user successfully"));
         }
 
         return BadRequest(OperationResult.BadRequest(result.Errors));

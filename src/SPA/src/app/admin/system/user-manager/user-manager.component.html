@@ -56,6 +56,25 @@
               </div>
 
               @if (!isCollapse) {
+              <!-- Email -->
+              <div nz-col
+                       [nzLg]="8"
+                       [nzMd]="12"
+                       [nzSm]="24"
+                       [nzXl]="8"
+                       [nzXs]="24"
+                       [nzXXl]="8">
+                    <nz-form-item>
+                      <nz-form-label [nzFor]="">Email</nz-form-label>
+                      <nz-form-control>
+                        <input name="email"
+                               nz-input
+                               placeholder="Please enter a email"
+                               formControlName="email" />
+                      </nz-form-control>
+                    </nz-form-item>
+                    </div>
+              <!-- Is Active -->
               <div nz-col
                    [nzLg]="8"
                    [nzMd]="12"
@@ -63,7 +82,6 @@
                    [nzXl]="8"
                    [nzXs]="24"
                    [nzXXl]="8">
-                <!-- Is Active -->
                 <nz-form-item>
                   <nz-form-label [nzFor]="">Is Active</nz-form-label>
                   <nz-form-control>
@@ -79,6 +97,7 @@
                   </nz-form-control>
                 </nz-form-item>
               </div>
+<!-- Gender -->
               <div nz-col
                    [nzLg]="8"
                    [nzMd]="12"
@@ -86,25 +105,17 @@
                    [nzXl]="8"
                    [nzXs]="24"
                    [nzXXl]="8">
-                <!-- Email -->
                 <nz-form-item>
-                  <nz-form-label [nzFor]="">Email</nz-form-label>
-                  <nz-form-control>
-                    <input name="email"
-                           nz-input
-                           placeholder="Please enter a email"
-                           formControlName="email" />
+                  <nz-form-label [nzFor]="">Gender</nz-form-label>
+                  <nz-form-control [nzSm]="18"
+                                   [nzXs]="24">
+                    <nz-radio-group formControlName="gender">
+                      <label nz-radio
+                             [nzValue]="0">Male</label>
+                      <label nz-radio
+                             [nzValue]="1">Female</label>
+                    </nz-radio-group>
                   </nz-form-control>
-                </nz-form-item>
-              </div>
-              <div nz-col
-                   [nzLg]="8"
-                   [nzMd]="12"
-                   [nzSm]="24"
-                   [nzXl]="8"
-                   [nzXs]="24"
-                   [nzXXl]="8">
-                <nz-form-item>
                 </nz-form-item>
               </div>
               }

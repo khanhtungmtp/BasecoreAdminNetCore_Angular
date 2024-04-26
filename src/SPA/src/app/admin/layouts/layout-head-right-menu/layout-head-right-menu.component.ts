@@ -26,6 +26,7 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { UrlRouteConstants } from '@app/_core/constants/url-route.constants';
 import { SystemLanguageService } from '@app/_core/services/system/system-language.service';
 import { SystemLanguageVM } from '@app/_core/models/system/systemlanguage';
+import { LangConstants } from '@app/_core/constants/lang-constants';
 
 @Component({
   selector: 'app-layout-head-right-menu',
@@ -128,6 +129,6 @@ export class LayoutHeadRightMenuComponent implements OnInit {
 
   ngOnInit(): void {
     this.getLanguage();
-    this.currentLang = localStorage.getItem(LocalStorageConstants.LANG) ?? 'en_US';
+    this.currentLang = localStorage.getItem(LocalStorageConstants.LANG) ?? LangConstants.EN;
   }
 }

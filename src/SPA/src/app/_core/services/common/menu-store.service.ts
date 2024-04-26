@@ -1,13 +1,10 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Menu } from '@app/_core/models/common/types';
-import { FunctionVM } from '@app/_core/models/system/functionvm';
 import { FunctionUtility } from '@app/_core/utilities/function-utility';
 import { environment } from '@env/environment';
-import { BehaviorSubject, Observable, catchError, map } from 'rxjs';
+import { BehaviorSubject, Observable, map } from 'rxjs';
 import { BaseService } from '../platform/baseservice';
-import { OperationResult } from '@app/_core/utilities/operation-result';
 import { BaseHttpService } from '../base-http.service';
+import { MenuVM } from '@app/_core/models/system/menuvm';
 
 //Menu store service
 @Injectable({
@@ -22,24 +19,25 @@ export class MenuStoreService extends BaseService {
     super()
   }
   baseUrl: string = environment.apiUrl;
-  private menuArray$ = new BehaviorSubject<FunctionVM[]>([]);
+  private menuArray$ = new BehaviorSubject<MenuVM[]>([]);
 
-  setMenuArrayStore(menuArray: FunctionVM[]): void {
+  setMenuArrayStore(menuArray: MenuVM[]): void {
     this.menuArray$.next(menuArray);
   }
 
-  getMenuArrayStore(): Observable<FunctionVM[]> {
+  getMenuArrayStore(): Observable<MenuVM[]> {
     return this.menuArray$.asObservable();
   }
 
   getMenuByUserId(userId: string) {
-    return this.httpBase.get<FunctionVM[]>(`Users/${userId}/menu`).pipe(map(response => {
+    return this.httpBase.get<MenuVM[]>(`Users/${userId}/menu`).pipe(map(response => {
       if (response.length === 0) {
         // Handle the undefined case, e.g., by returning an empty array or throwing an error
         console.error('Received undefined data');
         return [];
       }
-      return this.ultility.UnflatteringForLeftMenu(response);
+      const roleView = response.filter(x => x.code.includes('VIEW'));
+      return this.ultility.UnflatteringForLeftMenu(roleView);
     }));
   }
 }
