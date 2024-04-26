@@ -15,5 +15,5 @@ public interface I_User
     Task<OperationResult<UserVM>> GetByIdAsync(string id);
     Task<OperationResult<PagingResult<UserVM>>> GetPaging(PaginationParam pagination, UserSearchRequest userSearchRequest);
     Task<OperationResult<PagingResult<ForumQuickVM>>> GetForumByUserId(string userId, PaginationParam pagination);
-    Task<OperationResult> DeleteRangeAsync(List<string> ids);
+    Task<OperationResult> DeleteRangeAsync(List<string> ids, string idLogedIn);
 }

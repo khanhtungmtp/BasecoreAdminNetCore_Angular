@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } 
 import { OptionsInterface } from '@app/_core/models/common/types';
 import { UserVM } from '@app/_core/models/user-manager/uservm';
 import { RoleService } from '@app/_core/services/user-manager/role.service';
+import { UserManagerService } from '@app/_core/services/user-manager/user-manager.service';
 import { ValidatorsService } from '@app/_core/services/validators/validators.service';
 import { fnCheckForm } from '@app/_core/utilities/tools';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
@@ -16,7 +17,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
-import { Observable, of } from 'rxjs';
+import { Observable, catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-user-manager-modal',
@@ -29,15 +30,13 @@ import { Observable, of } from 'rxjs';
 export class UserManagerModalComponent implements OnInit {
   addEditForm!: FormGroup;
   roleOptions: OptionsInterface[] = [];
-  isEdit = false;
-  value?: string;
-  deptNodes: NzTreeNodeOptions[] = [];
+  isEdit: boolean = false;
 
   readonly nzModalData: UserVM = inject(NZ_MODAL_DATA);
   private fb = inject(FormBuilder);
   private validatorsService = inject(ValidatorsService);
   private roleService = inject(RoleService);
-
+  private dataService = inject(UserManagerService);
   constructor(private modalRef: NzModalRef) { }
 
   //This method is if there is asynchronous data that needs to be loaded, add it in this method
@@ -50,7 +49,10 @@ export class UserManagerModalComponent implements OnInit {
     if (!fnCheckForm(this.addEditForm)) {
       return of(false);
     }
-    return of(this.addEditForm.value);
+    return this.dataService.add(this.addEditForm.value).pipe(
+      catchError(error => {
+        return of(null);
+      }))
   }
 
   getRoleList(): Promise<void> {
@@ -78,7 +80,7 @@ export class UserManagerModalComponent implements OnInit {
       isActive: [true],
       dateOfBirth: [null],
       phoneNumber: [null, [this.validatorsService.mobileValidator()]],
-      email: [null, [this.validatorsService.emailValidator()]],
+      email: [null, [Validators.required, Validators.email]],
       roles: [null, [Validators.required]]
     });
   }

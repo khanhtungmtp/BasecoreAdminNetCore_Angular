@@ -2,7 +2,7 @@
       autocomplete="off"
       [formGroup]="addEditForm">
   <nz-form-item>
-    <nz-form-label nzFor="sex"
+    <nz-form-label nzFor="userName"
                    nzRequired
                    [nzSm]="4"
                    [nzXs]="24">User Name</nz-form-label>
@@ -17,7 +17,7 @@
   </nz-form-item>
   @if (!isEdit) {
   <nz-form-item>
-    <nz-form-label nzFor="roleId"
+    <nz-form-label nzFor="password"
                    nzRequired
                    [nzSm]="4"
                    [nzXs]="24">Password</nz-form-label>
@@ -33,7 +33,7 @@
   </nz-form-item>
   }
   <nz-form-item>
-    <nz-form-label nzFor="sex"
+    <nz-form-label nzFor="gender"
                    nzRequired
                    [nzSm]="4"
                    [nzXs]="24">Gender</nz-form-label>

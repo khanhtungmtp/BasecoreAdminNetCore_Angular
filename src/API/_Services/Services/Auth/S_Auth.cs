@@ -62,20 +62,12 @@ public class S_Auth(IRepositoryAccessor repoStore, UserManager<User> userManager
         var key = Encoding.ASCII
         .GetBytes(_jwtSettings.Value.SecurityKey);
 
-        var roles = _userManager.GetRolesAsync(user).Result;
-
-        List<Claim> claims =
-        [
-            new Claim("Id", user.Id),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
-            new Claim(JwtRegisteredClaimNames.Sub, user.Email ?? ""),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        ];
-
-        foreach (var role in roles)
-        {
-            claims.Add(new Claim(ClaimTypes.Role, role));
-        }
+        var claims = new[]
+            {
+               new Claim("Id", user.Id),
+               new Claim(ClaimTypes.NameIdentifier, user.Id ?? ""),
+               new Claim(ClaimTypes.Name, user.UserName ?? ""),
+            };
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

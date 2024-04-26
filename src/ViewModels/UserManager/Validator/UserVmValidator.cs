@@ -12,6 +12,10 @@ public class UserVmValidator : AbstractValidator<UserCreateRequest>
                 .WithMessage("Password is not match complexity rules.");
         RuleFor(x => x.FullName).NotEmpty().WithMessage("FullName value is required").MaximumLength(50).WithMessage("FullName cannot over limit 50 characters");
         RuleFor(x => x.PhoneNumber).NotEmpty().WithMessage("Phone number is required");
-        RuleFor(x => x.Email).NotEmpty().WithMessage("Email value is required").Matches(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$").WithMessage("Email format is not match");
+        RuleFor(x => x.Email)
+         .NotEmpty()
+         .WithMessage("Email value is required")
+         .Matches(@"^[\w.-]+@([\w-]+\.)+[\w-]{2,}$")
+         .WithMessage("Email format is not match");
     }
 }

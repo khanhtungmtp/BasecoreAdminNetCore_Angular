@@ -10,11 +10,11 @@ using ViewModels.UserManager;
 
 namespace API.Controllers.UserManager;
 
-public class UsersController(UserManager<User> userManager, I_User user, RoleManager<SystemRole> rolesManager) : BaseController
+public class UsersController(UserManager<User> userManager, I_User userService, RoleManager<SystemRole> rolesManager) : BaseController
 {
     private readonly UserManager<User> _userManager = userManager;
     private readonly RoleManager<SystemRole> _rolesManager = rolesManager;
-    private readonly I_User _user = user;
+    private readonly I_User _userService = userService;
 
     // url: POST : http://localhost:6001/api/user
     [HttpPost]
@@ -89,7 +89,7 @@ public class UsersController(UserManager<User> userManager, I_User user, RoleMan
         if (result.Succeeded)
         {
             // Update roles if specified
-            if (request.Roles is not null && request.Roles.Any())
+            if (request.Roles is not null && request.Roles.Count != 0)
             {
                 var currentRoles = await _userManager.GetRolesAsync(user);
                 var rolesToAdd = request.Roles.Except(currentRoles);
@@ -136,7 +136,7 @@ public class UsersController(UserManager<User> userManager, I_User user, RoleMan
     [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
     public async Task<IActionResult> GetPaging([FromQuery] PaginationParam pagination, [FromQuery] UserSearchRequest userSearchRequest)
     {
-        return Ok(await _user.GetPaging(pagination, userSearchRequest));
+        return Ok(await _userService.GetPaging(pagination, userSearchRequest));
     }
 
     // url: GET : http:localhost:6001/api/user/{id}
@@ -144,7 +144,7 @@ public class UsersController(UserManager<User> userManager, I_User user, RoleMan
     [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
     public async Task<IActionResult> GetById(string id)
     {
-        var user = await _user.GetByIdAsync(id);
+        var user = await _userService.GetByIdAsync(id);
         return HandleResult(user);
     }
 
@@ -170,6 +170,10 @@ public class UsersController(UserManager<User> userManager, I_User user, RoleMan
         var user = await _userManager.FindByIdAsync(id);
         if (user is null)
             return NotFound(OperationResult.NotFound("User not found"));
+        if (user.UserName == SystemConstants.UserNameAdmin)
+            return BadRequest(OperationResult.BadRequest("You can't delete admin user."));
+        if (user.UserName == UserNameLogedIn)
+            return BadRequest(OperationResult.BadRequest("You can't delete yourself."));
         var result = await _userManager.DeleteAsync(user);
         if (result.Succeeded)
         {
@@ -187,12 +191,21 @@ public class UsersController(UserManager<User> userManager, I_User user, RoleMan
         return BadRequest(OperationResult.BadRequest(result.Errors));
     }
 
+    // url: DELETE : http:localhost:6001/api/users/{ids}
+    [HttpDelete("DeleteUsers")]
+    [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.DELETE)]
+    public async Task<IActionResult> DeleteRangeFunction([FromBody] List<string> ids)
+    {
+        var result = await _userService.DeleteRangeAsync(ids, IdLogedIn);
+        return HandleResult(result);
+    }
+
     // GetMenuByUserPermission
     [HttpGet("{userId}/menu")]
     [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
     public async Task<IActionResult> GetMenuByUserPermission(string userId)
     {
-        var result = await _user.GetMenuByUserPermission(userId);
+        var result = await _userService.GetMenuByUserPermission(userId);
         return HandleResult(result);
     }
 
@@ -244,7 +257,7 @@ public class UsersController(UserManager<User> userManager, I_User user, RoleMan
     [HttpGet("{userId}/Forum")]
     public async Task<IActionResult> GetForumByUserId(string userId, PaginationParam pagination)
     {
-        return Ok(await _user.GetForumByUserId(userId, pagination));
+        return Ok(await _userService.GetForumByUserId(userId, pagination));
     }
 }
 

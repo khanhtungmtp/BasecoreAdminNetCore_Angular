@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using API.Helpers.Base;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,8 @@ namespace API.Controllers;
 [Authorize]
 public class BaseController : ControllerBase
 {
+    protected string IdLogedIn => User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+    protected string UserNameLogedIn => User.FindFirst(ClaimTypes.Name)?.Value ?? "";
     protected IActionResult HandleResult<T>(OperationResult<T> result)
     {
         if (!result.Succeeded)
@@ -22,7 +25,7 @@ public class BaseController : ControllerBase
     {
         if (!result.Succeeded)
         {
-            return HandleStatusCode(result.StatusCode, null!);
+            return HandleStatusCode(result.StatusCode, result);
         }
         return Ok(result);
     }

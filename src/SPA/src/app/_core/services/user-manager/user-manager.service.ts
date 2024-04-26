@@ -24,7 +24,7 @@ export class UserManagerService {
   }
 
   edit(id: string, model: UserVM) {
-    return this.httpBase.put<string>(`Users/${id}`, model, { needSuccessInfo: true, typeAction: 'add' });
+    return this.httpBase.put<string>(`Users/${id}`, model, { needSuccessInfo: true, typeAction: 'edit' });
   }
 
   delete(id: string) {
@@ -32,7 +32,7 @@ export class UserManagerService {
   }
 
   deleteRange(ids: string[]) {
-    return this.httpBase.delete<boolean>('Users/DeleteRange', ids);
+    return this.httpBase.delete<boolean>('Users/DeleteUsers', ids);
   }
 
 }

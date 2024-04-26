@@ -5,14 +5,9 @@ using ViewModels.System;
 
 namespace API.Controllers.System;
 
-public class ReportsController : BaseController
+public class ReportsController(I_Reports reportService) : BaseController
 {
-    private readonly I_Reports _reportService;
-
-    public ReportsController(I_Reports reportService)
-    {
-        _reportService = reportService;
-    }
+    private readonly I_Reports _reportService = reportService;
 
     [HttpPost("{forumId}/reports")]
     public async Task<IActionResult> PostReport(int forumId, [FromBody] ReportCreateRequest request)

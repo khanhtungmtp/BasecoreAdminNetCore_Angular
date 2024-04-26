@@ -175,10 +175,15 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
         return OperationResult<List<FunctionVM>>.Success(data, "Get data successfully.");
     }
 
-    public async Task<OperationResult> DeleteRangeAsync(List<string> ids)
+    public async Task<OperationResult> DeleteRangeAsync(List<string> ids, string idLogedIn)
     {
-        if (ids.Count == 0) return OperationResult.NotFound("List users not found.");
+        if (ids.Count == 0) return OperationResult.NotFound("List users empty.");
+
+        if (ids.Contains(idLogedIn))
+            return OperationResult.BadRequest("Cannot delete the list of users. The list of ids contains the userid of the currently logged in user.");
+
         var entitiesToDelete = await _repoStore.Users.FindAll(entity => ids.Contains(entity.Id)).ToListAsync();
+
         if (entitiesToDelete.Count == 0)
             return OperationResult.NotFound("List users empty.");
 

@@ -28,7 +28,6 @@ import { UserManagerModalService } from './user-manager-modal/user-manager-modal
 import { UserVM } from '@app/_core/models/user-manager/uservm';
 import { UserManagerService } from '@app/_core/services/user-manager/user-manager.service';
 import { Pagination, PaginationParam } from '@app/_core/utilities/pagination-utility';
-import { NzNotificationCustomService } from '@app/_core/services/nz-notificationCustom.service';
 
 @Component({
   selector: 'app-user-manager',
@@ -80,7 +79,6 @@ export class UserManagerComponent implements OnInit {
   private router = inject(Router);
   private message = inject(NzMessageService);
   private fb = inject(FormBuilder);
-  private notification = inject(NzNotificationCustomService);
 
   ngOnInit(): void {
     this.isActiveOptions = [...MapPipe.transformMapToArray(MapSet.isActive, MapKeyType.Boolean)];
@@ -108,7 +106,7 @@ export class UserManagerComponent implements OnInit {
   }
 
   resetForm(): void {
-    this.notification.success('Success', 'Reset successfully');
+    this.message.success('Reset successfully');
     this.searchParams.reset();
     this.getDataList();
   }
@@ -133,7 +131,7 @@ export class UserManagerComponent implements OnInit {
       )
       .subscribe(response => {
         if (isSearch)
-          this.notification.success('Success', 'Searched successfully');
+          this.message.success('Searched successfully');
         this.dataList = response.result;
         this.pagination = response.pagination;
         this.tableConfig.total = this.pagination.totalCount;
@@ -173,7 +171,7 @@ export class UserManagerComponent implements OnInit {
           return;
         }
         this.tableLoading(true);
-        this.addData(res.modalValue);
+        this.handleAddData(res.modalValue);
       });
   }
 
@@ -202,12 +200,12 @@ export class UserManagerComponent implements OnInit {
             }
             modalValue.id = id;
             this.tableLoading(true);
-            this.editData(modalValue, id);
+            this.handleEditData(modalValue, id);
           });
       });
   }
 
-  addData(param: UserVM): void {
+  handleAddData(param: UserVM): void {
     this.dataService.add(param)
       .pipe(
         finalize(() => {
@@ -220,7 +218,7 @@ export class UserManagerComponent implements OnInit {
       });
   }
 
-  editData(param: UserVM, id: string): void {
+  handleEditData(param: UserVM, id: string): void {
     this.dataService.edit(id, param)
       .pipe(
         finalize(() => {

@@ -9,17 +9,17 @@ import { ValidatorsRuleService } from './validators-rule.service';
 export class ValidatorsService {
   private vrService = inject(ValidatorsRuleService);
 
-  // 邮箱校验
+  // Email verification
   public emailValidator(): ValidatorFn | null {
     return this.commonUtil(this.vrService.emailRule);
   }
 
-  // 手机号码校验
+  // Mobile phone number verification
   public mobileValidator(): ValidatorFn | null {
     return this.commonUtil(this.vrService.mobileRule);
   }
 
-  // 密码校验
+  // Password verification
   public passwordValidator(): ValidatorFn | null {
     return this.commonUtil(this.vrService.passwordRule);
   }
