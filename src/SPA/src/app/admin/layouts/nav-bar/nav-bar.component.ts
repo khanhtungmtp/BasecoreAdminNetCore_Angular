@@ -21,7 +21,6 @@ import { AuthService } from '@app/_core/services/auth/auth.service';
 import { LocalStorageConstants } from '@app/_core/constants/local-storage.constants';
 import { UserForLogged } from '@app/_core/models/auth/auth';
 import { FunctionVM } from '@app/_core/models/system/functionvm';
-import { MenuVM } from '@app/_core/models/system/menuvm';
 
 @Component({
   selector: 'app-nav-bar',
@@ -47,7 +46,7 @@ export class NavBarComponent implements OnInit {
   private themesService = inject(ThemeService);
 
   routerPath = this.router.url;
-  copyMenus: MenuVM[] = [];
+  copyMenus: FunctionVM[] = [];
   authCodeArray: string[] = [];
 
   themesOptions$ = this.themesService.getThemesMode();
@@ -61,8 +60,8 @@ export class NavBarComponent implements OnInit {
   isOverMode = false;
   isCollapsed = false;
   isMixinMode = false;
-  leftMenuArray: MenuVM[] = [];
-  leftMenu: MenuVM[] = [];
+  leftMenuArray: FunctionVM[] = [];
+  leftMenu: FunctionVM[] = [];
 
   destroyRef = inject(DestroyRef);
 
@@ -166,9 +165,9 @@ export class NavBarComponent implements OnInit {
   }
 
   // Deep copy clone menu array
-  cloneMenuArray(sourceMenuArray: MenuVM[], target: MenuVM[] = []): MenuVM[] {
+  cloneMenuArray(sourceMenuArray: FunctionVM[], target: FunctionVM[] = []): FunctionVM[] {
     sourceMenuArray.forEach(item => {
-      const obj: MenuVM = { id: '', name: '', menuType: 'C', url: '', parentId: '', sortOrder: 0, icon: '', children: [], newLinkFlag: false, open: false, selected: false, code: '', functionId: '', commandId: '' };
+      const obj: FunctionVM = { id: '', name: '', menuType: 'C', url: '', parentId: '', sortOrder: 0, icon: '', children: [], newLinkFlag: false, open: false, selected: false };
       for (let i in item) {
         if (item.hasOwnProperty(i)) {
           // @ts-ignore

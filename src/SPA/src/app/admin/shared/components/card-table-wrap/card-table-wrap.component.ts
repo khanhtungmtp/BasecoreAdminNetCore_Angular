@@ -84,6 +84,7 @@ export class CardTableWrapComponent implements AfterContentInit {
 
   // Is all tableCheckbox selected in the configuration?
   changeAllTableTableConfigShow(e: boolean): void {
+    console.log('e: ', e);
     if (e) {
       this.allTableFieldChecked = e;
       this.allTableFieldIndeterminate = false;
@@ -143,8 +144,10 @@ export class CardTableWrapComponent implements AfterContentInit {
   // The judgment column displays the status of this checkbox
   judgeAllChecked(): void {
     this.allTableFieldChecked = this.tableHeaders.every(item => item.show === true);
+    console.log('this.allTableFieldChecked: ', this.allTableFieldChecked);
     const allUnChecked = this.tableHeaders.every(item => !item.show);
     this.allTableFieldIndeterminate = !this.allTableFieldChecked && !allUnChecked;
+    console.log('this.allTableFieldIndeterminate: ', this.allTableFieldIndeterminate);
   }
 
   // reset

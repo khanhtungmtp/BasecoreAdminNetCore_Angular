@@ -22,7 +22,8 @@ import { finalize } from 'rxjs';
 import { FunctionFormComponent } from './function-form/function-form.component';
 import { NzNotificationCustomService } from '@app/_core/services/nz-notificationCustom.service';
 import { NzSpinnerCustomService } from '@app/_core/services/common/nz-spinner.service';
-
+import { HasRoleDirective } from '@app/_core/directives/hasrole.directive';
+import { ActionCode } from '@app/_core/constants/actionCode';
 
 @Component({
   selector: 'app-function',
@@ -42,10 +43,12 @@ import { NzSpinnerCustomService } from '@app/_core/services/common/nz-spinner.se
     NzIconModule,
     CardTableWrapComponent,
     AntTableComponent,
-    NzBadgeModule
+    NzBadgeModule,
+    HasRoleDirective
   ]
 })
 export class FunctionComponent implements OnInit {
+  actionCode = ActionCode;
   filter: string = '';
   pagination: Pagination = <Pagination>{
     pageNumber: 1,

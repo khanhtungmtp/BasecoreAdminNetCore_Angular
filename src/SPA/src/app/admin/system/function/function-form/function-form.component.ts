@@ -14,16 +14,18 @@ import { NzNotificationCustomService } from '@app/_core/services/nz-notification
 import { TranslateService } from '@ngx-translate/core';
 import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
 import { FunctionUtility } from '@app/_core/utilities/function-utility';
+import { IconSelComponent } from '@app/admin/shared/biz-components/icon-sel/icon-sel.component';
 
 @Component({
   selector: 'app-function-form',
   standalone: true,
-  imports: [NzModalModule, ReactiveFormsModule, NzTreeSelectModule, NzFormModule, NzInputModule, NzButtonModule, NzSelectModule, NzInputNumberModule],
+  imports: [IconSelComponent, NzModalModule, ReactiveFormsModule, NzTreeSelectModule, NzFormModule, NzInputModule, NzButtonModule, NzSelectModule, NzInputNumberModule],
   templateUrl: './function-form.component.html',
   styleUrl: './function-form.component.less'
 })
 export class FunctionFormComponent implements OnInit {
   nodes: any[] = [];
+  selIconVisible = false;
   dataForm: FormGroup<{
     id: FormControl<string | null>;
     name: FormControl<string | null>;
@@ -56,11 +58,16 @@ export class FunctionFormComponent implements OnInit {
     this.initForm();
 
   }
+
   ngOnInit(): void {
     this.getParentIds();
     if (this.id) {
       this.getById();
     }
+  }
+
+  seledIcon(e: string): void {
+    this.dataForm.get('icon')?.setValue(e);
   }
 
   initForm() {

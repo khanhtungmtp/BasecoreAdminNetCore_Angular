@@ -47,6 +47,7 @@ export interface UserForLoggedIn {
   id: string;
   username: string;
   email: string;
+  permissions: string[];
   token: string;
   refreshToken: string;
 }

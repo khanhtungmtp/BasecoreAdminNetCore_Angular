@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, input } from '@angular/core';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
-import { FormGroup, FormBuilder, ReactiveFormsModule, FormControl, FormsModule } from '@angular/forms';
+import { FormGroup, FormBuilder, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { MessageConstants, CaptionConstants } from '@constants/message.enum';
@@ -17,6 +17,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzNotificationModule } from 'ng-zorro-antd/notification';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { fnCheckForm } from '@app/_core/utilities/tools';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -26,20 +27,9 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent extends InjectBase implements OnInit {
-  validateForm: FormGroup<{
-    userName: FormControl<string | null>;
-    password: FormControl<string | null>;
-    remember: FormControl<boolean | null>;
-  }> = new FormGroup({
-    userName: new FormControl(''),
-    password: new FormControl(''),
-    remember: new FormControl(true),
-  });
-
+  validateForm!: FormGroup;
+  @Input() returnUrl: string = '';
   isCapsLockOn: boolean = false;
-
-  user: UserLoginParam = <UserLoginParam>{
-  };
 
   constructor(private fb: FormBuilder, private authService: AuthService) {
     super();
@@ -62,14 +52,18 @@ export class LoginComponent extends InjectBase implements OnInit {
   }
 
   login(): void {
-    if (this.validateForm.valid) {
-      this.user.userName = this.validateForm.value.userName as string
-      this.user.password = this.validateForm.value.password as string
+    if (!fnCheckForm(this.validateForm)) {
+      return;
+    }
+    const param = this.validateForm.getRawValue();
       this.spinnerService.show();
-      this.authService.login(this.user).subscribe({
+    this.authService.login(param).subscribe({
         next: (res) => {
           this.notification.success(MessageConstants.LOGGED_IN, CaptionConstants.SUCCESS);
           this.spinnerService.hide();
+        if (this.returnUrl)
+          this.router.navigateByUrl(this.returnUrl);
+        else
           this.router.navigate([UrlRouteConstants.DASHBOARD]);
         },
         // error: (err) => {
@@ -77,15 +71,5 @@ export class LoginComponent extends InjectBase implements OnInit {
         // },
       });
 
-    } else {
-      Object.values(this.validateForm.controls).forEach(control => {
-        if (control.invalid) {
-          control.markAsDirty();
-          control.updateValueAndValidity({ onlySelf: true });
-        }
-      });
-    }
   }
-
-
 }

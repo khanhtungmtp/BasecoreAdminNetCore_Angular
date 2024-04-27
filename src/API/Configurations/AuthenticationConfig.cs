@@ -17,7 +17,12 @@ public static class AuthenticationConfig
             opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        }).AddJwtBearer(opt =>
+        })
+        // .AddCookie(x =>
+        // {
+        //     x.Cookie.Name = "token";
+        // })
+        .AddJwtBearer(opt =>
         {
             opt.SaveToken = true;
             opt.RequireHttpsMetadata = false;
@@ -43,7 +48,12 @@ public static class AuthenticationConfig
                         context.Response.Headers.Append("Token-Expired", "true");
                     }
                     return Task.CompletedTask;
-                }
+                },
+                // OnMessageReceived = context =>
+                // {
+                //     context.Token = context.Request.Cookies["token"];
+                //     return Task.CompletedTask;
+                // }
             };
         });
         services.AddAuthorization();

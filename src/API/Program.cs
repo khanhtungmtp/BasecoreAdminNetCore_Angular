@@ -1,5 +1,6 @@
 using System.Net;
 using API.Configurations;
+using API.Configurations.AppSetting;
 using API.Data;
 using API.Helpers.Base;
 using FluentValidation;

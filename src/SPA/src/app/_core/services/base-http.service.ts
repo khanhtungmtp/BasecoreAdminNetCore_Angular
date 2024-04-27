@@ -23,25 +23,17 @@ export class BaseHttpService {
     this.uri = !environment.production ? environment.apiUrl : 'https://localhost:6001/api/';
   }
 
-  private removeEmptyProperties(obj: any): any {
-    const newObj: any = {};
-    Object.keys(obj).forEach(key => {
-      if (obj[key] !== null && obj[key] !== undefined && obj[key] !== '') {
-        newObj[key] = obj[key];
-      }
-    });
-    return newObj;
-  }
-
   // Modify your service methods
   get<T>(path: string, param?: NzSafeAny, config?: HttpCustomConfig): Observable<T> {
-    config = config || { needSuccessInfo: false, typeAction: 'view' };
+    config = config || { needSuccessInfo: false, typeAction: 'view', sendCookie: false };
     let reqPath = this.getUrl(path, config);
 
     // Loại bỏ các thuộc tính có giá trị là rỗng hoặc null từ tham số param
     const filteredParams = param ? this.removeEmptyProperties(param) : {};
     const params = new HttpParams({ fromObject: filteredParams });
-    return this.http.get<OperationResult>(reqPath, { params }).pipe(
+    const requestOptions = this.getRequestOptions(config);
+
+    return this.http.get<OperationResult>(reqPath, { params, ...requestOptions }).pipe(
       tap(() => this.handleSuccessNotification(config)),
       map(response => this.handleResponse(response)),
       catchError(this.handleError)
@@ -49,7 +41,7 @@ export class BaseHttpService {
   }
 
   delete<T>(path: string, body?: NzSafeAny, queryParams?: NzSafeAny, config?: HttpCustomConfig): Observable<T> {
-    config = config || { needSuccessInfo: true, typeAction: 'delete' };
+    config = config || { needSuccessInfo: true, typeAction: 'delete', sendCookie: false };
     let reqPath = this.getUrl(path, config);
 
     // Chuyển đổi queryParams thành HttpParams
@@ -70,9 +62,9 @@ export class BaseHttpService {
   }
 
   post<T>(path: string, param?: NzSafeAny, config?: HttpCustomConfig): Observable<T> {
-    config = config || { needSuccessInfo: false, typeAction: 'add' };
+    config = config || { needSuccessInfo: false, typeAction: 'add', sendCookie: false };
     let reqPath = this.getUrl(path, config);
-    return this.http.post<OperationResult>(reqPath, param).pipe(
+    return this.http.post<OperationResult>(reqPath, param, this.getRequestOptions(config)).pipe(
       tap(() => this.handleSuccessNotification(config)),
       map(response => this.handleResponse(response)),
       catchError(this.handleError)
@@ -80,9 +72,19 @@ export class BaseHttpService {
   }
 
   put<T>(path: string, param?: NzSafeAny, config?: HttpCustomConfig): Observable<T> {
-    config = config || { needSuccessInfo: false, typeAction: 'edit' };
+    config = config || { needSuccessInfo: false, typeAction: 'edit', sendCookie: false };
     let reqPath = this.getUrl(path, config);
-    return this.http.put<OperationResult>(reqPath, param).pipe(
+    return this.http.put<OperationResult>(reqPath, param, this.getRequestOptions(config)).pipe(
+      tap(() => this.handleSuccessNotification(config)),
+      map(response => this.handleResponse(response)),
+      catchError(this.handleError)
+    );
+  }
+
+  patch<T>(path: string, param?: NzSafeAny, config?: HttpCustomConfig): Observable<T> {
+    config = config || { needSuccessInfo: false, typeAction: 'edit', sendCookie: false };
+    let reqPath = this.getUrl(path, config);
+    return this.http.patch<OperationResult>(reqPath, param, this.getRequestOptions(config)).pipe(
       tap(() => this.handleSuccessNotification(config)),
       map(response => this.handleResponse(response)),
       catchError(this.handleError)
@@ -90,15 +92,16 @@ export class BaseHttpService {
   }
 
   downLoadWithBlob(path: string, param?: NzSafeAny, config?: HttpCustomConfig): Observable<NzSafeAny> {
-    config = config || { needSuccessInfo: false, typeAction: 'download' };
+    config = config || { needSuccessInfo: false, typeAction: 'download', sendCookie: false };
     let reqPath = this.getUrl(path, config);
     return this.http.post(reqPath, param, {
       responseType: 'blob',
-      headers: new HttpHeaders().append('Content-Type', 'application/json')
+      headers: new HttpHeaders().append('Content-Type', 'application/json'),
+      ...config
     }).pipe(tap(() => this.handleSuccessNotification(config)));
   }
 
-  getUrl(path: string, config: HttpCustomConfig): string {
+  private getUrl(path: string, config: HttpCustomConfig): string {
     let reqPath = this.uri + path;
     if (config.otherUrl) {
       reqPath = path;
@@ -106,6 +109,25 @@ export class BaseHttpService {
     return reqPath;
   }
 
+  private getRequestOptions(config: HttpCustomConfig): { headers?: HttpHeaders, withCredentials?: boolean } {
+    const headers = new HttpHeaders().set('Content-Type', 'application/json').set('Accept', 'application/json');
+    const requestOptions: { headers?: HttpHeaders, withCredentials?: boolean } = {
+      headers,
+      withCredentials: config && config.sendCookie ? true : false
+    };
+
+    return requestOptions;
+  }
+
+  private removeEmptyProperties(obj: any): any {
+    const newObj: any = {};
+    Object.keys(obj).forEach(key => {
+      if (obj[key] !== null && obj[key] !== undefined && obj[key] !== '') {
+        newObj[key] = obj[key];
+      }
+    });
+    return newObj;
+  }
 
   private handleError(error: any) {
     console.log('An error occurred baseServices:', error);

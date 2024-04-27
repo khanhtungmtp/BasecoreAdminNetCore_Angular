@@ -1,4 +1,4 @@
-namespace API.Configurations;
+namespace API.Configurations.AppSetting;
 
 public class AppSetting
 {

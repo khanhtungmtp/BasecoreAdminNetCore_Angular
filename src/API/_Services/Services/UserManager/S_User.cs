@@ -146,35 +146,33 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
         return predicate;
     }
 
-    public async Task<OperationResult<List<MenuVM>>> GetMenuByUserPermission(string userId)
+    public async Task<OperationResult<List<FunctionVM>>> GetMenuByUserPermission(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
-            return OperationResult<List<MenuVM>>.NotFound("User not found.");
+            return OperationResult<List<FunctionVM>>.NotFound("User not found.");
         var roles = await _userManager.GetRolesAsync(user);
-        IQueryable<MenuVM>? query = from f in _repoStore.Functions.FindAll(true)
+        IQueryable<FunctionVM>? query = from f in _repoStore.Functions.FindAll(true)
                                         join p in _repoStore.Permissions.FindAll(true)
                                             on f.Id equals p.FunctionId
                                         join r in _rolesManager.Roles on p.RoleId equals r.Id
                                         join a in _repoStore.Commands.FindAll(true)
                                             on p.CommandId equals a.Id
-                                    where roles.Contains(r.Name ?? string.Empty)
-                                    //  && a.Id == "VIEW"
-                                    select new MenuVM
+                                        where roles.Contains(r.Name ?? string.Empty) && a.Id == "VIEW"
+                                        select new FunctionVM
                                         {
                                             Id = f.Id,
                                             Name = f.Name,
                                             Url = f.Url,
                                             ParentId = f.ParentId,
                                             SortOrder = f.SortOrder,
-                                        Code = p.FunctionId + ":" + p.CommandId,
                                             Icon = f.Icon
                                         };
         var data = await query.Distinct()
             .OrderBy(x => x.ParentId)
             .ThenBy(x => x.SortOrder)
             .ToListAsync();
-        return OperationResult<List<MenuVM>>.Success(data, "Get data successfully.");
+        return OperationResult<List<FunctionVM>>.Success(data, "Get data successfully.");
     }
 
     public async Task<OperationResult> DeleteRangeAsync(List<string> ids, string idLogedIn)
@@ -193,6 +191,5 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
         await _repoStore.SaveChangesAsync();
         return OperationResult.Success("Delete users successfully.");
     }
-
 
 }

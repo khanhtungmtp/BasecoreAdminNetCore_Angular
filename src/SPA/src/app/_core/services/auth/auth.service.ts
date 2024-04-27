@@ -6,29 +6,35 @@ import { UrlRouteConstants } from '@constants/url-route.constants';
 import { TokenRequest } from '@app/_core/models/auth/token-request';
 import { UserForLogged, UserForLoggedIn, UserLoginParam } from '@models/auth/auth';
 import { map } from 'rxjs/operators';
-import { BaseService } from '../platform/baseservice';
 import { BaseHttpService } from '../base-http.service';
 import { WindowService } from '../common/window.service';
 import { LoginInOutService } from './login-in-out.service';
-import { TokenResponse } from '@app/_core/models/auth/token-response';
+import { UserInformation } from '@app/_core/models/auth/userInformation';
 import { AuthResponse } from '@app/_core/models/auth/auth-response';
+import { BehaviorSubject } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService extends BaseService {
-  public profileUser: UserForLoggedIn = <UserForLoggedIn>{};
+export class AuthService {
+  public profileUser: UserInformation = <UserInformation>{};
   jwtHelper = new JwtHelperService();
+  private isRefreshingToken = false;
+  private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+
   constructor(
     private httpBase: BaseHttpService,
     private windowServe: WindowService,
     private loginOutService: LoginInOutService,
-    private router: Router) { super() }
+    private router: Router) { }
 
   login(param: UserLoginParam) {
     return this.httpBase.post<UserForLoggedIn>('Auth/login', param).pipe(map(response => {
-      this.profileUser = response
-      localStorage.setItem(LocalStorageConstants.USER, JSON.stringify(response));
-      localStorage.setItem(LocalStorageConstants.TOKEN, response?.token as string);
+      // except 2 field token, refreshToken
+      const { token, refreshToken, ...otherProps } = response;
+      this.profileUser = { ...otherProps }
+      this.setToken(response.token);
+      this.setRefreshToken(response.refreshToken);
+      this.setUserProfile(this.profileUser);
       return response
     }))
   }
@@ -44,31 +50,51 @@ export class AuthService extends BaseService {
     this.loginOutService.loginOut().then();
   }
 
-  loggedIn() {
-    const token: string = localStorage.getItem(LocalStorageConstants.TOKEN) as string;
-    const user: UserForLogged = JSON.parse(localStorage.getItem(LocalStorageConstants.USER) as string);
-    return !!user || !this.jwtHelper.isTokenExpired(token);
+  refreshToken() {
+    const tokenRequest: TokenRequest = {
+      refreshToken: this.getRefreshToken() as string,
+      email: this.getEmail() as string,
+      token: this.getToken() as string
+    }
+    return this.httpBase.post<AuthResponse>('Auth/refresh-token', tokenRequest);
   }
 
-  refreshToken(tokenRequest: TokenRequest) {
-    return this.httpBase.post<TokenResponse>('Auth/refresh-token', tokenRequest);
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token')
   }
+
+  // handle
+  public setToken(token: string): void {
+    localStorage.setItem(LocalStorageConstants.TOKEN, token);
+  };
+
+  public setRefreshToken(refreshToken: string): void {
+    localStorage.setItem(LocalStorageConstants.REFRESH_TOKEN, refreshToken);
+  };
+
+  public setUserProfile(user: UserInformation): void {
+    localStorage.setItem(LocalStorageConstants.USER, JSON.stringify(user));
+  }
+
+  public getRefreshToken = (): string | null => {
+    return localStorage.getItem(LocalStorageConstants.REFRESH_TOKEN);
+  };
 
   public getToken = (): string | null => {
     return localStorage.getItem(LocalStorageConstants.TOKEN);
   };
 
-  getRefreshToken = (): string | null => {
-    const user = localStorage.getItem(LocalStorageConstants.USER);
-    if (!user) return null;
-    const userDetail: AuthResponse = JSON.parse(user);
-    return userDetail.refreshToken;
+  public getEmail = (): string => {
+    const user: UserForLogged = JSON.parse(localStorage.getItem(LocalStorageConstants.USER) as string);
+    return user.email as string;
   };
 
-  private isTokenExpired() {
-    const token = this.getToken();
-    if (!token) return true;
-    if (this.jwtHelper.isTokenExpired(token)) this.logout();
-    return true;
+  public getUserProfile = () => {
+    const user: UserInformation = JSON.parse(localStorage.getItem(LocalStorageConstants.USER) as string);
+    return user;
+  };
+
+  public isTokenExpired() {
+    return !!this.getToken() && this.jwtHelper.isTokenExpired(this.getToken());
   }
 }

@@ -65,6 +65,11 @@ namespace API._Repositories
             return await _dbContext.SaveChangesAsync() > 0;
         }
 
+        public bool SaveChanges()
+        {
+            return _dbContext.SaveChanges() > 0;
+        }
+
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {
             return await _dbContext.Database.BeginTransactionAsync();

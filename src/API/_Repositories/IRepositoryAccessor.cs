@@ -7,6 +7,7 @@ namespace API._Repositories
     public interface IRepositoryAccessor
     {
         Task<bool> SaveChangesAsync();
+        bool SaveChanges();
         Task<IDbContextTransaction> BeginTransactionAsync();
         IRepository<User> Users { get; }
         IRepository<Command> Commands { get; }

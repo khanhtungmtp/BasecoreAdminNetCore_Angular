@@ -201,23 +201,17 @@ export class UserManagerComponent implements OnInit {
       });
   }
 
-  changeStatus(e: boolean, id: string): void {
+  changeStatus(id: string, isActive: boolean): void {
     this.tableConfig.loading = true;
-    const people = <UserVM>{
-      id,
-      isActive: !e
-    };
     this.dataService
-      .edit(id, people)
+      .updateStatus(id, !isActive)
       .pipe(
         finalize(() => {
           this.tableLoading(false);
         }),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(() => {
-        this.getDataList();
-      });
+      .subscribe();
   }
 
   deleteRange(): void {
@@ -298,10 +292,9 @@ export class UserManagerComponent implements OnInit {
           width: 100
         },
         {
-          title: 'Is active',
+          title: 'Full name',
           width: 100,
-          field: 'isActive',
-          tdTemplate: this.isActiveFlag
+          field: 'fullName'
         },
         {
           title: 'Gender',
@@ -320,9 +313,10 @@ export class UserManagerComponent implements OnInit {
           field: 'email'
         },
         {
-          title: 'Date of birth',
+          title: 'Is active',
           width: 100,
-          field: 'dateOfBirth'
+          field: 'isActive',
+          tdTemplate: this.isActiveFlag
         },
         {
           title: 'Last Login Time',

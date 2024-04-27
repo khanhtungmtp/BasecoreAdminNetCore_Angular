@@ -1,21 +1,31 @@
-// import { Directive, Input, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
-// import { AuthService } from '../services/auth/auth.service';
-// import { UserLogin } from '../services/auth/login.service';
-// @Directive({
-//   selector: '[appHasRole]',
-//   standalone: true
-// })
-// export class HasRoleDirective implements OnInit {
-//   @Input() appHasRole: string[] = [];
-//   user: UserLogin = <UserLogin>{}
-//   constructor(private viewContainerRef: ViewContainerRef, private templateRef: TemplateRef<any>, authServices: AuthService) {
-//     this.user = authServices.currentUser;
-//   }
-//   ngOnInit(): void {
-//     if (this.user.roles.some(role => this.appHasRole.includes(role))) {
-//       this.viewContainerRef.createEmbeddedView(this.templateRef);
-//     } else
-//       this.viewContainerRef.clear();
-//   }
+import { Directive, Input, TemplateRef, ViewContainerRef, inject } from '@angular/core';
+import { AuthService } from '../services/auth/auth.service';
+@Directive({
+  selector: '[appHasRole]',
+  standalone: true
+})
+export class HasRoleDirective {
+  codeArray: string[];
 
-// }
+  private authService = inject(AuthService);
+  private templateRef = inject(TemplateRef);
+  private viewContainerRef = inject(ViewContainerRef);
+
+  constructor() {
+    this.codeArray = this.authService.getUserProfile().permissions
+  }
+
+  @Input('appHasRole')
+  set appHasRole(actionCode: string | undefined) {
+    if (!actionCode) {
+      this.show(true);
+      return;
+    }
+    this.codeArray.includes(actionCode) ? this.show(true) : this.show(false);
+  }
+
+  private show(hasAuth: boolean): void {
+    hasAuth ? this.viewContainerRef.createEmbeddedView(this.templateRef) : this.viewContainerRef.clear();
+  }
+}
+

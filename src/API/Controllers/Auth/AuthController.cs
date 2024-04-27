@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using API._Services.Interfaces.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +31,18 @@ public class AuthController(I_Auth authService) : ControllerBase
     {
         var result = await _authService.RefreshTokenAsync(request);
         if (!result.Succeeded)
-            return BadRequest(result);
+            return Forbid();
+
+        return Ok(result);
+    }
+
+    [HttpPost]
+    [Route("revoke")]
+    public async Task<IActionResult> Revoke(string username)
+    {
+        var result = await _authService.Revoke(username);
+        if (!result.Succeeded)
+            return Forbid(result.Message ?? "Invalid token");
 
         return Ok(result);
     }

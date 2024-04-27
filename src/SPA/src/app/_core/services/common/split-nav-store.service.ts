@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MenuVM } from '@app/_core/models/system/menuvm';
+import { FunctionVM } from '@app/_core/models/system/functionvm';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 /*** When automatically splitting the menu, the store on the left menu
@@ -8,13 +8,13 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class SplitNavStoreService {
-  private splitLeftNavArray$ = new BehaviorSubject<MenuVM[]>([]);
+  private splitLeftNavArray$ = new BehaviorSubject<FunctionVM[]>([]);
 
-  setSplitLeftNavArrayStore(menu: MenuVM[]): void {
+  setSplitLeftNavArrayStore(menu: FunctionVM[]): void {
     this.splitLeftNavArray$.next(menu);
   }
 
-  getSplitLeftNavArrayStore(): Observable<MenuVM[]> {
+  getSplitLeftNavArrayStore(): Observable<FunctionVM[]> {
     return this.splitLeftNavArray$.asObservable();
   }
 }

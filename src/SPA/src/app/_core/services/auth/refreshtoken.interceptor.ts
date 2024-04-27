@@ -20,13 +20,10 @@ export const RefreshTokenInterceptor: HttpInterceptorFn = (req, next) => {
   });
   return next(cloned).pipe(
     catchError((err: HttpErrorResponse) => {
+      console.log('err: ', err);
       if (err.status === 401) {
         authService
-          .refreshToken({
-            email: authService.profileUser?.email,
-            token: authService.getToken() || '',
-            refreshToken: authService.getRefreshToken() || '',
-          })
+          .refreshToken()
           .subscribe({
             next: (response) => {
               if (response != null) {

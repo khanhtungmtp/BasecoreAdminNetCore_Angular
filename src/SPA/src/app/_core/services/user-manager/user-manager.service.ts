@@ -27,6 +27,10 @@ export class UserManagerService {
     return this.httpBase.put<string>(`Users/${id}`, model, { needSuccessInfo: true, typeAction: 'edit' });
   }
 
+  updateStatus(id: string, isActive: boolean) {
+    return this.httpBase.patch<string>(`Users/${id}/UpdateStatus`, isActive, { needSuccessInfo: true, typeAction: 'edit' });
+  }
+
   delete(id: string) {
     return this.httpBase.delete<string>(`Users/${id}`, { needSuccessInfo: true });
   }

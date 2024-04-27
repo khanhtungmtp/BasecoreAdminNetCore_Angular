@@ -9,4 +9,5 @@ public interface I_Auth
 {
     Task<OperationResult<AuthResponse>> LoginAsync(LoginRequest request);
     Task<OperationResult<AuthResponse>> RefreshTokenAsync(TokenRequest request);
+    Task<OperationResult> Revoke(string username);
 }

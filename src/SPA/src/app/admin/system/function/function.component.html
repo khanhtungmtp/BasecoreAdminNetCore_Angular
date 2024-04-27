@@ -81,7 +81,8 @@
 
 
   <ng-template #tableBtns>
-    <button class="m-r-8"
+    <button *appHasRole="actionCode.FunctionCreate"
+            class="m-r-8"
             nz-button
             nzType="primary"
             (click)="openModal()">
@@ -89,7 +90,8 @@
          nzType="plus"></i>
       New
     </button>
-    <button nz-button
+    <button *appHasRole="actionCode.FunctionDelete"
+            nz-button
             nzType="default"
             (click)="deleteItemChecked()">
       <i nz-icon

@@ -206,10 +206,7 @@
   <ng-template #isActiveFlag
                let-isActive="isActive"
                let-id="id">
-    <nz-switch nzCheckedChildren="enable"
-               nzUnCheckedChildren="Disable"
-               [ngModel]="isActive"
-               [nzControl]="true"
-               [nzDisabled]="true"></nz-switch>
+    <nz-switch [ngModel]="isActive"
+               (ngModelChange)="changeStatus(id,isActive)"></nz-switch>
   </ng-template>
 </div>

@@ -1,4 +1,4 @@
-namespace API.Configurations;
+namespace API.Configurations.AppSetting;
 
 public class JwtSetting
 {
@@ -8,8 +8,8 @@ public class JwtSetting
 
     public string ValidIssuer { get; set; } = string.Empty;
 
-    public TimeSpan ExpireInMinutes { get; set; }
+    public string ExpireInMinutes { get; set; } = string.Empty;
 
-    public string RefreshTokenValidityIn { get; set; } = string.Empty;
+    public string RefreshTokenValidityInDays { get; set; } = string.Empty;
 
 }

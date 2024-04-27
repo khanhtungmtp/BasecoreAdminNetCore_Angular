@@ -125,9 +125,24 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
                 }
             }
 
-            return Ok(OperationResult<string>.Success(user.Id ?? string.Empty, "Update user successfully"));
+            return Ok(OperationResult<string>.Success(user.UserName ?? string.Empty, "Update user successfully"));
         }
 
+        return BadRequest(OperationResult.BadRequest(result.Errors));
+    }
+
+    // PATCH api/users/{id}/status
+    [HttpPatch("{id}/UpdateStatus")]
+    [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.UPDATE)]
+    public async Task<IActionResult> UpdateStatus(string id, [FromBody] bool isActive)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user is null)
+            return NotFound(OperationResult.NotFound("User not found"));
+        user.IsActive = isActive;
+        var result = await _userManager.UpdateAsync(user);
+        if (result.Succeeded)
+            return Ok(OperationResult<string>.Success(user.UserName ?? string.Empty, "Update user status successfully"));
         return BadRequest(OperationResult.BadRequest(result.Errors));
     }
 
@@ -260,4 +275,3 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
         return Ok(await _userService.GetForumByUserId(userId, pagination));
     }
 }
-

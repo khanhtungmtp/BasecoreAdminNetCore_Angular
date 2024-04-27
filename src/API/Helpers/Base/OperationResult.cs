@@ -58,4 +58,11 @@ public class OperationResult<T> : ApiResponseBase<T>
 
     public static OperationResult<T> BadRequest(string message = "") =>
         new((int)HttpStatusCode.BadRequest, false, message, default!);
+
+    public static OperationResult<T> Unauthorized(string message = "") =>
+        new((int)HttpStatusCode.Unauthorized, false, message, default!);
+
+    public static OperationResult<T> Forbidden(string message = "") =>
+        new((int)HttpStatusCode.Forbidden, false, message, default!);
+
 }

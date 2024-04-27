@@ -1,5 +1,6 @@
 export const LocalStorageConstants = {
   TOKEN: 'BaseAdmin_Token',
+  REFRESH_TOKEN: 'BaseAdmin_RefreshToken',
   USER: 'BaseAdmin_User',
   DIRECTORY: 'BaseAdmin_Directory',
   ROLES: 'BaseAdmin_Roles',
