@@ -10,15 +10,15 @@ public class S_CommandInFunction(IRepositoryAccessor repoStore) : BaseServices(r
 {
     public async Task<OperationResult<List<CommandVM>>> GetListByIdAsync(string functionId)
     {
-        var query = from a in _repoStore.Commands.FindAll(true)
-                    join commandinfunc in _repoStore.CommandInFunctions.FindAll(true) on a.Id equals commandinfunc.CommandId into result1
+        var query = from cmd in _repoStore.Commands.FindAll(true)
+                    join commandinfunc in _repoStore.CommandInFunctions.FindAll(true) on cmd.Id equals commandinfunc.CommandId into result1
                     from commandInFunction in result1.DefaultIfEmpty()
                     join func in _repoStore.Functions.FindAll(true) on commandInFunction.FunctionId equals func.Id into result2
                     from function in result2.DefaultIfEmpty()
                     select new
                     {
-                        a.Id,
-                        a.Name,
+                        cmd.Id,
+                        cmd.Name,
                         commandInFunction.FunctionId
                     };
 

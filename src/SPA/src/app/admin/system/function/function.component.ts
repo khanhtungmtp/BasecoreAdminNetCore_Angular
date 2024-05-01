@@ -25,6 +25,7 @@ import { NzSpinnerCustomService } from '@app/_core/services/common/nz-spinner.se
 import { HasRoleDirective } from '@app/_core/directives/hasrole.directive';
 import { ActionCode } from '@app/_core/constants/actionCode';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-function',
@@ -109,9 +110,12 @@ export class FunctionComponent implements OnInit {
       pageSize: e?.pageSize || this.pagination.pageSize,
       pageNumber: this.filter === '' ? (e?.pageIndex || this.pagination.pageNumber) : 1,
     }
-    this.dataService.getFunctionsPaging(this.filter, _pagingParam).pipe(finalize(() => {
-      this.tableLoading(false);
-    })).subscribe((response => {
+    this.dataService.getFunctionsPaging(this.filter, _pagingParam).pipe(
+      finalize(() => {
+        this.tableLoading(false);
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((response => {
       this.dataList = response.result;
       this.pagination = response.pagination;
       this.tableConfig.total = this.pagination.totalCount;

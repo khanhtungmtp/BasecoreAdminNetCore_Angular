@@ -19,5 +19,13 @@ export const SYSTEM_ROUTES: Routes = [
     },
     loadChildren: () => import('./user-manager/user-manager.routes')
   },
+  {
+    path: 'role',
+    data: {
+      title: 'Role manager',
+      actionCode: ActionCode.RoleManagerView,
+    },
+    loadChildren: () => import('./role-manager/role-manager.routes')
+  },
 
 ];

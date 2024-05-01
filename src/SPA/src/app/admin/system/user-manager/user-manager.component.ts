@@ -28,8 +28,9 @@ import { UserManagerService } from '@app/_core/services/user-manager/user-manage
 import { Pagination, PaginationParam } from '@app/_core/utilities/pagination-utility';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { WaterMarkComponent } from '@app/admin/shared/components/water-mark/water-mark.component';
 @Component({
-  selector: 'app-user-manager',
+  selector: 'app-role-manager',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
@@ -48,7 +49,8 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     NzIconModule,
     CardTableWrapComponent,
     AntTableComponent,
-    NzSwitchModule
+    NzSwitchModule,
+    WaterMarkComponent
   ],
   templateUrl: './user-manager.component.html'
 })

@@ -2,12 +2,37 @@ using API._Repositories;
 using API._Services.Interfaces.UserManager;
 using API.Helpers.Base;
 using API.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ViewModels.System;
 
 namespace API._Services.Services.UserManager;
-public class S_Roles(IRepositoryAccessor repoStore) : BaseServices(repoStore), I_Roles
+public class S_Roles(IRepositoryAccessor repoStore, RoleManager<IdentityRole> rolesManager) : BaseServices(repoStore), I_Roles
 {
+    private readonly RoleManager<IdentityRole> _rolesManager = rolesManager;
+    public async Task<OperationResult<List<PermissionScreenVm>>> GetAllPermissionTree()
+    {
+        var data = await (
+        from f in _repoStore.Functions.FindAll(true)
+        join cif in _repoStore.CommandInFunctions.FindAll(true) on f.Id equals cif.FunctionId into functionCommands
+        from sa in functionCommands.DefaultIfEmpty()
+        group sa by new { f.Id, f.Name, f.ParentId } into grouped
+        orderby grouped.Key.ParentId
+        select new PermissionScreenVm()
+        {
+            Id = grouped.Key.Id,
+            Name = grouped.Key.Name,
+            ParentId = grouped.Key.ParentId,
+            HasCreate = grouped.Any(x => x != null && x.CommandId == "CREATE"),
+            HasUpdate = grouped.Any(x => x != null && x.CommandId == "UPDATE"),
+            HasDelete = grouped.Any(x => x != null && x.CommandId == "DELETE"),
+            HasView = grouped.Any(x => x != null && x.CommandId == "VIEW"),
+            HasApprove = grouped.Any(x => x != null && x.CommandId == "APPROVE")
+        }
+        ).ToListAsync();
+        return OperationResult<List<PermissionScreenVm>>.Success(data, "Get data successfully.");
+    }
+
     public async Task<OperationResult<List<PermissionVm>>> GetPermissionByRoleId(string roleId)
     {
         List<PermissionVm>? permissions = await (from p in _repoStore.Permissions.FindAll(true)
@@ -23,23 +48,41 @@ public class S_Roles(IRepositoryAccessor repoStore) : BaseServices(repoStore), I
         return OperationResult<List<PermissionVm>>.Success(permissions, "Get permission by role id successfully.");
     }
 
-    public async Task<OperationResult<string>> PutPermissionByRoleId(string roleId, UpdatePermissionRequest request)
+    public async Task<OperationResult<string>> PutPermissionByRoleId(string roleId, List<PermissionVm> request)
     {
-        //create new permission list from user changed
-        var newPermissions = new List<Permission>();
-        foreach (var p in request.Permissions)
+        if (request.Count == 0)
+            return OperationResult<string>.NotFound("No permission selected");
+
+        // Assuming _repoStore.Permissions is a DbSet<Permission>
+        var currentPermissionsInDbQuery = _repoStore.Permissions.FindAll(p => p.RoleId == roleId);
+
+        var currentPermissionsInDb = await currentPermissionsInDbQuery.ToListAsync();
+
+        foreach (var item in request)
         {
-            newPermissions.Add(new Permission(p.FunctionId, roleId, p.CommandId));
+            var permission = new Permission(item.FunctionId, roleId, item.CommandId);
+
+            if (!item.Checked)
+            {
+                var existingPermission = await currentPermissionsInDbQuery
+                    .FirstOrDefaultAsync(x => x.FunctionId == item.FunctionId && x.CommandId == item.CommandId);
+
+                if (existingPermission != null)
+                    _repoStore.Permissions.Remove(existingPermission);
+            }
+            else
+            {
+                var exists = await currentPermissionsInDbQuery
+                    .AnyAsync(x => x.FunctionId == item.FunctionId && x.CommandId == item.CommandId);
+
+                if (!exists)
+                    _repoStore.Permissions.Add(permission);
+            }
         }
-        var existingPermissions = _repoStore.Permissions.FindAll(x => x.RoleId == roleId);
 
-        _repoStore.Permissions.RemoveMany(existingPermissions);
-        _repoStore.Permissions.AddMany(newPermissions.Distinct(new MyPermissionComparer()));
-        bool result = await _repoStore.SaveChangesAsync();
-        if (result)
-            return OperationResult<string>.Success("Save permission successfully");
-
-        return OperationResult<string>.BadRequest("Save permission failed");
+        // Save the changes
+        await _repoStore.SaveChangesAsync();
+        return OperationResult<string>.Success("Save permission successfully");
     }
 
     internal class MyPermissionComparer : IEqualityComparer<Permission>

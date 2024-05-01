@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { DestroyRef, inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
 
@@ -7,6 +7,7 @@ import { ThemeService } from '@services/common/theme.service';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 
 import { WindowService } from './window.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 type setThemeProp = 'setIsNightTheme' | 'setThemesMode';
 type getThemeProp = 'getIsNightTheme' | 'getThemesMode';
@@ -26,7 +27,7 @@ interface InitThemeOption {
 export class InitThemeService {
   private themesService = inject(ThemeService);
   private windowServe = inject(WindowService);
-
+  destroyRef = inject(DestroyRef);
   themeInitOption: InitThemeOption[] = [
     {
       storageKey: IsNightKey,
@@ -47,7 +48,7 @@ export class InitThemeService {
         if (hasCash) {
           this.themesService[item.setMethodName](JSON.parse(hasCash));
         } else {
-          (this.themesService[item.getMethodName]() as Observable<NzSafeAny>).pipe(first()).subscribe(res => this.windowServe.setStorage(item.storageKey, JSON.stringify(res)));
+          (this.themesService[item.getMethodName]() as Observable<NzSafeAny>).pipe(first(), takeUntilDestroyed(this.destroyRef)).subscribe(res => this.windowServe.setStorage(item.storageKey, JSON.stringify(res)));
         }
       });
       return resolve();

@@ -20,7 +20,7 @@ import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
 import { Observable, catchError, of } from 'rxjs';
 
 @Component({
-  selector: 'app-user-manager-modal',
+  selector: 'app-role-manager-modal',
   templateUrl: './user-manager-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,

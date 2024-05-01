@@ -1,5 +1,5 @@
 import { NgTemplateOutlet, AsyncPipe } from '@angular/common';
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input, Inject, inject, DestroyRef, booleanAttribute } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input, inject, DestroyRef, booleanAttribute } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -16,10 +16,9 @@ import { fnStopMouseEvent } from '@app/_core/utilities/tools';
 import { ThemeMode } from '../setting-drawer/setting-drawer.component';
 import { MenuStoreService } from '@app/_core/services/common/menu-store.service';
 import { UserInfoService } from '@app/_core/services/common/userInfo.service';
-import { AuthService } from '@app/_core/services/auth/auth.service';
 import { LocalStorageConstants } from '@app/_core/constants/local-storage.constants';
 import { UserForLogged } from '@app/_core/models/auth/auth';
-import { FunctionVM } from '@app/_core/models/system/functionvm';
+import { FunctionTreeVM } from '@app/_core/models/system/functionvm';
 
 @Component({
   selector: 'app-nav-bar',
@@ -30,12 +29,11 @@ import { FunctionVM } from '@app/_core/models/system/functionvm';
 })
 export class NavBarComponent implements OnInit {
   @Input({ transform: booleanAttribute })
-  isMixinHead = false; // Is mixed mode top navigation
+  isMixinHead: boolean = false; // Is mixed mode top navigation
   @Input({ transform: booleanAttribute })
-  isMixinLeft = false;
+  isMixinLeft: boolean = false;
 
   private router = inject(Router);
-  private authService = inject(AuthService);
   private userInfoService = inject(UserInfoService);
   private menuServices = inject(MenuStoreService);
   private splitNavStoreService = inject(SplitNavStoreService);
@@ -44,8 +42,8 @@ export class NavBarComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private themesService = inject(ThemeService);
 
-  routerPath = this.router.url;
-  copyMenus: FunctionVM[] = [];
+  routerPath: string = this.router.url;
+  copyMenus: FunctionTreeVM[] = [];
   authCodeArray: string[] = [];
 
   themesOptions$ = this.themesService.getThemesMode();
@@ -56,11 +54,11 @@ export class NavBarComponent implements OnInit {
   subTheme$: Observable<any>;
   userProfile: UserForLogged = JSON.parse(localStorage.getItem(LocalStorageConstants.USER) as string);
   themesMode: ThemeMode['key'] = 'side';
-  isOverMode = false;
-  isCollapsed = false;
-  isMixinMode = false;
-  leftMenuArray: FunctionVM[] = [];
-  leftMenu: FunctionVM[] = [];
+  isOverMode: boolean = false;
+  isCollapsed: boolean = false;
+  isMixinMode: boolean = false;
+  leftMenuArray: FunctionTreeVM[] = [];
+  leftMenu: FunctionTreeVM[] = [];
 
   destroyRef = inject(DestroyRef);
 
@@ -146,7 +144,7 @@ export class NavBarComponent implements OnInit {
   }
 
   getMenuByUser() {
-    this.menuServices.getMenuByUserId(this.userProfile.id).subscribe({
+    this.menuServices.getMenuByUserId(this.userProfile.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.leftMenu = res;
         this.cdr.markForCheck();
@@ -164,9 +162,9 @@ export class NavBarComponent implements OnInit {
   }
 
   // Deep copy clone menu array
-  cloneMenuArray(sourceMenuArray: FunctionVM[], target: FunctionVM[] = []): FunctionVM[] {
+  cloneMenuArray(sourceMenuArray: FunctionTreeVM[], target: FunctionTreeVM[] = []): FunctionTreeVM[] {
     sourceMenuArray.forEach(item => {
-      const obj: FunctionVM = { id: '', name: '', menuType: 'C', url: '', parentId: '', sortOrder: 0, icon: '', children: [], newLinkFlag: false, open: false, selected: false };
+      const obj: FunctionTreeVM = { id: '', name: '', menuType: 'C', url: '', parentId: '', sortOrder: 0, icon: '', children: [], newLinkFlag: false, open: false, selected: false };
       for (let i in item) {
         if (item.hasOwnProperty(i)) {
           // @ts-ignore
@@ -218,7 +216,7 @@ export class NavBarComponent implements OnInit {
     this.splitNavStoreService.setSplitLeftNavArrayStore(currentLeftNavArray);
   }
 
-  flatMenu(menus: FunctionVM[], routePath: string): void {
+  flatMenu(menus: FunctionTreeVM[], routePath: string): void {
     menus.forEach(item => {
       item.selected = false;
       item.open = false;
@@ -232,7 +230,7 @@ export class NavBarComponent implements OnInit {
     });
   }
 
-  clickMenuItem(menus: FunctionVM[]): void {
+  clickMenuItem(menus: FunctionTreeVM[]): void {
     if (!menus) {
       return;
     }
@@ -243,14 +241,14 @@ export class NavBarComponent implements OnInit {
   }
 
   // Change the current menu display state
-  changeOpen(currentMenu: FunctionVM, allMenu: FunctionVM[]): void {
+  changeOpen(currentMenu: FunctionTreeVM, allMenu: FunctionTreeVM[]): void {
     allMenu.forEach(item => {
       item.open = false;
     });
     currentMenu.open = true;
   }
 
-  closeMenuOpen(menus: FunctionVM[]): void {
+  closeMenuOpen(menus: FunctionTreeVM[]): void {
     menus.forEach(menu => {
       menu.open = false;
       if (menu.children && menu.children.length > 0) {
@@ -261,7 +259,7 @@ export class NavBarComponent implements OnInit {
     });
   }
 
-  changeRoute(e: MouseEvent, menu: FunctionVM): void {
+  changeRoute(e: MouseEvent, menu: FunctionTreeVM): void {
     if (menu.newLinkFlag) {
       fnStopMouseEvent(e);
       window.open(menu.url, '_blank');

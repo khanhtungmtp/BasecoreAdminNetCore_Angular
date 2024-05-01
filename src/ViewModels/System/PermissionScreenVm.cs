@@ -1,3 +1,4 @@
+
 namespace ViewModels.System;
 
 public class PermissionScreenVm
@@ -6,7 +7,10 @@ public class PermissionScreenVm
 
     public string Name { get; set; } = string.Empty;
 
-    public string ParentId { get; set; } = string.Empty;
+    public string? ParentId { get; set; } = string.Empty;
+    public string Url { get; set; } = string.Empty;
+    public int SortOrder { get; set; }
+    public string Icon { get; set; } = string.Empty;
 
     public bool HasCreate { get; set; }
 

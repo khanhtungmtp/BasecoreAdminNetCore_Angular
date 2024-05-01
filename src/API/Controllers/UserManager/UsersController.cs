@@ -10,10 +10,10 @@ using ViewModels.UserManager;
 
 namespace API.Controllers.UserManager;
 
-public class UsersController(UserManager<User> userManager, I_User userService, RoleManager<SystemRole> rolesManager) : BaseController
+public class UsersController(UserManager<User> userManager, I_User userService, RoleManager<IdentityRole> rolesManager) : BaseController
 {
     private readonly UserManager<User> _userManager = userManager;
-    private readonly RoleManager<SystemRole> _rolesManager = rolesManager;
+    private readonly RoleManager<IdentityRole> _rolesManager = rolesManager;
     private readonly I_User _userService = userService;
 
     // url: POST : http://localhost:6001/api/user
@@ -109,7 +109,7 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
                     if (!await _rolesManager.RoleExistsAsync(role))
                     {
                         // Optionally create the role if it doesn't exist
-                        await _rolesManager.CreateAsync(new SystemRole()
+                        await _rolesManager.CreateAsync(new IdentityRole()
                         {
                             Id = role,
                             Name = role,
@@ -216,7 +216,7 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
     }
 
     // GetMenuByUserPermission
-    [HttpGet("{userId}/menu")]
+    [HttpGet("{userId}/menu-tree")]
     [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
     public async Task<IActionResult> GetMenuByUserPermission(string userId)
     {

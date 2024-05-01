@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, OnInit, ChangeDetectionStrategy, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, ChangeDetectorRef, DestroyRef } from '@angular/core';
 import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
@@ -23,6 +23,7 @@ import { SystemLanguageService } from '@app/_core/services/system/system-languag
 import { SystemLanguageVM } from '@app/_core/models/system/systemlanguage';
 import { LangConstants } from '@app/_core/constants/lang-constants';
 import { AuthService } from '@app/_core/services/auth/auth.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-layout-head-right-menu',
@@ -46,7 +47,7 @@ export class LayoutHeadRightMenuComponent implements OnInit {
   private languageService = inject(SystemLanguageService);
   private cdr = inject(ChangeDetectorRef);
   private modalSrv = inject(NzModalService);
-
+  private destroyRef = inject(DestroyRef);
   // lock screen
   lockScreen(): void {
     this.lockWidgetService
@@ -122,7 +123,7 @@ export class LayoutHeadRightMenuComponent implements OnInit {
   }
 
   getLanguage() {
-    this.languageService.getLanguages().subscribe({
+    this.languageService.getLanguages().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.listLanguage = res;
         this.setCurrentLanguage(this.currentLang);

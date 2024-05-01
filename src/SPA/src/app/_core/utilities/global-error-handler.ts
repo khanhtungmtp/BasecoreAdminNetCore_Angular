@@ -115,13 +115,13 @@ export class GlobalErrorHandler implements ErrorHandler {
     if (error instanceof HttpErrorResponse) {
       apiError = this.handleServerSideError(error);
 
-      if (error.status === 403 || error.status === 401) {
-        this.authService.logout();
-      }
-      else if (error.status === 400) {
-        console.log('errors servers 400:', error);
-        // this.notification.error('Error: ' + apiError.statusCode, apiError.message)
-      }
+      // if (error.status === 403 || error.status === 401) {
+      //   this.authService.logout();
+      // }
+      // else if (error.status === 400) {
+      //   console.log('errors servers 400:', error);
+      //   // this.notification.error('Error: ' + apiError.statusCode, apiError.message)
+      // }
       // Handle other HttpErrorResponse cases if needed
     } else {
       apiError = this.handleClientSideError(error);

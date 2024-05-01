@@ -19,7 +19,7 @@ import { Menu } from '@app/_core/models/common/types';
 import { MenuStoreService } from '@app/_core/services/common/menu-store.service';
 import { ThemeService } from '@app/_core/services/common/theme.service';
 import { BasicConfirmModalComponent } from '@app/_core/utilities/base-modal';
-import { FunctionVM } from '@app/_core/models/system/functionvm';
+import { FunctionTreeVM, FunctionVM } from '@app/_core/models/system/functionvm';
 
 interface ResultItem {
   selItem: boolean;
@@ -50,7 +50,7 @@ export class SearchRouteComponent extends BasicConfirmModalComponent implements 
   resultList: ResultItem[] = [];
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
   inputValue: string | null = null;
-  menuNavList: FunctionVM[] = [];
+  menuNavList: FunctionTreeVM[] = [];
   destroyRef = inject(DestroyRef);
 
   constructor(protected override modalRef: NzModalRef) {
@@ -108,7 +108,7 @@ export class SearchRouteComponent extends BasicConfirmModalComponent implements 
     this.modalRef.destroy();
   }
 
-  getResultItem(menu: FunctionVM, fatherTitle: string = ''): ResultItem[] {
+  getResultItem(menu: FunctionTreeVM, fatherTitle: string = ''): ResultItem[] {
     const fatherTitleTemp = fatherTitle === '' ? menu.name : `${fatherTitle} > ${menu.name}`;
     let resultItem: ResultItem = {
       title: fatherTitleTemp,

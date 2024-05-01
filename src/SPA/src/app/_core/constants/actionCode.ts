@@ -6,4 +6,6 @@ export const ActionCode = {
   FunctionDelete: 'SYSTEM_FUNCTION:DELETE',
   /*User manager operation*/
   UserManagerView: 'SYSTEM_USER:VIEW',
+  /*Role manager operation*/
+  RoleManagerView: 'SYSTEM_ROLE:VIEW',
 };

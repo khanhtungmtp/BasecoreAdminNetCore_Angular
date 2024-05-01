@@ -7,9 +7,9 @@ import { tap } from 'rxjs/operators';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { CollapsedNavWidth, SideNavWidth } from '@app/_core/constants/app.constants';
-import { Menu } from '@app/_core/models/common/types';
 import { SplitNavStoreService } from '@app/_core/services/common/split-nav-store.service';
 import { ThemeService } from '@app/_core/services/common/theme.service';
+import { FunctionTreeVM } from '@app/_core/models/system/functionvm';
 
 @Component({
   selector: 'app-footer-submit',
@@ -35,7 +35,7 @@ export class FooterSubmitComponent implements OnInit {
   isOverMode = false;
   hasLeftNav = false;
   isTopMode = false;
-  leftMenuArray: Menu[] = [];
+  leftMenuArray: FunctionTreeVM[] = [];
   isMixMode = false;
   destroyRef = inject(DestroyRef);
 

@@ -1,6 +1,8 @@
 using System.Text.RegularExpressions;
+using ViewModels.System;
 
 namespace API.Helpers.Utilities;
+
 
 public static partial class FunctionUtility
 {
@@ -159,4 +161,61 @@ public static partial class FunctionUtility
     private static partial Regex MyRegex2();
     [GeneratedRegex(@"-+")]
     private static partial Regex MyRegex3();
+
+    public static List<T> UnflatteringForLeftMenu<T>(List<T> nodes) where T : ITreeNode, new()
+    {
+        var map = new Dictionary<string, T>();
+        var roots = new List<T>();
+
+        // First pass: Collect nodes into a map
+        foreach (var node in nodes)
+        {
+            node.Children = []; // Initialize children list
+            map[node.Id] = node; // Store node in the map
+        }
+
+        // Second pass: Build tree structure
+        foreach (var node in nodes)
+        {
+            if (!string.IsNullOrEmpty(node.ParentId) && node.ParentId != "ROOT")
+            {
+                if (map.TryGetValue(node.ParentId, out T? parentNode))
+                {
+                    parentNode.Children.Add(node); // Add node to its parent's children list
+                }
+            }
+            else
+            {
+                roots.Add(node); // Add node to roots if it has no parent or its parent is "ROOT"
+            }
+        }
+
+        return roots;
+    }
+
+    public static List<T> UnflatteringForTree<T>(List<T> nodes) where T : ITreeNode, new()
+    {
+        var map = new Dictionary<string, int>();
+        var roots = new List<T>();
+
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            map[nodes[i].Id] = i; // initialize the map
+            nodes[i].Children = []; // initialize the children
+        }
+
+        foreach (var node in nodes)
+        {
+            if (!string.IsNullOrEmpty(node.ParentId) && map.TryGetValue(node.ParentId, out int value))
+            {
+                nodes[value].Children.Add(node);
+            }
+            else
+            {
+                roots.Add(node);
+            }
+        }
+
+        return roots;
+    }
 }

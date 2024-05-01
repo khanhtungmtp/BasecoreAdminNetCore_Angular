@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { FunctionVM } from '@app/_core/models/system/functionvm';
+import { FunctionTreeVM } from '@app/_core/models/system/functionvm';
 import { FunctionUtility } from '@app/_core/utilities/function-utility';
 import { environment } from '@env/environment';
-import { BehaviorSubject, Observable, map } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { BaseService } from '../platform/baseservice';
 import { BaseHttpService } from '../base-http.service';
 
@@ -14,29 +14,21 @@ export class MenuStoreService extends BaseService {
   /**
    *
    */
-  constructor(private httpBase: BaseHttpService,
-    private ultility: FunctionUtility,) {
+  constructor(private httpBase: BaseHttpService,) {
     super()
   }
   baseUrl: string = environment.apiUrl;
-  private menuArray$ = new BehaviorSubject<FunctionVM[]>([]);
+  private menuArray$ = new BehaviorSubject<FunctionTreeVM[]>([]);
 
-  setMenuArrayStore(menuArray: FunctionVM[]): void {
+  setMenuArrayStore(menuArray: FunctionTreeVM[]): void {
     this.menuArray$.next(menuArray);
   }
 
-  getMenuArrayStore(): Observable<FunctionVM[]> {
+  getMenuArrayStore(): Observable<FunctionTreeVM[]> {
     return this.menuArray$.asObservable();
   }
 
   getMenuByUserId(userId: string) {
-    return this.httpBase.get<FunctionVM[]>(`Users/${userId}/menu`).pipe(map(response => {
-      if (response.length === 0) {
-        // Handle the undefined case, e.g., by returning an empty array or throwing an error
-        console.error('Received undefined data');
-        return [];
-      }
-      return this.ultility.UnflatteringForLeftMenu(response);
-    }));
+    return this.httpBase.get<FunctionTreeVM[]>(`Users/${userId}/menu-tree`);
   }
 }

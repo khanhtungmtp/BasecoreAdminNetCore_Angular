@@ -7,4 +7,5 @@ public class PermissionVm
     public string RoleId { get; set; } = string.Empty;
 
     public string CommandId { get; set; } = string.Empty;
+    public bool Checked { get; set; }
 }

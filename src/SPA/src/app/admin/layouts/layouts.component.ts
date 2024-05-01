@@ -25,7 +25,7 @@ import { WindowService } from '@app/_core/services/common/window.service';
 import { DriverService } from '@app/_core/services/common/driver.service';
 import { SplitNavStoreService } from '@app/_core/services/common/split-nav-store.service';
 import { NzModalModule } from 'ng-zorro-antd/modal';
-import { FunctionVM } from '@app/_core/models/system/functionvm';
+import { FunctionTreeVM } from '@app/_core/models/system/functionvm';
 
 const layoutsComponent = [
   SidebarComponent
@@ -108,7 +108,7 @@ export class LayoutsComponent implements OnInit, AfterViewInit {
   theme: Theme['key'] = 'dark'; // theme mode
 
   themesOptions!: SettingInterface;
-  mixinModeLeftNav: FunctionVM[] = []; // Left menu in blended mode
+  mixinModeLeftNav: FunctionTreeVM[] = []; // Left menu in blended mode
   contentMarginTop = '48px';
 
   changeCollapsed(isCollapsed: boolean): void {

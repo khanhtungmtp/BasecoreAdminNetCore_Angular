@@ -8,7 +8,7 @@ export const hasRoleGuardFn: CanActivateFn = (route, state) => {
   const router = inject(Router);
   let actionCode = route.data["actionCode"] as string;
   var loggedInUser = authService.getUserProfile();
-  if (Object.keys(loggedInUser).length > 0) {
+  if (loggedInUser != null && Object.keys(loggedInUser).length > 0) {
     var listPermission = loggedInUser.permissions;
     if (listPermission != null && listPermission.length > 0 && listPermission.filter(x => x == actionCode).length > 0)
       return true;

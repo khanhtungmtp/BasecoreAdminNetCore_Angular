@@ -4,6 +4,7 @@ using API.Helpers.Base;
 using API.Helpers.Constants;
 using API.Helpers.Utilities;
 using API.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,9 +13,9 @@ using ViewModels.UserManager;
 
 namespace API.Controllers.UserManager;
 
-public class RolesController(RoleManager<SystemRole> rolesManager, I_Roles roles) : BaseController
+public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles roles) : BaseController
 {
-    private readonly RoleManager<SystemRole> _rolesManager = rolesManager;
+    private readonly RoleManager<IdentityRole> _rolesManager = rolesManager;
     private readonly I_Roles _roles = roles;
 
     // url: POST : http://localhost:6001/api/roles
@@ -22,7 +23,7 @@ public class RolesController(RoleManager<SystemRole> rolesManager, I_Roles roles
     [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.CREATE)]
     public async Task<IActionResult> CreateRole(RoleCreateRequest request)
     {
-        var role = new SystemRole()
+        var role = new IdentityRole()
         {
             Id = request.Id,
             Name = request.Name,
@@ -31,7 +32,7 @@ public class RolesController(RoleManager<SystemRole> rolesManager, I_Roles roles
         var result = await _rolesManager.CreateAsync(role);
         if (result.Succeeded)
         {
-            return CreatedAtAction(nameof(GetById), new { id = request.Id }, request);
+            return Ok(OperationResult.Success("Create role successfully"));
         }
         else
             return BadRequest(OperationResult.BadRequest(result.Errors));
@@ -42,27 +43,35 @@ public class RolesController(RoleManager<SystemRole> rolesManager, I_Roles roles
     [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.VIEW)]
     public async Task<IActionResult> GetAll()
     {
-        var listRoleVM = await _rolesManager.Roles.Select(x => new RoleVM() { Id = x.Id, Name = x.Name ?? string.Empty, Description = x.Description }).ToListAsync();
+        var listRoleVM = await _rolesManager.Roles.Select(x => new RoleVM() { Id = x.Id, Name = x.Name ?? string.Empty }).ToListAsync();
         return Ok(OperationResult<List<RoleVM>>.Success(listRoleVM, "Get Roles Successfully"));
     }
 
+    [HttpGet("GetAllPermissionTree")]
+    [AllowAnonymous]
+    // [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.VIEW)]
+    public async Task<IActionResult> GetAllPermissionTree()
+    {
+        var role = await _roles.GetAllPermissionTree();
+        if (!role.Succeeded)
+            return NotFound(role);
+        return Ok(role);
+    }
+
+
     // url: GET : http:localhost:6001/api/roles
-    [HttpGet("GetRolesPaging")]
+    [HttpGet("GetPaging")]
     [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.VIEW)]
-    public async Task<IActionResult> GetPaging([FromQuery] PaginationParam pagination, [FromQuery] RoleVM roleVM)
+    public async Task<IActionResult> GetPaging(string? filter, [FromQuery] PaginationParam pagination)
     {
         var role = _rolesManager.Roles;
         if (role is null)
             return NotFound(OperationResult.NotFound("Role not found"));
-        if (!string.IsNullOrWhiteSpace(roleVM.Id))
+        if (!string.IsNullOrWhiteSpace(filter))
         {
-            role = role.Where(x => x.Id.Contains(roleVM.Id));
+            role = role.Where(x => x.Id.Contains(filter) || x.Name != null && x.Name.Contains(filter));
         }
-        if (!string.IsNullOrWhiteSpace(roleVM.Name))
-        {
-            role = role.Where(x => x.Name != null && x.Name.Contains(roleVM.Name));
-        }
-        var listRoleVM = await role.Select(x => new RoleVM() { Id = x.Id, Name = x.Name ?? string.Empty, Description = x.Description }).ToListAsync();
+        var listRoleVM = await role.Select(x => new RoleVM() { Id = x.Id, Name = x.Name ?? string.Empty }).ToListAsync();
         var resultPaging = PagingResult<RoleVM>.Create(listRoleVM, pagination.PageNumber, pagination.PageSize);
         return Ok(OperationResult<PagingResult<RoleVM>>.Success(resultPaging, "Get Roles Successfully"));
     }
@@ -78,8 +87,7 @@ public class RolesController(RoleManager<SystemRole> rolesManager, I_Roles roles
         var roleVM = new RoleVM()
         {
             Id = role.Id,
-            Name = role.Name ?? string.Empty,
-            Description = role.Description
+            Name = role.Name ?? string.Empty
         };
         return Ok(OperationResult<RoleVM>.Success(roleVM, "Get role successfully"));
     }
@@ -95,7 +103,6 @@ public class RolesController(RoleManager<SystemRole> rolesManager, I_Roles roles
         if (role is null)
             return NotFound(OperationResult.NotFound("Role not found"));
         role.Name = request.Name;
-        role.Description = request.Description;
         role.NormalizedName = request.Name.ToUpper();
         var result = await _rolesManager.UpdateAsync(role);
         if (result.Succeeded)
@@ -134,7 +141,7 @@ public class RolesController(RoleManager<SystemRole> rolesManager, I_Roles roles
     // url: PUT : http:localhost:6001/api/roles/{id}/permissions
     [HttpPut("{roleId}/permissions")]
     [ClaimRequirement(FunctionCode.SYSTEM_PERMISSION, CommandCode.UPDATE)]
-    public async Task<IActionResult> PutPermissionByRoleId(string roleId, [FromBody] UpdatePermissionRequest request)
+    public async Task<IActionResult> PutPermissionByRoleId(string roleId, [FromBody] List<PermissionVm> request)
     {
         var role = await _roles.PutPermissionByRoleId(roleId, request);
         if (!role.Succeeded)

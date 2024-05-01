@@ -13,10 +13,10 @@ using ViewModels.System;
 using ViewModels.UserManager;
 
 namespace API._Services.Services.UserManager;
-public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager, RoleManager<SystemRole> rolesManager) : BaseServices(repoStore), I_User
+public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager, RoleManager<IdentityRole> rolesManager) : BaseServices(repoStore), I_User
 {
     private readonly UserManager<User> _userManager = userManager;
-    private readonly RoleManager<SystemRole> _rolesManager = rolesManager;
+    private readonly RoleManager<IdentityRole> _rolesManager = rolesManager;
 
     public async Task<OperationResult<UserVM>> GetByIdAsync(string userId)
     {
@@ -146,20 +146,20 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
         return predicate;
     }
 
-    public async Task<OperationResult<List<FunctionVM>>> GetMenuByUserPermission(string userId)
+    public async Task<OperationResult<List<FunctionTreeVM>>> GetMenuByUserPermission(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
-            return OperationResult<List<FunctionVM>>.NotFound("User not found.");
+            return OperationResult<List<FunctionTreeVM>>.NotFound("User not found.");
         var roles = await _userManager.GetRolesAsync(user);
-        IQueryable<FunctionVM>? query = from f in _repoStore.Functions.FindAll(true)
+        IQueryable<FunctionTreeVM>? query = from f in _repoStore.Functions.FindAll(true)
                                         join p in _repoStore.Permissions.FindAll(true)
                                             on f.Id equals p.FunctionId
                                         join r in _rolesManager.Roles on p.RoleId equals r.Id
                                         join a in _repoStore.Commands.FindAll(true)
                                             on p.CommandId equals a.Id
                                         where roles.Contains(r.Name ?? string.Empty) && a.Id == "VIEW"
-                                        select new FunctionVM
+                                            select new FunctionTreeVM
                                         {
                                             Id = f.Id,
                                             Name = f.Name,
@@ -172,7 +172,8 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
             .OrderBy(x => x.ParentId)
             .ThenBy(x => x.SortOrder)
             .ToListAsync();
-        return OperationResult<List<FunctionVM>>.Success(data, "Get data successfully.");
+        var dataTree = FunctionUtility.UnflatteringForLeftMenu(data);
+        return OperationResult<List<FunctionTreeVM>>.Success(dataTree, "Get data successfully.");
     }
 
     public async Task<OperationResult> DeleteRangeAsync(List<string> ids, string idLogedIn)

@@ -45,7 +45,7 @@ public class S_Auth : BaseServices, I_Auth
         string? refreshToken = GenerateRefreshToken();
         _ = int.TryParse(_jwtSettings.Value.RefreshTokenValidityInDays, out int RefreshTokenValidityIn);
         user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddMinutes(RefreshTokenValidityIn);
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(RefreshTokenValidityIn);
         await _userManager.UpdateAsync(user);
         // get permission for command
         /*

@@ -84,7 +84,6 @@ export class CardTableWrapComponent implements AfterContentInit {
 
   // Is all tableCheckbox selected in the configuration?
   changeAllTableTableConfigShow(e: boolean): void {
-    console.log('e: ', e);
     if (e) {
       this.allTableFieldChecked = e;
       this.allTableFieldIndeterminate = false;

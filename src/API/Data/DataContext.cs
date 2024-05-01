@@ -1,12 +1,13 @@
 using API.Models;
 using API.Models.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace API.Data;
 
-public class DataContext(DbContextOptions options) : IdentityDbContext<User, SystemRole, string>(options)
+public class DataContext(DbContextOptions options) : IdentityDbContext<User>(options)
 {
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -34,7 +35,7 @@ public class DataContext(DbContextOptions options) : IdentityDbContext<User, Sys
     {
         base.OnModelCreating(builder);
 
-        builder.Entity<SystemRole>().Property(x => x.Id).HasMaxLength(50).IsUnicode(false);
+        builder.Entity<IdentityRole>().Property(x => x.Id).HasMaxLength(50).IsUnicode(false);
         builder.Entity<User>().Property(x => x.Id).HasMaxLength(50).IsUnicode(false);
 
         builder.Entity<LabelInForum>()

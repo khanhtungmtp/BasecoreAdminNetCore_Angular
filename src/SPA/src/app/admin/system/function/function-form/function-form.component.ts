@@ -88,7 +88,7 @@ export class FunctionFormComponent implements OnInit {
   getParentIds(): void {
     this.functionService.getParentIds().subscribe({
       next: (res) => {
-        this.listParentId = this.ultility.UnflatteringForLeftMenu(res);
+        this.listParentId = this.ultility.unflatteringForLeftMenu(res);
         const rootParent: any = {
           "id": "ROOT",
           "name": "ROOT",

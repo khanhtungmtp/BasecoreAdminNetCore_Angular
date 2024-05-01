@@ -4,11 +4,11 @@ using static API.Helpers.Constants.SystemConstants;
 namespace API.Data;
 public class DbInitializer(DataContext context,
   UserManager<User> userManager,
-  RoleManager<SystemRole> roleManager)
+  RoleManager<IdentityRole> roleManager)
 {
     private readonly DataContext _context = context;
     private readonly UserManager<User> _userManager = userManager;
-    private readonly RoleManager<SystemRole> _roleManager = roleManager;
+    private readonly RoleManager<IdentityRole> _roleManager = roleManager;
     private readonly string AdminRoleName = "Admin";
     private readonly string UserRoleName = "Member";
 
@@ -18,13 +18,13 @@ public class DbInitializer(DataContext context,
 
         if (!_roleManager.Roles.Any())
         {
-            await _roleManager.CreateAsync(new SystemRole
+            await _roleManager.CreateAsync(new IdentityRole
             {
                 Id = AdminRoleName,
                 Name = AdminRoleName,
                 NormalizedName = AdminRoleName.ToUpper(),
             });
-            await _roleManager.CreateAsync(new SystemRole
+            await _roleManager.CreateAsync(new IdentityRole
             {
                 Id = UserRoleName,
                 Name = UserRoleName,

@@ -3,8 +3,6 @@ import { Injectable } from "@angular/core";
 import { LocalStorageConstants } from "@constants/local-storage.constants";
 import { RoleInfomation } from "@models/auth/auth";
 import { Pagination } from "./pagination-utility";
-import { OperationResult } from "./operation-result";
-// import { TranslateService } from "@ngx-translate/core";
 import { NzNotificationCustomService } from "@services/nz-notificationCustom.service";
 import { NzSpinnerCustomService } from "@services/common/nz-spinner.service";
 interface TreeNode {
@@ -22,8 +20,7 @@ export class FunctionUtility {
 
   constructor(
     private snotify: NzNotificationCustomService,
-    private spinnerService: NzSpinnerCustomService,
-    // private translateService: TranslateService
+    private spinnerService: NzSpinnerCustomService
   ) { }
 
   /**
@@ -245,7 +242,7 @@ export class FunctionUtility {
   }
 
 
-  UnflatteringForLeftMenu = <T extends TreeNode>(arr: T[]): T[] => {
+  unflatteringForLeftMenu = <T extends TreeNode>(arr: T[]): T[] => {
     const map: Record<string, T> = {}; // Change map to Record<string, T>
     const roots: T[] = [];
 
@@ -264,6 +261,29 @@ export class FunctionUtility {
         }
       } else {
         roots.push(node); // Add node to roots if it has no parent or its parent is "ROOT"
+      }
+    }
+    return roots;
+  }
+
+  unflatteringForTree = (arr: any[]): any[] => {
+    const map: Record<string, any> = {}; // Change map to Record<string, T>
+    const roots: any[] = [];
+    let node = {
+      parentId: '',
+      expanded: true,
+      children: []
+    };
+    for (let i = 0; i < arr.length; i += 1) {
+      map[arr[i].id] = i; // initialize the map
+      arr[i].children = []; // initialize the children
+    }
+    for (let i = 0; i < arr.length; i += 1) {
+      node = arr[i];
+      if (node.parentId !== null && arr[map[node.parentId]] != undefined) {
+        arr[map[node.parentId]].children.push(node);
+      } else {
+        roots.push(node);
       }
     }
     return roots;

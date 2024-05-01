@@ -53,7 +53,6 @@ export class LockWidgetComponent extends BasicConfirmModalComponent implements O
       // @ts-ignore
       beforeLockPath: this.activatedRoute.snapshot['_routerState'].url
     };
-    console.log('lockedState: ', lockedState);
     this.lockScreenStoreService.setLockScreenStore(lockedState);
     this.windowSrv.setSessionStorage(LockedKey, fnEncrypt(lockedState, salt));
     this.modalRef.destroy();

@@ -12,13 +12,12 @@ import { NzContextMenuService, NzDropdownMenuComponent, NzDropDownModule } from 
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
-import { Menu } from '@app/_core/models/common/types';
 import { SplitNavStoreService } from '@app/_core/services/common/split-nav-store.service';
 import { TabService, TabModel } from '@app/_core/services/common/tab.service';
 import { ThemeService } from '@app/_core/services/common/theme.service';
 import { fnStopMouseEvent } from '@app/_core/utilities/tools';
 import { MouseHoverShowDirective } from '@app/admin/shared/directives/mouse-hover-show.directive';
-import { FunctionVM } from '@app/_core/models/system/functionvm';
+import { FunctionTreeVM } from '@app/_core/models/system/functionvm';
 
 @Component({
   selector: 'app-tab',
@@ -40,7 +39,7 @@ export class TabComponent implements OnInit {
   tabsSourceData$ = this.tabService.getTabArray$();
   themesOptions$ = this.themesService.getThemesMode();
   isNightTheme$ = this.themesService.getIsNightTheme();
-  leftMenuArray$: Observable<FunctionVM[]> = this.splitNavStoreService.getSplitLeftNavArrayStore();
+  leftMenuArray$: Observable<FunctionTreeVM[]> = this.splitNavStoreService.getSplitLeftNavArrayStore();
   isOverMode$ = this.themesService.getIsOverMode();
   isCollapsed$ = this.themesService.getIsCollapsed();
   destroyRef = inject(DestroyRef);
