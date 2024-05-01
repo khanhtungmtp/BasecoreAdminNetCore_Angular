@@ -144,10 +144,8 @@ export class CardTableWrapComponent implements AfterContentInit {
   // The judgment column displays the status of this checkbox
   judgeAllChecked(): void {
     this.allTableFieldChecked = this.tableHeaders.every(item => item.show === true);
-    console.log('this.allTableFieldChecked: ', this.allTableFieldChecked);
     const allUnChecked = this.tableHeaders.every(item => !item.show);
     this.allTableFieldIndeterminate = !this.allTableFieldChecked && !allUnChecked;
-    console.log('this.allTableFieldIndeterminate: ', this.allTableFieldIndeterminate);
   }
 
   // reset

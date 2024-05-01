@@ -24,6 +24,7 @@ import { NzNotificationCustomService } from '@app/_core/services/nz-notification
 import { NzSpinnerCustomService } from '@app/_core/services/common/nz-spinner.service';
 import { HasRoleDirective } from '@app/_core/directives/hasrole.directive';
 import { ActionCode } from '@app/_core/constants/actionCode';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-function',
@@ -31,6 +32,7 @@ import { ActionCode } from '@app/_core/constants/actionCode';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
+    TranslateModule,
     PageHeaderComponent,
     NzCardModule,
     WaterMarkComponent,
@@ -70,6 +72,8 @@ export class FunctionComponent implements OnInit {
   private dataService = inject(FunctionService);
   private notification = inject(NzNotificationCustomService)
   protected spinnerService = inject(NzSpinnerCustomService);
+  private translate = inject(TranslateService);
+
   destroyRef = inject(DestroyRef);
   ngOnInit(): void {
     this.initTable();
@@ -148,8 +152,8 @@ export class FunctionComponent implements OnInit {
   }
   deleteRow(id: string): void {
     this.modalSrv.confirm({
-      nzTitle: 'Are you sure you want to delete it? ',
-      nzContent: 'Cannot be recovered after deletion',
+      nzTitle: this.translate.instant('system.message.confirmDeleteMsg'),
+      nzContent: this.translate.instant('system.message.confirmDeleteMsgContent'),
       nzOnOk: () => {
         this.tableLoading(true);
         /*The comment is the simulation interface call*/
@@ -174,8 +178,8 @@ export class FunctionComponent implements OnInit {
   deleteItemChecked(): void {
     if (this.checkedCashArray.length > 0) {
       this.modalSrv.confirm({
-        nzTitle: 'Are you sure you want to delete it? ',
-        nzContent: 'Cannot be recovered after deletion',
+        nzTitle: this.translate.instant('system.message.confirmDeleteMsg'),
+        nzContent: this.translate.instant('system.message.confirmDeleteMsgContent'),
         nzOnOk: () => {
           const ids: string[] = [];
           this.checkedCashArray.forEach(item => {

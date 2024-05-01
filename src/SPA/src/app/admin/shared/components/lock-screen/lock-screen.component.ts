@@ -17,11 +17,11 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 
 import { ChangNumberToChinesePipe } from '../../pipes/chang-number-to-chinese.pipe';
 import { LockedKey, salt } from '@app/_core/constants/app.constants';
-import { LoginInOutService } from '@app/_core/services/auth/login-in-out.service';
 import { LockScreenFlag, LockScreenStoreService } from '@app/_core/services/common/lock-screen-store.service';
 import { WindowService } from '@app/_core/services/common/window.service';
 import { fnCheckForm, fnEncrypt } from '@app/_core/utilities/tools';
 import { TranslateModule } from '@ngx-translate/core';
+import { AuthService } from '@app/_core/services/auth/auth.service';
 
 @Component({
   selector: 'app-lock-screen',
@@ -48,14 +48,14 @@ export class LockScreenComponent implements OnInit {
 
   private lockScreenStoreService = inject(LockScreenStoreService);
   private router = inject(Router);
-  private loginOutService = inject(LoginInOutService);
+  private loginOutService = inject(AuthService);
   private fb = inject(FormBuilder);
   private windowSrv = inject(WindowService);
 
   // Return to the login page to unlock
   loginOut(): void {
     this.unlock();
-    this.loginOutService.loginOut().then();
+    this.loginOutService.logout();
   }
 
   // 进入系统

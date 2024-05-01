@@ -24,7 +24,6 @@ import { ThemeService, SettingInterface } from '@app/_core/services/common/theme
 import { WindowService } from '@app/_core/services/common/window.service';
 import { DriverService } from '@app/_core/services/common/driver.service';
 import { SplitNavStoreService } from '@app/_core/services/common/split-nav-store.service';
-import { Menu } from '@app/_core/models/common/types';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { FunctionVM } from '@app/_core/models/system/functionvm';
 

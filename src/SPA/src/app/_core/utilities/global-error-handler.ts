@@ -93,10 +93,8 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { ErrorGlobalResponse } from "@models/base/error-global-response";
 import { NzNotificationCustomService } from "../services/nz-notificationCustom.service";
 import { environment } from '@env/environment';
-import { Router } from "@angular/router";
-import { UrlRouteConstants } from "../constants/url-route.constants";
-import { LoginInOutService } from "../services/auth/login-in-out.service";
 import { NzSpinnerCustomService } from "../services/common/nz-spinner.service";
+import { AuthService } from "../services/auth/auth.service";
 
 @Injectable({
   providedIn: "root",
@@ -106,8 +104,7 @@ export class GlobalErrorHandler implements ErrorHandler {
 
   constructor(
     private notification: NzNotificationCustomService,
-    private router: Router,
-    private loginOutService: LoginInOutService,
+    private authService: AuthService,
     private spinnerService: NzSpinnerCustomService) { }
 
   handleError(error: any) {
@@ -119,13 +116,11 @@ export class GlobalErrorHandler implements ErrorHandler {
       apiError = this.handleServerSideError(error);
 
       if (error.status === 403 || error.status === 401) {
-        this.loginOutService.loginOut();
-        this.router.navigate([UrlRouteConstants.LOGIN]);
+        this.authService.logout();
       }
       else if (error.status === 400) {
         console.log('errors servers 400:', error);
-        this.notification.error('Error: ' + apiError.statusCode, apiError.message)
-        return;
+        // this.notification.error('Error: ' + apiError.statusCode, apiError.message)
       }
       // Handle other HttpErrorResponse cases if needed
     } else {
@@ -137,7 +132,7 @@ export class GlobalErrorHandler implements ErrorHandler {
 
   private handleServerSideError(error: HttpErrorResponse): ErrorGlobalResponse {
     const defaultMessage = "Sorry, there is an error on server.";
-    const isValidatorError = error.error?.type === 'ValidatorError';
+    const isValidatorError: boolean = error.error?.type === 'ValidatorError';
     const errorMessage = this.isProduct || !error.error?.message
       ? defaultMessage
       : isValidatorError

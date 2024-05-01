@@ -3,7 +3,7 @@
     "selectAll": "Please select...",
     "message": {
       "changeLanguage": "You are changing the system language, please press OK to confirm the change.",
-      "logIn": "Welcome to the system",
+      "logedIn": "Welcome to the system",
       "logInFailed": "Your Account and/or password do not match",
       "confirmPassword": "New Password and Confirm Password do not match",
       "passwordLockScreenFailure": "Lock screen password is incorrect",
@@ -11,6 +11,7 @@
       "logout": "You have been logged out",
       "confirmDelete": "Are you sure delete ?",
       "confirmDeleteMsg": "Are you sure you want to delete it?",
+      "confirmDeleteMsgContent": "Cannot be recovered after deletion",
       "confirmDeleteRangeMsg": "Are you sure you want to delete these records ?",
       "confirmChangeState": "Are you sure you want to change this state ?",
       "createOKMsg": "Create successfully",
@@ -43,7 +44,8 @@
       "clearMsg": "Clear successfully",
       "queryErrorMsg": "Query error",
       "deleteItem": "Delete Item",
-      "messageContentDelete": "Would you like to delete "
+      "messageContentDelete": "Would you like to delete ",
+      "requiredFields": "Required fields"
     },
     "caption": {
       "success": "Success!",
@@ -175,7 +177,7 @@
       "directory": "Directory"
     }
   },
-  "basicMaintenance": {
+  "setting": {
     "roleSetting": {
       "titleMain": "2.1 Role Setting",
       "titleAdd": "2.1 Role Setting - Add",
@@ -219,12 +221,13 @@
       "all": "All",
       "resetPassword": "Reset Password"
     },
-    "resetPassword": {
-      "title": "2.8 Reset Password",
-      "account": "Account",
-      "name": "Name",
+    "changePassword": {
+      "title": "Change Password",
+      "oldPassword": "Old Password",
       "newPassword": "New Password",
       "againNewPassword": "Again New Password",
+      "doNotMatch": "The new password and confirm password do not match.",
+      "changePasswordOk": "You have successfully changed your password, do you want to log in again?",
       "note": "Note: English character and number must be least 6 digits"
     }
   }

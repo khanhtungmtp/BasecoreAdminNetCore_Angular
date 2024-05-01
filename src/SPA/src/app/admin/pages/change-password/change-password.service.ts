@@ -11,13 +11,8 @@ import { ModalWrapService } from '@app/_core/utilities/base-modal';
   providedIn: 'root'
 })
 export class ChangePasswordService {
-  // private modalWrapService = inject(ModalWrapService);
-  /**
-   *
-   */
-  constructor(private modalWrapService: ModalWrapService) {
+  private modalWrapService = inject(ModalWrapService);
 
-  }
   protected getContentComponent(): NzSafeAny {
     return ChangePasswordComponent;
   }

@@ -3,7 +3,7 @@
     "selectAll": "請選擇...",
     "message": {
       "changeLanguage": "您正在更改系统语言，请按“确定”以确认更改",
-      "logIn": "歡迎使用本系統",
+      "logedIn": "歡迎使用本系統",
       "logInFailed": "帳號或秘密錯誤",
       "confirmPassword": "新密碼與確認新密碼輸入不一致",
       "passwordLockScreenFailure": "锁屏密码不正确",
@@ -13,6 +13,7 @@
       "confirmDeleteMsg": "是否確認刪除該記錄？",
       "confirmDeleteRangeMsg": "是否確認刪除多筆記錄？",
       "confirmChangeState": "是否確認更改此狀態？",
+      "confirmDeleteMsgContent": "删除后无法恢复。",
       "createOKMsg": "新增成功",
       "updateOKMsg": "修改成功",
       "deleteOKMsg": "刪除成功",
@@ -43,7 +44,8 @@
       "clearMsg": "清除成功",
       "queryErrorMsg": "查詢失敗",
       "deleteItem": "刪除項目",
-      "messageContentDelete": "您想刪除嗎 "
+      "messageContentDelete": "您想刪除嗎 ",
+      "requiredFields": "必填项"
     },
     "caption": {
       "success": "成功!",
@@ -173,7 +175,7 @@
       "directory": "目錄"
     }
   },
-  "basicMaintenance": {
+  "setting": {
     "roleSetting": {
       "titleMain": "2.1 角色/權限設定",
       "titleAdd": "2.1 角色/權限設定 - 新增",
@@ -215,12 +217,13 @@
       "all": "全部",
       "resetPassword": "重設密碼"
     },
-    "resetPassword": {
-      "title": "2.8 重設密碼",
-      "account": "帳號",
-      "name": "姓名",
+    "changePassword": {
+      "title": "重設密碼",
+      "oldPassword": "原密码",
       "newPassword": "新密碼",
-      "againNewPassword": "再次輸入新密碼",
+      "againNewPassword": "确认新密码",
+      "doNotMatch": "新密码和确认密码不一致",
+      "changePasswordOk": "您已经成功更改密码，您想要重新登录吗？",
       "note": "說明:英文數字至少6位數"
     }
   }

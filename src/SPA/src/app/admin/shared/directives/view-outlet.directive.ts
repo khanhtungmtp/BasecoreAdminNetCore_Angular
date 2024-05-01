@@ -38,12 +38,12 @@ export class ViewOutletDirective implements OnChanges {
   private embeddedViewRef: EmbeddedViewRef<NzSafeAny> | undefined;
 
   /**
-   * 组件或者模板 TemplateRef
+   * Component or template TemplateRef
    */
   @Input() viewOutlet: Type<NzSafeAny> | TemplateRef<NzSafeAny> | null = null;
 
   /**
-   * 组件和模板上下文传递数据
+   * Component and template context passing data
    */
   @Input() viewOutletContext?: NzSafeAny;
 

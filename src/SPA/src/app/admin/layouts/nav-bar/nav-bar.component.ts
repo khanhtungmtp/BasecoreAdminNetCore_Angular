@@ -13,7 +13,6 @@ import { SplitNavStoreService } from '@app/_core/services/common/split-nav-store
 import { TabService } from '@app/_core/services/common/tab.service';
 import { ThemeService } from '@app/_core/services/common/theme.service';
 import { fnStopMouseEvent } from '@app/_core/utilities/tools';
-import { AuthDirective } from '@app/admin/shared/directives/auth.directive';
 import { ThemeMode } from '../setting-drawer/setting-drawer.component';
 import { MenuStoreService } from '@app/_core/services/common/menu-store.service';
 import { UserInfoService } from '@app/_core/services/common/userInfo.service';
@@ -27,7 +26,7 @@ import { FunctionVM } from '@app/_core/models/system/functionvm';
   templateUrl: './nav-bar.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [NzMenuModule, NzNoAnimationModule, NgTemplateOutlet, AuthDirective, NzButtonModule, NzIconModule, RouterLink, AsyncPipe]
+  imports: [NzMenuModule, NzNoAnimationModule, NgTemplateOutlet, NzButtonModule, NzIconModule, RouterLink, AsyncPipe]
 })
 export class NavBarComponent implements OnInit {
   @Input({ transform: booleanAttribute })

@@ -3,7 +3,7 @@
     "selectAll": "Hãy chọn...",
     "message": {
       "changeLanguage": "Bạn đang thực hiện thay đổi ngôn ngữ hệ thống, vui lòng nhấn ok để xác nhận thay đổi.",
-      "logIn": "Chào mừng bạn đến với hệ thống",
+      "logedIn": "Chào mừng bạn đến với hệ thống",
       "logInFailed": "Tên người dùng và / hoặc mật khẩu của bạn không đúng",
       "confirmPassword": "Mật khẩu mới và mật khẩu xác nhận không khớp",
       "passwordLockScreenFailure": "Mật khẩu màn hình khóa không chính xác",
@@ -11,6 +11,7 @@
       "logout": "Bạn đã đăng xuất khỏi hệ thống",
       "confirmDelete": "Bạn có chắc chắn muốn xóa ?",
       "confirmDeleteMsg": "Bạn có chắc chắn muốn xóa bản ghi này không ?",
+      "confirmDeleteMsgContent": "Không thể khôi phục sau khi xóa.",
       "confirmDeleteRangeMsg": "Bạn có chắc chắn muốn xóa các bản ghi này không ?",
       "confirmChangeState": "Bạn có chắc chắn muốn thay đổi trạng thái này không ?",
       "createOKMsg": "Thêm mới thành công",
@@ -42,7 +43,8 @@
       "clearMsg": "Huỷ lọc thành công",
       "invalidValue": "Dữ liệu chưa hợp lệ",
       "deleteItem": "Xoá dòng dữ liệu",
-      "messageContentDelete": "Bạn có muốn xoá "
+      "messageContentDelete": "Bạn có muốn xoá ",
+      "requiredFields": "Trường bắt buộc"
     },
     "caption": {
       "success": "Thành công!",
@@ -173,7 +175,7 @@
       "directory": "Thư mục cha"
     }
   },
-  "basicMaintenance": {
+  "setting": {
     "roleSetting": {
       "titleMain": "2.1 Cài đặt quyền",
       "titleAdd": "2.1 Cài đặt quyền - Thêm",
@@ -214,6 +216,15 @@
       "enabled": "Y.Bật",
       "all": "Tất cả",
       "resetPassword": "Khôi phục mật khẩu"
+    },
+    "changePassword": {
+      "title": "Change Password",
+      "oldPassword": "Mật khẩu hiện tại",
+      "newPassword": "Mật khẩu mới",
+      "againNewPassword": "Nhập lại mật khẩu mới",
+      "doNotMatch": "Mật khẩu mới và xác nhận mật khẩu không giống nhau.",
+      "changePasswordOk": "Bạn vừa mới thay đổi mật khẩu thành công, bạn có muốn đăng nhập lại không?",
+      "note": "Note: English character and number must be least 6 digits"
     }
   }
 }

@@ -1,32 +1,40 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { FormControl, NonNullableFormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Observable, of } from 'rxjs';
+import { Observable, catchError, of } from 'rxjs';
 
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
-import { NzModalRef } from 'ng-zorro-antd/modal';
+import { NZ_MODAL_DATA, NzModalRef } from 'ng-zorro-antd/modal';
 import { fnCheckForm } from '@app/_core/utilities/tools';
 import { PasswordStrengthMeterComponent } from '@app/admin/shared/biz-components/password-strength-meter/password-strength-meter.component';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { UserManagerService } from '@app/_core/services/user-manager/user-manager.service';
+import { NzSafeAny } from 'ng-zorro-antd/core/types';
+import { UserPasswordChangeRequest } from '@app/_core/models/user-manager/userpasswordchangerequest';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
 
 @Component({
   selector: 'app-change-password',
   templateUrl: './change-password.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [FormsModule, NzFormModule, ReactiveFormsModule, NzGridModule, NzInputModule, NzButtonModule, PasswordStrengthMeterComponent, NzIconModule]
+  imports: [TranslateModule, NzAlertModule, FormsModule, NzFormModule, ReactiveFormsModule, NzGridModule, NzInputModule, NzButtonModule, PasswordStrengthMeterComponent, NzIconModule]
 })
 export class ChangePasswordComponent {
-  passwordVisible = false;
-  compirePasswordVisible = false;
-
+  passwordVisible: boolean = false;
+  errorMessage: string = '';
+  compirePasswordVisible: boolean = false;
+  readonly nzModalData: any = inject(NZ_MODAL_DATA);
   constructor(
     private modalRef: NzModalRef,
+    private translate: TranslateService,
+    private userManagerService: UserManagerService,
+    private cdr: ChangeDetectorRef,
     private fb: NonNullableFormBuilder
   ) { }
-
   get newPassword(): string {
     return this.validateForm.controls.newPassword.value!;
   }
@@ -35,14 +43,32 @@ export class ChangePasswordComponent {
     if (!fnCheckForm(this.validateForm)) {
       return of(false);
     }
-    return of(this.validateForm.value);
+
+    const request: UserPasswordChangeRequest = {
+      oldPassword: this.validateForm.value.oldPassword!,
+      newPassword: this.validateForm.value.sureNewPassword!
+    }
+
+    return this.userManagerService.changePassword(this.nzModalData.userId, request).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  private handleError(error: any): Observable<NzSafeAny> {
+    if (error.error && error.error.message) {
+      this.errorMessage = error.error.message;
+    } else {
+      this.errorMessage = error.message;
+    }
+    this.cdr.detectChanges();
+    return of(null);
   }
 
   confirmationValidator = (control: FormControl): { [s: string]: any } => {
     if (!control.value) {
       return { required: true };
     } else if (control.value !== this.validateForm.controls.newPassword.value) {
-      return { message: '两次输入密码不一致', error: true };
+      return { message: this.translate.instant('setting.changePassword.doNotMatch'), error: true };
     }
     return {};
   };

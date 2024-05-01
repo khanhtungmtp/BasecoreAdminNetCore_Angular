@@ -57,9 +57,9 @@
 <span class="bst-header-icon"
       nz-dropdown
       [nzDropdownMenu]="language">
-  <i nz-icon
-     nzTheme="outline"
-     nzType="font-size"></i>
+  <img [src]="currentImageLange"
+       class="avatar"
+       alt="Language" />
 </span>
 <nz-dropdown-menu #language="nzDropdownMenu">
   <ul nz-menu

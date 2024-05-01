@@ -7,7 +7,6 @@ import { ModalBtnStatus } from '@app/_core/utilities/base-modal';
 import { AntTableComponent, AntTableConfig } from '@app/admin/shared/components/ant-table/ant-table.component';
 import { CardTableWrapComponent } from '@app/admin/shared/components/card-table-wrap/card-table-wrap.component';
 import { PageHeaderComponent, PageHeaderType } from '@app/admin/shared/components/page-header/page-header.component';
-import { AuthDirective } from '@app/admin/shared/directives/auth.directive';
 import { MapPipe, MapSet, MapKeyType } from '@app/admin/shared/pipes/map.pipe';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
@@ -28,12 +27,13 @@ import { UserVM } from '@app/_core/models/user-manager/uservm';
 import { UserManagerService } from '@app/_core/services/user-manager/user-manager.service';
 import { Pagination, PaginationParam } from '@app/_core/utilities/pagination-utility';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
-
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-user-manager',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
+    TranslateModule,
     NzRadioModule,
     PageHeaderComponent,
     NzGridModule,
@@ -48,7 +48,6 @@ import { NzRadioModule } from 'ng-zorro-antd/radio';
     NzIconModule,
     CardTableWrapComponent,
     AntTableComponent,
-    AuthDirective,
     NzSwitchModule
   ],
   templateUrl: './user-manager.component.html'
@@ -80,6 +79,7 @@ export class UserManagerComponent implements OnInit {
   private modalService = inject(UserManagerModalService);
   private message = inject(NzMessageService);
   private fb = inject(FormBuilder);
+  private translate = inject(TranslateService);
 
   ngOnInit(): void {
     this.isActiveOptions = [...MapPipe.transformMapToArray(MapSet.isActive, MapKeyType.Boolean)];
@@ -218,8 +218,8 @@ export class UserManagerComponent implements OnInit {
     if (this.checkedCashArray.length > 0) {
       const ids: string[] = [];
       this.modalSrv.confirm({
-        nzTitle: 'Are you sure you want to delete it? ',
-        nzContent: 'Cannot be recovered after deletion',
+        nzTitle: this.translate.instant('system.message.confirmDeleteMsg'),
+        nzContent: this.translate.instant('system.message.confirmDeleteMsgContent'),
         nzOnOk: () => {
           this.checkedCashArray.forEach(item => {
             ids.push(item.id);
@@ -250,8 +250,8 @@ export class UserManagerComponent implements OnInit {
 
   deleteRow(id: string): void {
     this.modalSrv.confirm({
-      nzTitle: 'Are you sure you want to delete it? ',
-      nzContent: 'Cannot be recovered after deletion',
+      nzTitle: this.translate.instant('system.message.confirmDeleteMsg'),
+      nzContent: this.translate.instant('system.message.confirmDeleteMsgContent'),
       nzOnOk: () => {
         this.tableLoading(true);
         this.dataService

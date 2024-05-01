@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { LocalStorageConstants } from '@constants/local-storage.constants';
 import { UrlRouteConstants } from '@constants/url-route.constants';
@@ -8,24 +8,26 @@ import { UserForLogged, UserForLoggedIn, UserLoginParam } from '@models/auth/aut
 import { map } from 'rxjs/operators';
 import { BaseHttpService } from '../base-http.service';
 import { WindowService } from '../common/window.service';
-import { LoginInOutService } from './login-in-out.service';
 import { UserInformation } from '@app/_core/models/auth/userInformation';
 import { AuthResponse } from '@app/_core/models/auth/auth-response';
-import { BehaviorSubject } from 'rxjs';
+import { SimpleReuseStrategy } from '../common/reuse-strategy';
+import { TabService } from '../common/tab.service';
+import { MenuStoreService } from '../common/menu-store.service';
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   public profileUser: UserInformation = <UserInformation>{};
   jwtHelper = new JwtHelperService();
-  private isRefreshingToken = false;
-  private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
   constructor(
     private httpBase: BaseHttpService,
     private windowServe: WindowService,
-    private loginOutService: LoginInOutService,
-    private router: Router) { }
+    private activatedRoute: ActivatedRoute,
+    private menuService: MenuStoreService,
+    private router: Router,
+    private tabService: TabService) { }
 
   login(param: UserLoginParam) {
     return this.httpBase.post<UserForLoggedIn>('Auth/login', param).pipe(map(response => {
@@ -43,11 +45,42 @@ export class AuthService {
     return this.httpBase.get<Boolean>('Auth/GetPasswordReset', Account);
   }
 
+  async clearTabCash(): Promise<void> {
+    await SimpleReuseStrategy.deleteAllRouteSnapshot(this.activatedRoute.snapshot);
+    return await new Promise(resolve => {
+      // clear tab
+      this.tabService.clearTabs();
+      resolve();
+    });
+  }
+
+  async clearSessionCash(): Promise<void> {
+    return new Promise(resolve => {
+      this.menuService.setMenuArrayStore([]);
+      resolve();
+    });
+  }
+
+  private async loginOut(): Promise<void> {
+    await this.clearTabCash();
+    await this.clearSessionCash();
+    this.router.navigate([UrlRouteConstants.LOGIN]);
+  }
+
   logout(): void {
+    // Lưu giữ giá trị của key mà không muốn xóa
+    const savedThemeOptionsKeyOld = localStorage.getItem(LocalStorageConstants.ThemeOptionsKey);
+    const savedLangOld = localStorage.getItem(LocalStorageConstants.LANG);
+
     this.windowServe.clearStorage();
     this.windowServe.clearSessionStorage();
-    this.router.navigate([UrlRouteConstants.LOGIN]);
-    this.loginOutService.loginOut().then();
+    if (savedThemeOptionsKeyOld) {
+      localStorage.setItem(LocalStorageConstants.ThemeOptionsKey, savedThemeOptionsKeyOld);
+    }
+    if (savedLangOld) {
+      localStorage.setItem(LocalStorageConstants.LANG, savedLangOld);
+    }
+    this.loginOut().then();
   }
 
   refreshToken() {

@@ -3,6 +3,7 @@ import { BaseHttpService } from '../base-http.service';
 import { PaginationParam, PagingResult } from '@app/_core/utilities/pagination-utility';
 import { UserVM } from '@app/_core/models/user-manager/uservm';
 import { UserSearchRequest } from './../../models/user-manager/usersearchrequest';
+import { UserPasswordChangeRequest } from '@app/_core/models/user-manager/userpasswordchangerequest';
 
 @Injectable({
   providedIn: 'root'
@@ -37,6 +38,10 @@ export class UserManagerService {
 
   deleteRange(ids: string[]) {
     return this.httpBase.delete<boolean>('Users/DeleteUsers', ids);
+  }
+
+  changePassword(userId: string, request: UserPasswordChangeRequest) {
+    return this.httpBase.put<boolean>(`Users/${userId}/change-password`, request);
   }
 
 }

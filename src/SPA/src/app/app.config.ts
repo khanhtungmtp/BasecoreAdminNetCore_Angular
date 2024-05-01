@@ -8,10 +8,7 @@ import { registerLocaleData } from '@angular/common';
 import vi from '@angular/common/locales/vi';
 import { FormsModule } from '@angular/forms';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptors, withInterceptorsFromDi } from '@angular/common/http';
-import { JwtModule } from '@auth0/angular-jwt';
-import { environment } from '@env/environment';
-import { LocalStorageConstants } from '@constants/local-storage.constants';
+import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { GlobalErrorHandler } from '@utilities/global-error-handler';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -26,19 +23,17 @@ import { DashboardOutline, FormOutline, MenuFoldOutline, MenuUnfoldOutline, Doll
 import { LoadAliIconCdnService } from '@services/common/load-ali-icon-cdn.service';
 import { SubLockedStatusService } from '@services/common/sub-locked-status.service';
 import { SubWindowWithService } from '@services/common/sub-window-with.service';
-import { RefreshTokenInterceptor } from './_core/services/auth/refreshtoken.interceptor';
 import { TokenInterceptor } from './_core/services/auth/token.interceptor';
+import { CommonService } from './_core/services/common.service';
+import { LocalStorageConstants } from './_core/constants/local-storage.constants';
 const icons = [MenuFoldOutline, MenuUnfoldOutline, DashboardOutline, FormOutline, DollarCircleOutline];
 registerLocaleData(vi);
-export function tokenGetter() {
-  return localStorage.getItem(LocalStorageConstants.TOKEN);
-}
-
+export const langDefault = localStorage.getItem(LocalStorageConstants.LANG) || 'en_US';
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 
-// export function StartupServiceFactory(startupService: StartupService) {
+// export function StartupServiceFactory(startupService: CommonService) {
 //   return () => startupService.load();
 // }
 
@@ -65,17 +60,10 @@ const APPINIT_PROVIDES = [
   // {
   //   provide: APP_INITIALIZER,
   //   useFactory: StartupServiceFactory,
-  //   deps: [StartupService],
+  //   deps: [CommonService],
   //   multi: true
   // },
-  // // Load Ali icon library CDN
-  {
-    provide: APP_INITIALIZER,
-    useFactory: LoadAliIconCdnFactory,
-    deps: [LoadAliIconCdnService],
-    multi: true
-  },
-  // // Initialized lock screen service
+  // Initialized lock screen service
   {
     provide: APP_INITIALIZER,
     useFactory: InitLockedStatusServiceFactory,
@@ -109,7 +97,6 @@ const APPINIT_PROVIDES = [
 
 export const appConfig: ApplicationConfig = {
   providers: [
-
     provideRouter(routes, withPreloading(SelectivePreloadingStrategyService), // Custom module pre -load
       // withViewTransitions({
       //   skipInitialTransition: true
@@ -127,15 +114,8 @@ export const appConfig: ApplicationConfig = {
           useFactory: HttpLoaderFactory,
           deps: [HttpClient],
         },
-        defaultLanguage: 'en_US'
+        defaultLanguage: langDefault
       }),
-      JwtModule.forRoot({
-        config: {
-          tokenGetter: tokenGetter,
-          allowedDomains: environment.allowedDomains,
-          disallowedRoutes: environment.disallowedRoutes,
-        },
-      })
     ), provideAnimationsAsync(), provideHttpClient(
       // withInterceptors([RefreshTokenInterceptor]),
       // DI-based interceptors must be explicitly enabled.

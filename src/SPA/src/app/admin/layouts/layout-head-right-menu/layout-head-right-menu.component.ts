@@ -1,32 +1,28 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, OnInit, ChangeDetectionStrategy, inject, ChangeDetectorRef } from '@angular/core';
-import { Router } from '@angular/router';
 import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { ModalOptions } from 'ng-zorro-antd/modal';
+import { ModalOptions, NzModalService } from 'ng-zorro-antd/modal';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 
 import { HomeNoticeComponent } from '../home-notice/home-notice.component';
-import { UserInfoService } from '@app/_core/services/common/userInfo.service';
-import { WindowService } from '@app/_core/services/common/window.service';
 import { ScreenLessHiddenDirective } from '@app/admin/shared/directives/screen-less-hidden.directive';
 import { ToggleFullscreenDirective } from '@app/admin/shared/directives/toggle-fullscreen.directive';
 import { ModalBtnStatus } from '@app/_core/utilities/base-modal';
 import { ChangePasswordService } from '@app/admin/pages/change-password/change-password.service';
 import { LockWidgetService } from '@app/admin/tpl/lock-widget/lock-widget.service';
-import { LoginInOutService } from '@app/_core/services/auth/login-in-out.service';
 import { SearchRouteService } from '@app/admin/tpl/search-route/search-route.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { LocalStorageConstants } from '@app/_core/constants/local-storage.constants';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
-import { UrlRouteConstants } from '@app/_core/constants/url-route.constants';
 import { SystemLanguageService } from '@app/_core/services/system/system-language.service';
 import { SystemLanguageVM } from '@app/_core/models/system/systemlanguage';
 import { LangConstants } from '@app/_core/constants/lang-constants';
+import { AuthService } from '@app/_core/services/auth/auth.service';
 
 @Component({
   selector: 'app-layout-head-right-menu',
@@ -39,18 +35,17 @@ import { LangConstants } from '@app/_core/constants/lang-constants';
 export class LayoutHeadRightMenuComponent implements OnInit {
   listLanguage: SystemLanguageVM[] = [];
   currentLang: string = '';
+  currentImageLange: string = '';
   baseImage: string = "../../../../assets/images/lang/";
-  private router = inject(Router);
   private changePasswordModalService = inject(ChangePasswordService);
-  private loginOutService = inject(LoginInOutService);
+  private authService = inject(AuthService);
   private lockWidgetService = inject(LockWidgetService);
-  private windowServe = inject(WindowService);
   private searchRouteService = inject(SearchRouteService);
   private message = inject(NzMessageService);
-  private userInfoService = inject(UserInfoService);
   private translate = inject(TranslateService);
   private languageService = inject(SystemLanguageService);
   private cdr = inject(ChangeDetectorRef);
+  private modalSrv = inject(NzModalService);
 
   // lock screen
   lockScreen(): void {
@@ -67,22 +62,31 @@ export class LayoutHeadRightMenuComponent implements OnInit {
 
   // change Password
   changePassword(): void {
-     //   this.changePasswordModalService.show({ nzTitle: this.translate.instant('system.caption.changePassword') }).subscribe(({ modalValue, status }) => {
-     //     if (status === ModalBtnStatus.Cancel) {
-     //       return;
-     //     }
-     //     this.userInfoService.getUserInfo().subscribe(res => {
-     //       this.user = {
-     //         id: res.userId,
-     //         oldPassword: modalValue.oldPassword,
-     //         newPassword: modalValue.newPassword
-     //       };
-     //     });
-     //     this.accountService.editAccountPsd(this.user).subscribe(() => {
-     //       this.loginOutService.loginOut().then();
-     //       this.message.success(this.translate.instant('system.message.changePasswordOKMsg'));
-     //     });
-     //   });
+    const userId = this.authService.getUserProfile().id
+    this.changePasswordModalService
+      .show({ nzTitle: this.translate.instant('system.caption.changePassword') }, { userId })
+      .subscribe(({ modalValue, status }) => {
+        if (status === ModalBtnStatus.Cancel) {
+          return;
+        }
+
+        if (modalValue) {
+          this.translate.get(['system.caption.warning', 'system.message.changePasswordOKMsg', 'setting.changePassword.changePasswordOk']).subscribe(translations => {
+            const warnTitle = translations['system.caption.warning'];
+            const content = translations['setting.changePassword.changePasswordOk'];
+            const okMsg = translations['system.message.changePasswordOKMsg'];
+
+            this.modalSrv.confirm({
+              nzTitle: warnTitle,
+              nzContent: content,
+              nzOnOk: () => {
+                this.message.success(okMsg);
+                this.authService.logout();
+              }
+            });
+          });
+        }
+      });
    }
 
   showSearchModal(): void {
@@ -97,29 +101,31 @@ export class LayoutHeadRightMenuComponent implements OnInit {
   }
 
   logOut(): void {
-    // Lưu giữ giá trị của key mà không muốn xóa
-    const savedThemeOptionsKeyOld = localStorage.getItem(LocalStorageConstants.ThemeOptionsKey);
-    this.windowServe.clearStorage();
-    this.windowServe.clearSessionStorage();
-    if (savedThemeOptionsKeyOld) {
-      localStorage.setItem(LocalStorageConstants.ThemeOptionsKey, savedThemeOptionsKeyOld);
-    }
     this.message.success(this.translate.instant('system.message.logout'));
-    this.router.navigate([UrlRouteConstants.LOGIN]);
-    this.loginOutService.loginOut().then();
+    this.authService.logout();
     this.cdr.markForCheck();
   }
 
   switchLang(lang: string) {
     localStorage.setItem(LocalStorageConstants.LANG, lang);
     this.translate.use(lang);
+    this.setCurrentLanguage(lang);
     this.message.info(this.translate.instant('system.caption.switchSuccessful'));
+  }
+
+  setCurrentLanguage(languageCode: string): void {
+    // Find the language in listLanguage array and update the icon URL
+    const language = this.listLanguage.find(lang => lang.languageCode === languageCode);
+    if (language) {
+      this.currentImageLange = this.baseImage + language.urlImage;
+    }
   }
 
   getLanguage() {
     this.languageService.getLanguages().subscribe({
       next: (res) => {
         this.listLanguage = res;
+        this.setCurrentLanguage(this.currentLang);
       },
       error: (e) => {
         throw e
@@ -128,7 +134,7 @@ export class LayoutHeadRightMenuComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getLanguage();
     this.currentLang = localStorage.getItem(LocalStorageConstants.LANG) ?? LangConstants.EN;
+    this.getLanguage();
   }
 }

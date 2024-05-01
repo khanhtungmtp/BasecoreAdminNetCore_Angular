@@ -164,11 +164,11 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
     }
 
     // url: PUT : http:localhost:6001/api/user/{id}/change-password
-    [HttpPut("{id}/change-password")]
+    [HttpPut("{userId}/change-password")]
     [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.UPDATE)]
-    public async Task<IActionResult> ChangePassword(string id, [FromBody] UserPasswordChangeRequest request)
+    public async Task<IActionResult> ChangePassword(string userId, [FromBody] UserPasswordChangeRequest request)
     {
-        var user = await _userManager.FindByIdAsync(id);
+        var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
             return NotFound(OperationResult.NotFound("User not found"));
         var result = await _userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
