@@ -1,22 +1,18 @@
 import { Injectable } from '@angular/core';
 import { FunctionTreeVM } from '@app/_core/models/system/functionvm';
-import { FunctionUtility } from '@app/_core/utilities/function-utility';
 import { environment } from '@env/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { BaseService } from '../platform/baseservice';
 import { BaseHttpService } from '../base-http.service';
 
 //Menu store service
 @Injectable({
   providedIn: 'root'
 })
-export class MenuStoreService extends BaseService {
+export class MenuStoreService {
   /**
    *
    */
-  constructor(private httpBase: BaseHttpService,) {
-    super()
-  }
+  constructor(private httpBase: BaseHttpService,) { }
   baseUrl: string = environment.apiUrl;
   private menuArray$ = new BehaviorSubject<FunctionTreeVM[]>([]);
 

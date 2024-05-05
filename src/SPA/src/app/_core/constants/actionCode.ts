@@ -4,8 +4,8 @@ export const ActionCode = {
   FunctionView: 'SYSTEM_FUNCTION:VIEW',
   FunctionCreate: 'SYSTEM_FUNCTION:CREATE',
   FunctionDelete: 'SYSTEM_FUNCTION:DELETE',
-  /*User manager operation*/
-  CommandInFunctionView: 'COMMAND_IN_FUNCTION:VIEW',
+  /* Language operation*/
+  LanguageView: 'LANGUAGE:VIEW',
   /*User manager operation*/
   UserManagerView: 'SYSTEM_USER:VIEW',
   /*Role manager operation*/

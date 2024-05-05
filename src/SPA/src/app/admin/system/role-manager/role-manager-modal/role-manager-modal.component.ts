@@ -3,7 +3,6 @@ import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } 
 import { OptionsInterface } from '@app/_core/models/common/types';
 import { UserVM } from '@app/_core/models/user-manager/uservm';
 import { RoleService } from '@app/_core/services/user-manager/role.service';
-import { UserManagerService } from '@app/_core/services/user-manager/user-manager.service';
 import { ValidatorsService } from '@app/_core/services/validators/validators.service';
 import { fnCheckForm } from '@app/_core/utilities/tools';
 import { NzAlertModule } from 'ng-zorro-antd/alert';

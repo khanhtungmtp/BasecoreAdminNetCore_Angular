@@ -30,7 +30,7 @@ import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { WaterMarkComponent } from '@app/admin/shared/components/water-mark/water-mark.component';
 @Component({
-  selector: 'app-role-manager',
+  selector: 'app-user-manager',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [

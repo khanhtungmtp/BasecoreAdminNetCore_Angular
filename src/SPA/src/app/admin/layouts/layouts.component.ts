@@ -4,7 +4,6 @@ import { RouterOutlet } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
-import { SidebarComponent } from './sidebar/sidebar.component';
 import { Observable } from 'rxjs';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzNoAnimationModule } from 'ng-zorro-antd/core/no-animation';
@@ -26,10 +25,6 @@ import { DriverService } from '@app/_core/services/common/driver.service';
 import { SplitNavStoreService } from '@app/_core/services/common/split-nav-store.service';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { FunctionTreeVM } from '@app/_core/models/system/functionvm';
-
-const layoutsComponent = [
-  SidebarComponent
-];
 
 export interface IBreadcrumb {
   label: string;

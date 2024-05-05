@@ -38,7 +38,8 @@ public class S_SystemLanguage(IRepositoryAccessor repoStore) : BaseServices(repo
             LanguageCode = language.LanguageCode,
             LanguageName = language.LanguageName,
             UrlImage = language.UrlImage,
-            IsActive = language.IsActive
+            IsActive = language.IsActive,
+            SortOrder = language.SortOrder
         };
         return OperationResult<SystemLanguageVM>.Success(languageVM, "Get language by id successfully.");
     }
@@ -61,7 +62,8 @@ public class S_SystemLanguage(IRepositoryAccessor repoStore) : BaseServices(repo
             LanguageCode = x.LanguageCode,
             LanguageName = x.LanguageName,
             UrlImage = x.UrlImage,
-            IsActive = x.IsActive
+            IsActive = x.IsActive,
+            SortOrder = x.SortOrder
         }).ToListAsync();
         var resultPaging = PagingResult<SystemLanguageVM>.Create(listFunctionVM, pagination.PageNumber, pagination.PageSize);
         return OperationResult<PagingResult<SystemLanguageVM>>.Success(resultPaging, "Get language successfully.");
@@ -76,12 +78,27 @@ public class S_SystemLanguage(IRepositoryAccessor repoStore) : BaseServices(repo
         language.LanguageName = request.LanguageName;
         language.SortOrder = request.SortOrder;
         language.UrlImage = request.UrlImage;
+        language.IsActive = request.IsActive;
         _repoStore.SystemLanguages.Update(language);
         bool result = await _repoStore.SaveChangesAsync();
         if (result)
             return OperationResult.Success("System language updated successfully.");
 
         return OperationResult.BadRequest("System language update failed.");
+    }
+
+    public async Task<OperationResult> PatchStatusAsync(string languageCode, bool isActive)
+    {
+        SystemLanguage? language = await _repoStore.SystemLanguages.FindByIdAsync(languageCode);
+        if (language is null)
+            return OperationResult.NotFound("System language not found.");
+        language.IsActive = isActive;
+        _repoStore.SystemLanguages.Update(language);
+        bool result = await _repoStore.SaveChangesAsync();
+        if (result)
+            return OperationResult.Success("Update language status successfully.");
+
+        return OperationResult.BadRequest("Update language status failed.");
     }
 
     public async Task<OperationResult<string>> DeleteAsync(string languageCode)

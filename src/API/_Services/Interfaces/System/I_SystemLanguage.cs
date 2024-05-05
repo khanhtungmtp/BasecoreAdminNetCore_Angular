@@ -14,5 +14,6 @@ public interface I_SystemLanguage
     Task<OperationResult<List<SystemLanguageVM>>> GetLanguagesAsync();
     Task<OperationResult<PagingResult<SystemLanguageVM>>> GetPagingAsync(string? filter, PaginationParam pagination);
     Task<OperationResult> PutAsync(string languageCode, SystemLanguageCreateRequest request);
+    Task<OperationResult> PatchStatusAsync(string languageCode, bool isActive);
     Task<OperationResult<string>> DeleteAsync(string languageCode);
 }

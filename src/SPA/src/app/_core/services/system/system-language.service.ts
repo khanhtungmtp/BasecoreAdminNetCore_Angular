@@ -13,22 +13,35 @@ export class SystemLanguageService {
   getLanguagesPaging(filter: string = '', pagination: PaginationParam) {
     const params = { ...pagination, filter };
 
-    return this.httpBase.get<PagingResult<SystemLanguageVM>>('SystemLanguages', params);
+    return this.httpBase.get<PagingResult<SystemLanguageVM>>('SystemLanguages/list-paging', params);
   }
 
   getLanguages() {
-    return this.httpBase.get<SystemLanguageVM[]>('SystemLanguages/GetLanguages');
+    return this.httpBase.get<SystemLanguageVM[]>('SystemLanguages/list');
   }
 
-  add(model: SystemLanguageVM) {
-    return this.httpBase.post<string>('SystemLanguages', model);
+  getByLanguageCode(id: string) {
+    return this.httpBase.get<SystemLanguageVM>(`SystemLanguages/${id}`);
   }
 
-  edit(id: string, model: SystemLanguageVM) {
-    return this.httpBase.put<string>(`${id}`, model);
+  add(request: SystemLanguageVM) {
+    return this.httpBase.post<string>('SystemLanguages', request, { needSuccessInfo: true, typeAction: 'add' });
   }
 
-  delete(id: string) {
-    return this.httpBase.delete<string>(`${id}`);
+  edit(languageCode: string, request: SystemLanguageVM) {
+    return this.httpBase.put<string>(`SystemLanguages/${languageCode}`, request, { needSuccessInfo: true, typeAction: 'edit' });
   }
+
+  updateStatus(languageCode: string, isActive: boolean) {
+    return this.httpBase.patch<string>(`SystemLanguages/${languageCode}/UpdateStatus`, isActive, { needSuccessInfo: true, typeAction: 'edit' });
+  }
+
+  delete(languageCode: string) {
+    return this.httpBase.delete<string>(`SystemLanguages/${languageCode}`);
+  }
+
+  deleteRange(languageCodes: string[]) {
+    return this.httpBase.delete<boolean>('SystemLanguages/deleteRange', languageCodes);
+  }
+
 }

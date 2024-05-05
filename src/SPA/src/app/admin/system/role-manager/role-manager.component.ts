@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActionCode } from '@app/_core/constants/actionCode';
 import { OptionsInterface } from '@app/_core/models/common/types';
 import { ModalBtnStatus } from '@app/_core/utilities/base-modal';
 import { AntTableComponent, AntTableConfig } from '@app/admin/shared/components/ant-table/ant-table.component';
@@ -23,8 +22,6 @@ import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { finalize } from 'rxjs';
 import { RoleManagerModalService } from './role-manager-modal/role-manager-modal.service';
-import { UserVM } from '@app/_core/models/user-manager/uservm';
-import { UserManagerService } from '@app/_core/services/user-manager/user-manager.service';
 import { Pagination, PaginationParam } from '@app/_core/utilities/pagination-utility';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -74,7 +71,6 @@ export class RoleManagerComponent implements OnInit {
   };
   dataList: RoleVM[] = [];
   checkedCashArray: RoleVM[] = [];
-  ActionCode = ActionCode;
   isCollapse: boolean = true;
   isActiveOptions: OptionsInterface[] = [];
   genderOptions: OptionsInterface[] = [];

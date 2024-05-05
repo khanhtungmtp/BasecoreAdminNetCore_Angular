@@ -19,8 +19,6 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { finalize } from 'rxjs';
-import { FunctionModalComponent } from './function-modal/function-modal.component';
-import { NzNotificationCustomService } from '@app/_core/services/nz-notificationCustom.service';
 import { NzSpinnerCustomService } from '@app/_core/services/common/nz-spinner.service';
 import { HasRoleDirective } from '@app/_core/directives/hasrole.directive';
 import { ActionCode } from '@app/_core/constants/actionCode';
@@ -53,14 +51,13 @@ import { ModalBtnStatus } from '@app/_core/utilities/base-modal';
   ]
 })
 export class FunctionComponent implements OnInit {
+  @ViewChild('operationTpl', { static: true }) operationTpl!: TemplateRef<NzSafeAny>;
   actionCode = ActionCode;
   filter: string = '';
   pagination: Pagination = <Pagination>{
     pageNumber: 1,
     pageSize: 10
   }
-  @ViewChild('operationTpl', { static: true }) operationTpl!: TemplateRef<NzSafeAny>;
-  isCollapse = true;
   tableConfig!: AntTableConfig;
   pageHeaderInfo: Partial<PageHeaderType> = {
     title: 'Function',
@@ -73,13 +70,18 @@ export class FunctionComponent implements OnInit {
   private message = inject(NzMessageService);
   private cdr = inject(ChangeDetectorRef);
   private dataService = inject(FunctionService);
-  private notification = inject(NzNotificationCustomService)
   protected spinnerService = inject(NzSpinnerCustomService);
   private translate = inject(TranslateService);
   private modalService = inject(FunctionModalService);
   destroyRef = inject(DestroyRef);
+
   ngOnInit(): void {
     this.initTable();
+  }
+
+  search(): void {
+    this.message.success('Search success');
+    this.getDataList();
   }
 
   // Triggered when the leftmost checkbox is selected
@@ -125,11 +127,6 @@ export class FunctionComponent implements OnInit {
       this.checkedCashArray = [...this.checkedCashArray];
     }));
 
-  }
-
-  search(): void {
-    this.message.success('Search success');
-    this.getDataList();
   }
 
   /*Reset*/
@@ -189,7 +186,7 @@ export class FunctionComponent implements OnInit {
         this.tableLoading(true);
         /*The comment is the simulation interface call*/
         this.dataService.delete(id).subscribe({
-          next: (res) => {
+          next: () => {
             if (this.dataList.length === 1) {
               this.tableConfig.pageIndex--;
             }
@@ -218,7 +215,7 @@ export class FunctionComponent implements OnInit {
           });
           this.tableLoading(true);
           this.dataService.deleteRange(ids).subscribe({
-            next: (res) => {
+            next: () => {
               if (this.dataList.length === 1) {
                 this.tableConfig.pageIndex--;
               }

@@ -15,14 +15,14 @@ public class SystemLanguagesController(I_SystemLanguage systemLanguageService) :
     // url: POST : http://localhost:6001/api/SystemLanguages
     [HttpPost]
     [ClaimRequirement(FunctionCode.SYSTEM_LANGUAGE, CommandCode.CREATE)]
-    public async Task<IActionResult> PostFunction(SystemLanguageCreateRequest request)
+    public async Task<IActionResult> PostLanguage(SystemLanguageCreateRequest request)
     {
         var result = await _systemLanguageService.CreateAsync(request);
         return HandleResult(result);
     }
 
     // url: GET : http:localhost:6001/api/SystemLanguages/GetLanguages
-    [HttpGet("GetLanguages")]
+    [HttpGet("list")]
     [AllowAnonymous]
     public async Task<IActionResult> GetLanguages()
     {
@@ -30,7 +30,7 @@ public class SystemLanguagesController(I_SystemLanguage systemLanguageService) :
     }
 
     // url: GET : http:localhost:6001/api/SystemLanguages/GetAllPaging
-    [HttpGet("GetAllPaging")]
+    [HttpGet("list-paging")]
     [AllowAnonymous]
     // [ClaimRequirement(FunctionCode.SYSTEM_LANGUAGE, CommandCode.VIEW)]
     public async Task<IActionResult> GetAllPaging(string? filter, [FromQuery] PaginationParam pagination)
@@ -49,20 +49,29 @@ public class SystemLanguagesController(I_SystemLanguage systemLanguageService) :
     }
 
     // url: PUT : http:localhost:6001/api/SystemLanguages/{id}
-    [HttpPut("{id}")]
+    [HttpPut("{languageCode}")]
     [ClaimRequirement(FunctionCode.SYSTEM_LANGUAGE, CommandCode.UPDATE)]
-    public async Task<IActionResult> PutFunction(string id, [FromBody] SystemLanguageCreateRequest request)
+    public async Task<IActionResult> PutLanguage(string languageCode, [FromBody] SystemLanguageCreateRequest request)
     {
-        var result = await _systemLanguageService.PutAsync(id, request);
+        var result = await _systemLanguageService.PutAsync(languageCode, request);
+        return HandleResult(result);
+    }
+
+    // PATCH api/users/{id}/status
+    [HttpPatch("{languageCode}/UpdateStatus")]
+    [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.UPDATE)]
+    public async Task<IActionResult> UpdateStatus(string languageCode, [FromBody] bool isActive)
+    {
+        var result = await _systemLanguageService.PatchStatusAsync(languageCode, isActive);
         return HandleResult(result);
     }
 
     // url: DELETE : http:localhost:6001/api/SystemLanguages/{id}
-    [HttpDelete("{id}")]
+    [HttpDelete("{languageCode}")]
     [ClaimRequirement(FunctionCode.SYSTEM_LANGUAGE, CommandCode.DELETE)]
-    public async Task<IActionResult> DeleteFunction(string id)
+    public async Task<IActionResult> DeleteLanguage(string languageCode)
     {
-        var result = await _systemLanguageService.DeleteAsync(id);
+        var result = await _systemLanguageService.DeleteAsync(languageCode);
         return HandleResult(result);
     }
 
