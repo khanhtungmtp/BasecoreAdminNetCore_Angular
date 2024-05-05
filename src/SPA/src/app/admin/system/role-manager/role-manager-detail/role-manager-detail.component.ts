@@ -17,7 +17,6 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { SystemConstants } from '@app/_core/constants/system.constants';
 import { PermissionVm } from '@app/_core/models/system/permissionvm';
 import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { Router } from '@angular/router';
 
 export interface TreeNodeInterface {

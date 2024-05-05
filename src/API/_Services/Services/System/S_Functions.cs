@@ -35,6 +35,7 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
         Function? function = await _repoStore.Functions.FindByIdAsync(id);
         if (function is null)
             return OperationResult<FunctionVM>.NotFound("Function not found.");
+        var commands = await GetListCommandByIdAsync(id);
         FunctionVM functionVM = new()
         {
             Id = function.Id,
@@ -42,9 +43,44 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
             Url = function.Url,
             Icon = function.Icon,
             ParentId = function.ParentId,
-            SortOrder = function.SortOrder
+            SortOrder = function.SortOrder,
+            CommandInFunction = commands
         };
         return OperationResult<FunctionVM>.Success(functionVM, "Get function by id successfully.");
+    }
+
+    private async Task<List<string>> GetListCommandByIdAsync(string functionId)
+    {
+        var query = from cmd in _repoStore.Commands.FindAll(true)
+                    join commandinfunc in _repoStore.CommandInFunctions.FindAll(true) on cmd.Id equals commandinfunc.CommandId into result1
+                    from commandInFunction in result1.DefaultIfEmpty()
+                    join func in _repoStore.Functions.FindAll(true) on commandInFunction.FunctionId equals func.Id into result2
+                    from function in result2.DefaultIfEmpty()
+                    select new
+                    {
+                        cmd.Id,
+                        cmd.Name,
+                        commandInFunction.FunctionId
+                    };
+
+        query = query.Where(x => x.FunctionId == functionId);
+
+        List<string>? data = await query.Select(x => x.Id).ToListAsync();
+        return data;
+    }
+
+    public async Task<OperationResult<List<FunctionVM>>> GetParentIdsAsync()
+    {
+        var query = _repoStore.Functions.FindAll(true);
+        var listFunctionVM = await query.Select(x => new FunctionVM()
+        {
+            Id = x.Id,
+            Name = x.Name,
+            ParentId = x.ParentId,
+            SortOrder = x.SortOrder,
+            Icon = x.Icon
+        }).ToListAsync();
+        return OperationResult<List<FunctionVM>>.Success(listFunctionVM, "Get Parent successfully.");
     }
 
     public async Task<OperationResult<PagingResult<FunctionVM>>> GetPagingAsync(string? filter, PaginationParam pagination)
@@ -90,12 +126,15 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
         Function? function = await _repoStore.Functions.FindByIdAsync(id);
         if (function is null)
             return OperationResult<string>.NotFound("Function not found.");
-
+        // Kiểm tra xem function có child functions hay không.
+        List<Function>? childFunctions = await _repoStore.Functions.FindAll(x => x.ParentId == id).ToListAsync();
+        if (childFunctions.Count > 0)
+            return OperationResult<string>.BadRequest("Cannot delete function with children. Please delete children first");
         _repoStore.Functions.Remove(function);
         // remove command in function
         List<CommandInFunction>? commands = await _repoStore.CommandInFunctions.FindAll(x => x.FunctionId == id).ToListAsync();
-        // if (commands.Count > 0)
-        _repoStore.CommandInFunctions.RemoveMany(commands);
+        if (commands.Count > 0)
+            _repoStore.CommandInFunctions.RemoveMany(commands);
 
         bool result = await _repoStore.SaveChangesAsync();
         if (result)
@@ -103,30 +142,42 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
         return OperationResult<string>.BadRequest("Function delete failed.");
     }
 
-    public async Task<OperationResult<List<FunctionVM>>> GetParentIdsAsync()
-    {
-        var query = _repoStore.Functions.FindAll(true);
-        var listFunctionVM = await query.Select(x => new FunctionVM()
-        {
-            Id = x.Id,
-            Name = x.Name,
-            ParentId = x.ParentId,
-            SortOrder = x.SortOrder,
-            Icon = x.Icon
-        }).ToListAsync();
-        return OperationResult<List<FunctionVM>>.Success(listFunctionVM, "Get Parent successfully.");
-    }
-
     public async Task<OperationResult> DeleteRangeAsync(List<string> ids)
     {
         if (ids.Count == 0) return OperationResult.NotFound("List function not found.");
-        var entitiesToDelete = await _repoStore.Functions.FindAll(entity => ids.Contains(entity.Id)).ToListAsync();
-        if (entitiesToDelete.Count == 0)
+
+        // Lấy ra danh sách các functions cần xoá.
+        var functionsToDelete = await _repoStore.Functions.FindAll(entity => ids.Contains(entity.Id)).ToListAsync();
+        if (functionsToDelete.Count == 0)
             return OperationResult.NotFound("List function empty.");
 
-        _repoStore.Functions.RemoveMany(entitiesToDelete);
-        await _repoStore.SaveChangesAsync();
-        return OperationResult.Success("Delete functions successfully.");
+        // Kiểm tra xem các functions này có child functions không.
+        foreach (var function in functionsToDelete)
+        {
+            var childFunctions = await _repoStore.Functions.FindAll(x => x.ParentId == function.Id).ToListAsync();
+            if (childFunctions.Any())
+            {
+                // Nếu tồn tại child functions, trả về lỗi và không xóa.
+                return OperationResult.BadRequest($"Function {function.Id} has child functions. Please delete child functions first.");
+            }
+            // remove command in function
+            List<CommandInFunction>? commands = await _repoStore.CommandInFunctions.FindAll(x => x.FunctionId == function.Id).ToListAsync();
+            if (commands.Count > 0)
+                _repoStore.CommandInFunctions.RemoveMany(commands);
+        }
 
+        // Xóa các functions không có child functions.
+        _repoStore.Functions.RemoveMany(functionsToDelete);
+
+        // Có thể thêm logic xóa các `CommandInFunction` liên quan tại đây nếu cần.
+
+        bool result = await _repoStore.SaveChangesAsync();
+        if (!result)
+        {
+            return OperationResult.BadRequest("Failed to delete functions.");
+        }
+
+        return OperationResult.Success("Functions deleted successfully.");
     }
+
 }

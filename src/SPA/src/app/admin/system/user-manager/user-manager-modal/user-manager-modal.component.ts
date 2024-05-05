@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { OptionsInterface } from '@app/_core/models/common/types';
 import { UserVM } from '@app/_core/models/user-manager/uservm';
@@ -18,7 +18,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
 import { Observable, catchError, of } from 'rxjs';
-
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 @Component({
   selector: 'app-role-manager-modal',
   templateUrl: './user-manager-modal.component.html',
@@ -38,7 +38,19 @@ export class UserManagerModalComponent implements OnInit {
   private roleService = inject(RoleService);
   private dataService = inject(UserManagerService);
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
   constructor(private modalRef: NzModalRef) { }
+
+  async ngOnInit(): Promise<void> {
+    this.initForm();
+    this.isEdit = !!this.nzModalData;
+    await Promise.all([this.getRoleList()]);
+    if (this.isEdit) {
+      this.addEditForm.patchValue(this.nzModalData);
+      this.addEditForm.controls['userName'].disable();
+      this.addEditForm.controls['password'].disable();
+    }
+  }
 
   //This method is if there is asynchronous data that needs to be loaded, add it in this method
   protected getAsyncFnData(modalValue: NzSafeAny): Observable<NzSafeAny> {
@@ -71,17 +83,22 @@ export class UserManagerModalComponent implements OnInit {
   }
 
   getRoleList(): Promise<void> {
-    return new Promise<void>(resolve => {
-      this.roleService.getRoles().subscribe((res) => {
-        this.roleOptions = [];
-        res.forEach(({ id, name }) => {
-          const obj: OptionsInterface = {
-            label: name,
-            value: id!
-          };
-          this.roleOptions.push(obj);
-        });
-        resolve();
+    return new Promise((resolve, reject) => {
+      this.roleService.getRoles().pipe(
+        takeUntilDestroyed(this.destroyRef)
+      ).subscribe({
+        next: (res) => {
+          this.roleOptions = [];
+          res.forEach(({ id, name }) => {
+            const obj: OptionsInterface = {
+              label: name,
+              value: id!
+            };
+            this.roleOptions.push(obj);
+          });
+          resolve();
+        },
+        error: (err) => reject(err)
       });
     });
   }
@@ -100,15 +117,5 @@ export class UserManagerModalComponent implements OnInit {
     });
   }
 
-  async ngOnInit(): Promise<void> {
-    this.initForm();
-    this.isEdit = !!this.nzModalData;
-    await Promise.all([this.getRoleList()]);
-    if (this.isEdit) {
-      this.addEditForm.patchValue(this.nzModalData);
-      this.addEditForm.controls['userName'].disable();
-      this.addEditForm.controls['password'].disable();
-    }
-  }
 }
 

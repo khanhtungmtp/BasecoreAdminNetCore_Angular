@@ -13,6 +13,7 @@ public class FunctionVM
     public string ParentId { get; set; } = string.Empty;
 
     public string Icon { get; set; } = string.Empty;
+    public List<string> CommandInFunction { get; set; } = [];
 }
 
 public interface ITreeNode

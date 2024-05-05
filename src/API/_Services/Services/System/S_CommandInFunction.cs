@@ -8,28 +8,14 @@ using ViewModels.System;
 namespace API._Services.Services.System;
 public class S_CommandInFunction(IRepositoryAccessor repoStore) : BaseServices(repoStore), I_CommandInFunction
 {
-    public async Task<OperationResult<List<CommandVM>>> GetListByIdAsync(string functionId)
+    public async Task<OperationResult<List<CommandVM>>> GetCommandsAsync()
     {
-        var query = from cmd in _repoStore.Commands.FindAll(true)
-                    join commandinfunc in _repoStore.CommandInFunctions.FindAll(true) on cmd.Id equals commandinfunc.CommandId into result1
-                    from commandInFunction in result1.DefaultIfEmpty()
-                    join func in _repoStore.Functions.FindAll(true) on commandInFunction.FunctionId equals func.Id into result2
-                    from function in result2.DefaultIfEmpty()
-                    select new
-                    {
-                        cmd.Id,
-                        cmd.Name,
-                        commandInFunction.FunctionId
-                    };
-
-        query = query.Where(x => x.FunctionId == functionId);
-
-        List<CommandVM>? data = await query.Select(x => new CommandVM()
+        var data = await _repoStore.Commands.FindAll(true).Select(x => new CommandVM()
         {
             Id = x.Id,
             Name = x.Name
         }).ToListAsync();
-        return OperationResult<List<CommandVM>>.Success(data, "Get command in function successfully.");
+        return OperationResult<List<CommandVM>>.Success(data, "Get command successfully.");
     }
 
     // PostCommandInFunction

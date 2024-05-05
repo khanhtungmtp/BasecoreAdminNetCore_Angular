@@ -19,13 +19,15 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { finalize } from 'rxjs';
-import { FunctionFormComponent } from './function-form/function-form.component';
+import { FunctionModalComponent } from './function-modal/function-modal.component';
 import { NzNotificationCustomService } from '@app/_core/services/nz-notificationCustom.service';
 import { NzSpinnerCustomService } from '@app/_core/services/common/nz-spinner.service';
 import { HasRoleDirective } from '@app/_core/directives/hasrole.directive';
 import { ActionCode } from '@app/_core/constants/actionCode';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FunctionModalService } from './function-modal/function-modal.service';
+import { ModalBtnStatus } from '@app/_core/utilities/base-modal';
 
 @Component({
   selector: 'app-function',
@@ -74,7 +76,7 @@ export class FunctionComponent implements OnInit {
   private notification = inject(NzNotificationCustomService)
   protected spinnerService = inject(NzSpinnerCustomService);
   private translate = inject(TranslateService);
-
+  private modalService = inject(FunctionModalService);
   destroyRef = inject(DestroyRef);
   ngOnInit(): void {
     this.initTable();
@@ -126,34 +128,59 @@ export class FunctionComponent implements OnInit {
   }
 
   search(): void {
-    this.notification.success('Success', 'Search success')
+    this.message.success('Search success');
     this.getDataList();
   }
 
   /*Reset*/
   resetForm(): void {
-    this.notification.success('Success', 'Reset success')
+    this.message.success('Reset success');
     this.filter = '';
     this.getDataList();
   }
 
-  openModal(id?: string): void {
-    const isEditMode = !!id;
-    const modal = this.modalSrv.create({
-      nzTitle: isEditMode ? 'Function Edit' : 'Function Add',
-      nzContent: FunctionFormComponent,
-      nzMaskClosable: false,
-      nzData: id
-    });
-
-    // Xử lý sự kiện afterClose để nhận dữ liệu từ modal khi nó đóng
-    modal.afterClose.subscribe(result => {
-      if (result || result?.succeeded) {
+  addModal(): void {
+    this.modalService
+      .show({ nzTitle: 'New function' })
+      .pipe(
+        finalize(() => {
+          this.tableLoading(false);
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(res => {
+        if (!res || res.status === ModalBtnStatus.Cancel) {
+          return;
+        }
+        this.tableLoading(true);
         this.getDataList();
-      }
-    });
-
+      });
   }
+
+  // edit
+  editModal(id: string): void {
+    this.dataService
+      .getById(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(res => {
+        this.modalService
+          .show({ nzTitle: 'Edit user' }, res)
+          .pipe(
+            finalize(() => {
+              this.tableLoading(false);
+            }),
+            takeUntilDestroyed(this.destroyRef)
+          )
+          .subscribe(({ status }) => {
+            if (status === ModalBtnStatus.Cancel) {
+              return;
+            }
+            this.tableLoading(true);
+            this.getDataList();
+          });
+      });
+  }
+
   deleteRow(id: string): void {
     this.modalSrv.confirm({
       nzTitle: this.translate.instant('system.message.confirmDeleteMsg'),
@@ -163,15 +190,15 @@ export class FunctionComponent implements OnInit {
         /*The comment is the simulation interface call*/
         this.dataService.delete(id).subscribe({
           next: (res) => {
-            this.notification.success('Success', `The item '${res}' has been successfully deleted`)
             if (this.dataList.length === 1) {
               this.tableConfig.pageIndex--;
             }
             this.getDataList();
             this.checkedCashArray.splice(this.checkedCashArray.findIndex(item => item.id === id), 1);
           },
-          error: () => {
+          error: (e) => {
             this.tableLoading(false);
+            throw e
           }
         })
 
@@ -192,15 +219,15 @@ export class FunctionComponent implements OnInit {
           this.tableLoading(true);
           this.dataService.deleteRange(ids).subscribe({
             next: (res) => {
-              if (res) this.notification.success('Success', "Delete success")
               if (this.dataList.length === 1) {
                 this.tableConfig.pageIndex--;
               }
               this.getDataList();
               this.checkedCashArray = [];
             },
-            error: () => {
-              this.tableLoading(false)
+            error: (e) => {
+              this.tableLoading(false);
+              throw e
             }
           })
         }

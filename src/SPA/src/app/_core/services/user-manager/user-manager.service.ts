@@ -20,12 +20,12 @@ export class UserManagerService {
     return this.httpBase.get<UserVM>(`Users/${id}`);
   }
 
-  add(model: UserVM) {
-    return this.httpBase.post<string>('Users', model, { needSuccessInfo: true, typeAction: 'add' });
+  add(request: UserVM) {
+    return this.httpBase.post<string>('Users', request, { needSuccessInfo: true, typeAction: 'add' });
   }
 
-  edit(id: string, model: UserVM) {
-    return this.httpBase.put<string>(`Users/${id}`, model, { needSuccessInfo: true, typeAction: 'edit' });
+  edit(id: string, request: UserVM) {
+    return this.httpBase.put<string>(`Users/${id}`, request, { needSuccessInfo: true, typeAction: 'edit' });
   }
 
   updateStatus(id: string, isActive: boolean) {

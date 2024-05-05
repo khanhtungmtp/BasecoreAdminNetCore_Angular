@@ -6,6 +6,7 @@ export interface FunctionVM {
   sortOrder: number;
   parentId: string;
   icon: string;
+  commandInFunction: string[];
   children?: FunctionVM[];
   newLinkFlag: boolean;
   open?: boolean;

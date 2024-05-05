@@ -77,12 +77,12 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     }
 
     // ========AREA COMMMAND IN FUNCTION (ACTION)=====
-    // GET: http://localhost:6001/api/function/{functionId}/command-in-function
-    [HttpGet("{functionId}/command-in-function")]
+    // GET: http://localhost:6001/api/function/GetCommands
+    [HttpGet("commands")]
     [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.VIEW)]
-    public async Task<IActionResult> GetCommandInFunction(string functionId)
+    public async Task<IActionResult> GetCommands()
     {
-        var result = await _commandInFunctionService.GetListByIdAsync(functionId);
+        var result = await _commandInFunctionService.GetCommandsAsync();
         return HandleResult(result);
     }
 

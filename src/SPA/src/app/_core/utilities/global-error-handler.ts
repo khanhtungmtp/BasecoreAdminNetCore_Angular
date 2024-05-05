@@ -6,7 +6,7 @@
 // import { environment } from '@env/environment';
 // import { Router } from "@angular/router";
 // import { UrlRouteConstants } from "../constants/url-route.constants";
-// import { LoginInOutService } from "../services/auth/login-in-out.service";
+// import { AuthService } from "../services/auth/auth.service";
 // @Injectable({
 //   providedIn: "root",
 // })
@@ -14,7 +14,7 @@
 //   private notification = inject(NzNotificationCustomService);
 //   private spinnerService = inject(NzSpinnerCustomService);
 //   private router = inject(Router);
-//   private loginOutService = inject(LoginInOutService);
+//   private authService = inject(AuthService);
 //   isProduct: boolean = environment.production
 
 //   handleError(error: any) {
@@ -31,7 +31,7 @@
 //       }
 //       else if (error.status === 403) {
 //         apiError.message = "You are not authorized to view this page";
-//         this.loginOutService.loginOut().then();
+//         this.authService.logout();
 //         this.router.navigate([UrlRouteConstants.LOGIN]);
 //         this.spinnerService.hide();
 //         this.notification.error('Error: ' + apiError.statusCode, apiError.message)
@@ -88,6 +88,8 @@
 //     this.notification.error('Error: ' + apiError.statusCode, apiError.message)
 //   }
 // }
+
+
 import { Injectable, ErrorHandler } from "@angular/core";
 import { HttpErrorResponse } from "@angular/common/http";
 import { ErrorGlobalResponse } from "@models/base/error-global-response";
@@ -118,10 +120,7 @@ export class GlobalErrorHandler implements ErrorHandler {
       // if (error.status === 403 || error.status === 401) {
       //   this.authService.logout();
       // }
-      // else if (error.status === 400) {
-      //   console.log('errors servers 400:', error);
-      //   // this.notification.error('Error: ' + apiError.statusCode, apiError.message)
-      // }
+      // else
       // Handle other HttpErrorResponse cases if needed
     } else {
       apiError = this.handleClientSideError(error);

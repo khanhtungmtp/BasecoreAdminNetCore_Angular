@@ -12,6 +12,15 @@ export const SYSTEM_ROUTES: Routes = [
     loadChildren: () => import('./function/function.routes')
   },
   {
+    path: 'command-in-functions',
+    // canActivate: [hasRoleGuardFn],
+    data: {
+      title: 'Command in functions',
+      actionCode: ActionCode.CommandInFunctionView,
+    },
+    loadChildren: () => import('./command-in-function/command-in-function.routes')
+  },
+  {
     path: 'user-manager',
     data: {
       title: 'User manager',
