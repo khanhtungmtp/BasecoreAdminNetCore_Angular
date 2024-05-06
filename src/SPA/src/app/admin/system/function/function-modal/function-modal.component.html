@@ -1,9 +1,11 @@
 <form nz-form
       [formGroup]="addEditForm">
   <nz-form-item>
-    <nz-form-label [nzSpan]="5"
+    <nz-form-label [nzSm]="4"
+                   [nzXs]="24"
                    nzRequired>Id</nz-form-label>
-    <nz-form-control [nzSpan]="15"
+    <nz-form-control [nzSm]="18"
+                     [nzXs]="24"
                      nzHasFeedback
                      nzValidatingTip="Validating..."
                      [nzErrorTip]="idErrorTpl">
@@ -22,9 +24,11 @@
     </nz-form-control>
   </nz-form-item>
   <nz-form-item>
-    <nz-form-label [nzSpan]="5"
+    <nz-form-label [nzSm]="4"
+                   [nzXs]="24"
                    nzRequired>Name</nz-form-label>
-    <nz-form-control [nzSpan]="15"
+    <nz-form-control [nzSm]="18"
+                     [nzXs]="24"
                      nzHasFeedback
                      nzValidatingTip="Validating..."
                      [nzErrorTip]="nameErrorTpl">
@@ -43,9 +47,11 @@
     </nz-form-control>
   </nz-form-item>
   <nz-form-item>
-    <nz-form-label [nzSpan]="5"
+    <nz-form-label [nzSm]="4"
+                   [nzXs]="24"
                    nzRequired>Url</nz-form-label>
-    <nz-form-control [nzSpan]="15"
+    <nz-form-control [nzSm]="18"
+                     [nzXs]="24"
                      nzHasFeedback
                      nzValidatingTip="Validating..."
                      [nzErrorTip]="urlErrorTpl">
@@ -64,9 +70,11 @@
     </nz-form-control>
   </nz-form-item>
   <nz-form-item>
-    <nz-form-label [nzSpan]="5"
+    <nz-form-label [nzSm]="4"
+                   [nzXs]="24"
                    nzRequired>Icon</nz-form-label>
-    <nz-form-control [nzSpan]="15">
+    <nz-form-control [nzSm]="18"
+                     [nzXs]="24">
       <nz-input-group [nzAddOnAfter]="selIcon">
         <input formControlName="icon"
                nz-input />
@@ -78,10 +86,12 @@
     </nz-form-control>
   </nz-form-item>
   <nz-form-item>
-    <nz-form-label [nzSpan]="5"
+    <nz-form-label [nzSm]="4"
+                   [nzXs]="24"
                    nzFor="parentId"
                    nzRequired>ParentId</nz-form-label>
-    <nz-form-control [nzSpan]="15"
+    <nz-form-control [nzSm]="18"
+                     [nzXs]="24"
                      nzErrorTip="Please select your parent!">
       <nz-tree-select [nzNodes]="nodes"
                       formControlName="parentId"
@@ -94,19 +104,25 @@
     </nz-form-control>
   </nz-form-item>
   <nz-form-item>
-    <nz-form-label [nzSpan]="5">Sort Order</nz-form-label>
-    <nz-input-number formControlName="sortOrder"
-                     style="width: 63%"
-                     [nzMin]="0"
-                     [nzMax]="10"
-                     [nzStep]="1"></nz-input-number>
+    <nz-form-label [nzSm]="4"
+                   [nzXs]="24">Sort Order</nz-form-label>
+    <nz-form-control [nzErrorTip]="combineTpl"
+                     [nzSm]="18"
+                     [nzXs]="24">
+      <nz-input-number formControlName="sortOrder"
+                       [nzMin]="0"
+                       style="width: 100%"
+                       [nzStep]="1"></nz-input-number>
+    </nz-form-control>
   </nz-form-item>
   <nz-form-item>
     <nz-form-label nzFor="commandInFunction"
                    nzRequired
-                   [nzSpan]="5">Command function</nz-form-label>
+                   [nzSm]="4"
+                   [nzXs]="24">Command function</nz-form-label>
     <nz-form-control [nzErrorTip]="combineTpl"
-                     [nzSpan]="15">
+                     [nzSm]="18"
+                     [nzXs]="24">
       <nz-select formControlName="commandInFunction"
                  nzMode="multiple"
                  nzPlaceHolder="commandInFunction">

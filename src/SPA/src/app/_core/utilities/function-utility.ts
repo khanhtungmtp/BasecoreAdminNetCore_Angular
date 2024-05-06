@@ -326,19 +326,5 @@ export class FunctionUtility {
 
 }
 
-export function getInfoMenu(str: string): RoleInfomation {
-  const roles: RoleInfomation[] = JSON.parse(
-    localStorage.getItem(LocalStorageConstants.ROLE_ALL) ?? ''
-  ) || [];  // Provide an empty array as a default value
-
-  const foundRole = roles.find((x) => x.programCode.includes(str));
-
-  if (foundRole) {
-    return foundRole;
-  } else {
-    // Handle the case when no role is found (e.g., throw an error, return a default role, etc.)
-    throw new Error(`No role found for programCode ${str}`);
-  }
-}
 
 

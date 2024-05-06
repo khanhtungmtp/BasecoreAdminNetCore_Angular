@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { OptionsInterface } from '@app/_core/models/common/types';
+import { OptionsInterface } from '@app/_core/models/core/types';
 import { UserVM } from '@app/_core/models/user-manager/uservm';
 import { RoleService } from '@app/_core/services/user-manager/role.service';
 import { UserManagerService } from '@app/_core/services/user-manager/user-manager.service';
@@ -39,6 +39,7 @@ export class UserManagerModalComponent implements OnInit {
   private dataService = inject(UserManagerService);
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
+  
   constructor(private modalRef: NzModalRef) { }
 
   async ngOnInit(): Promise<void> {
@@ -50,6 +51,20 @@ export class UserManagerModalComponent implements OnInit {
       this.addEditForm.controls['userName'].disable();
       this.addEditForm.controls['password'].disable();
     }
+  }
+
+  initForm(): void {
+    this.addEditForm = this.fb.group({
+      userName: [null, [Validators.required]],
+      fullName: [null, [Validators.required]],
+      password: ['@@User123', [Validators.required, this.validatorsService.passwordValidator()]],
+      gender: [0],
+      isActive: [true],
+      dateOfBirth: [null, [Validators.required]],
+      phoneNumber: [null, [this.validatorsService.mobileValidator()]],
+      email: [null, [Validators.required, Validators.email]],
+      roles: [null, [Validators.required]]
+    });
   }
 
   //This method is if there is asynchronous data that needs to be loaded, add it in this method
@@ -100,20 +115,6 @@ export class UserManagerModalComponent implements OnInit {
         },
         error: (err) => reject(err)
       });
-    });
-  }
-
-  initForm(): void {
-    this.addEditForm = this.fb.group({
-      userName: [null, [Validators.required]],
-      fullName: [null, [Validators.required]],
-      password: ['@@User123', [Validators.required, this.validatorsService.passwordValidator()]],
-      gender: [0],
-      isActive: [true],
-      dateOfBirth: [null, [Validators.required]],
-      phoneNumber: [null, [this.validatorsService.mobileValidator()]],
-      email: [null, [Validators.required, Validators.email]],
-      roles: [null, [Validators.required]]
     });
   }
 

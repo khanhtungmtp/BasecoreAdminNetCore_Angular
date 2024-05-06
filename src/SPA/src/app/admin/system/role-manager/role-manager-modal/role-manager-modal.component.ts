@@ -1,9 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { OptionsInterface } from '@app/_core/models/common/types';
 import { UserVM } from '@app/_core/models/user-manager/uservm';
 import { RoleService } from '@app/_core/services/user-manager/role.service';
-import { ValidatorsService } from '@app/_core/services/validators/validators.service';
 import { fnCheckForm } from '@app/_core/utilities/tools';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
@@ -28,12 +26,10 @@ import { Observable, catchError, of } from 'rxjs';
 })
 export class RoleManagerModalComponent implements OnInit {
   addEditForm!: FormGroup;
-  roleOptions: OptionsInterface[] = [];
   isEdit: boolean = false;
   errorMessage: string = '';
   readonly nzModalData: UserVM = inject(NZ_MODAL_DATA);
   private fb = inject(FormBuilder);
-  private validatorsService = inject(ValidatorsService);
   private roleService = inject(RoleService);
   private cdr = inject(ChangeDetectorRef);
   constructor(private modalRef: NzModalRef) { }

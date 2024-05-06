@@ -162,22 +162,22 @@ public class DbInitializer(DataContext context,
             {
                 new()
                 {
-                    LanguageCode = "en_US",
-                    LanguageName = "English",
+                    Id = "en_US",
+                    Name = "English",
                     UrlImage = "en.png",
                     IsActive = true
                 },
                 new()
                 {
-                    LanguageCode = "vi_VN",
-                    LanguageName = "Vietnamese",
+                    Id = "vi_VN",
+                    Name = "Vietnamese",
                     UrlImage = "vn.png",
                     IsActive = true
                 },
                 new()
                 {
-                    LanguageCode = "zh_TW",
-                    LanguageName = "繁體中文",
+                    Id = "zh_TW",
+                    Name = "繁體中文",
                     UrlImage = "zh.png",
                     IsActive = true
                 }

@@ -10,20 +10,20 @@ public class SystemLanguageSeed : IEntityTypeConfiguration<SystemLanguage>
         builder.HasData(
             new SystemLanguage
             {
-                LanguageCode = "en_US",
-                LanguageName = "English",
+                Id = "en_US",
+                Name = "English",
                 UrlImage = "en.png"
             },
             new SystemLanguage
             {
-                LanguageCode = "vi_VN",
-                LanguageName = "Vietnamese",
+                Id = "vi_VN",
+                Name = "Vietnamese",
                 UrlImage = "vn.png"
             },
             new SystemLanguage
             {
-                LanguageCode = "zh_TW",
-                LanguageName = "繁體中文",
+                Id = "zh_TW",
+                Name = "繁體中文",
                 UrlImage = "zh.png"
             }
         );

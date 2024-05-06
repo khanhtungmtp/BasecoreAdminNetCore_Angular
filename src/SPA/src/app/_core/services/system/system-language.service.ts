@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { SystemLanguageVM } from '@app/_core/models/system/systemlanguage';
+import { Injectable, inject } from '@angular/core';
+import { SystemLanguageVM } from '@app/_core/models/system/systemlanguagevm';
 import { PaginationParam, PagingResult } from '@app/_core/utilities/pagination-utility';
 import { BaseHttpService } from '../base-http.service';
 
@@ -7,8 +7,7 @@ import { BaseHttpService } from '../base-http.service';
   providedIn: 'root'
 })
 export class SystemLanguageService {
-  constructor(private httpBase: BaseHttpService,) {
-  }
+  httpBase = inject(BaseHttpService);
 
   getLanguagesPaging(filter: string = '', pagination: PaginationParam) {
     const params = { ...pagination, filter };
@@ -20,7 +19,7 @@ export class SystemLanguageService {
     return this.httpBase.get<SystemLanguageVM[]>('SystemLanguages/list');
   }
 
-  getByLanguageCode(id: string) {
+  getById(id: string) {
     return this.httpBase.get<SystemLanguageVM>(`SystemLanguages/${id}`);
   }
 

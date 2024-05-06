@@ -11,15 +11,15 @@ export const SYSTEM_ROUTES: Routes = [
     },
     loadChildren: () => import('./function/function.routes')
   },
-  // {
-  //   path: 'language',
-  //   // canActivate: [hasRoleGuardFn],
-  //   data: {
-  //     title: 'Language',
-  //     actionCode: ActionCode.LanguageView,
-  //   },
-  // loadChildren: () => import('./language/language.routes')
-  // },
+  {
+    path: 'language',
+    // canActivate: [hasRoleGuardFn],
+    data: {
+      title: 'Language',
+      actionCode: ActionCode.LanguageView,
+    },
+    loadChildren: () => import('./language/language.routes')
+  },
   {
     path: 'user-manager',
     data: {

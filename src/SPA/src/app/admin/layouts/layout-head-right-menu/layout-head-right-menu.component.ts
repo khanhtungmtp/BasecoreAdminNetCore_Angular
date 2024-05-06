@@ -20,7 +20,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { LocalStorageConstants } from '@app/_core/constants/local-storage.constants';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { SystemLanguageService } from '@app/_core/services/system/system-language.service';
-import { SystemLanguageVM } from '@app/_core/models/system/systemlanguage';
+import { SystemLanguageVM } from '@app/_core/models/system/systemlanguagevm';
 import { LangConstants } from '@app/_core/constants/lang-constants';
 import { AuthService } from '@app/_core/services/auth/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -114,9 +114,9 @@ export class LayoutHeadRightMenuComponent implements OnInit {
     this.message.info(this.translate.instant('system.caption.switchSuccessful'));
   }
 
-  setCurrentLanguage(languageCode: string): void {
+  setCurrentLanguage(id: string): void {
     // Find the language in listLanguage array and update the icon URL
-    const language = this.listLanguage.find(lang => lang.languageCode === languageCode);
+    const language = this.listLanguage.find(lang => lang.id === id);
     if (language) {
       this.currentImageLange = this.baseImage + language.urlImage;
     }

@@ -15,11 +15,10 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzModalRef } from 'ng-zorro-antd/modal';
-import { Menu } from '@app/_core/models/common/types';
 import { MenuStoreService } from '@app/_core/services/common/menu-store.service';
 import { ThemeService } from '@app/_core/services/common/theme.service';
 import { BasicConfirmModalComponent } from '@app/_core/utilities/base-modal';
-import { FunctionTreeVM, FunctionVM } from '@app/_core/models/system/functionvm';
+import { FunctionTreeVM } from '@app/_core/models/system/functionvm';
 
 interface ResultItem {
   selItem: boolean;

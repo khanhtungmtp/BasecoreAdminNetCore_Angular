@@ -12,13 +12,13 @@ public class S_SystemLanguage(IRepositoryAccessor repoStore) : BaseServices(repo
 {
     public async Task<OperationResult> CreateAsync(SystemLanguageCreateRequest request)
     {
-        var functionExists = await _repoStore.SystemLanguages.FindByIdAsync(request.LanguageCode);
+        var functionExists = await _repoStore.SystemLanguages.FindByIdAsync(request.Id);
         if (functionExists is not null)
             return OperationResult.Conflict("System language is existed.");
         var language = new SystemLanguage()
         {
-            LanguageCode = request.LanguageCode,
-            LanguageName = request.LanguageName,
+            Id = request.Id,
+            Name = request.Name,
             UrlImage = request.UrlImage,
             IsActive = request.IsActive
         };
@@ -35,8 +35,8 @@ public class S_SystemLanguage(IRepositoryAccessor repoStore) : BaseServices(repo
             return OperationResult<SystemLanguageVM>.NotFound("System language not found.");
         SystemLanguageVM languageVM = new()
         {
-            LanguageCode = language.LanguageCode,
-            LanguageName = language.LanguageName,
+            Id = language.Id,
+            Name = language.Name,
             UrlImage = language.UrlImage,
             IsActive = language.IsActive,
             SortOrder = language.SortOrder
@@ -46,7 +46,7 @@ public class S_SystemLanguage(IRepositoryAccessor repoStore) : BaseServices(repo
 
     public async Task<OperationResult<List<SystemLanguageVM>>> GetLanguagesAsync()
     {
-        var result = await _repoStore.SystemLanguages.FindAll(true).Select(x => new SystemLanguageVM() { LanguageCode = x.LanguageCode, LanguageName = x.LanguageName, UrlImage = x.UrlImage, IsActive = x.IsActive }).ToListAsync();
+        var result = await _repoStore.SystemLanguages.FindAll(true).Select(x => new SystemLanguageVM() { Id = x.Id, Name = x.Name, UrlImage = x.UrlImage, IsActive = x.IsActive }).ToListAsync();
         return OperationResult<List<SystemLanguageVM>>.Success(result, "Get languages successfully.");
     }
 
@@ -55,12 +55,12 @@ public class S_SystemLanguage(IRepositoryAccessor repoStore) : BaseServices(repo
         var query = _repoStore.SystemLanguages.FindAll(true);
         if (!string.IsNullOrWhiteSpace(filter))
         {
-            query = query.Where(x => x.LanguageCode.Contains(filter) || x.LanguageName.Contains(filter));
+            query = query.Where(x => x.Id.Contains(filter) || x.Name.Contains(filter));
         }
         var listFunctionVM = await query.Select(x => new SystemLanguageVM()
         {
-            LanguageCode = x.LanguageCode,
-            LanguageName = x.LanguageName,
+            Id = x.Id,
+            Name = x.Name,
             UrlImage = x.UrlImage,
             IsActive = x.IsActive,
             SortOrder = x.SortOrder
@@ -69,13 +69,13 @@ public class S_SystemLanguage(IRepositoryAccessor repoStore) : BaseServices(repo
         return OperationResult<PagingResult<SystemLanguageVM>>.Success(resultPaging, "Get language successfully.");
     }
 
-    public async Task<OperationResult> PutAsync(string languageCode, SystemLanguageCreateRequest request)
+    public async Task<OperationResult> PutAsync(string id, SystemLanguageCreateRequest request)
     {
-        SystemLanguage? language = await _repoStore.SystemLanguages.FindByIdAsync(languageCode);
-        if (language is null || language.LanguageCode != request.LanguageCode)
+        SystemLanguage? language = await _repoStore.SystemLanguages.FindByIdAsync(id);
+        if (language is null || language.Id != request.Id)
             return OperationResult.NotFound("System language not found.");
-        language.LanguageCode = request.LanguageCode;
-        language.LanguageName = request.LanguageName;
+        language.Id = request.Id;
+        language.Name = request.Name;
         language.SortOrder = request.SortOrder;
         language.UrlImage = request.UrlImage;
         language.IsActive = request.IsActive;
@@ -111,7 +111,7 @@ public class S_SystemLanguage(IRepositoryAccessor repoStore) : BaseServices(repo
 
         bool result = await _repoStore.SaveChangesAsync();
         if (result)
-            return OperationResult<string>.Success(language.LanguageCode, "System language deleted successfully.");
+            return OperationResult<string>.Success(language.Id, "System language deleted successfully.");
         return OperationResult<string>.BadRequest("System language delete failed.");
     }
 

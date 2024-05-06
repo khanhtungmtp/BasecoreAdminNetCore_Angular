@@ -1,6 +1,6 @@
 export interface SystemLanguageVM {
-  languageCode: string;
-  languageName: string;
+  id: string;
+  name: string;
   urlImage: string;
   sortOrder: number;
   isActive: boolean;

@@ -16,13 +16,14 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { fnCheckForm } from '@app/_core/utilities/tools';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { Observable, of, catchError } from 'rxjs';
-import { OptionsInterface } from '@app/_core/models/common/types';
+import { OptionsInterface } from '@app/_core/models/core/types';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-function-modal',
   standalone: true,
-  imports: [IconSelComponent, NzModalModule, NzAlertModule, ReactiveFormsModule, NzTreeSelectModule, NzFormModule, NzInputModule, NzButtonModule, NzSelectModule, NzInputNumberModule],
+  imports: [IconSelComponent, NzModalModule, NzAlertModule, ReactiveFormsModule, NzTreeSelectModule, NzFormModule,
+    NzInputModule, NzButtonModule, NzSelectModule, NzInputNumberModule],
   templateUrl: './function-modal.component.html'
 })
 export class FunctionModalComponent implements OnInit {
@@ -32,10 +33,8 @@ export class FunctionModalComponent implements OnInit {
   selIconVisible = false;
   addEditForm!: FormGroup;
   isEdit: boolean = false;
-  title: string = '';
-  titleBtnActionForm: string = '';
   listParentId: FunctionVM[] | undefined = [];
-  itemFunction: FunctionVM = <FunctionVM>{};
+
   constructor(private fb: FormBuilder,
     private functionService: FunctionService,
     private ultility: FunctionUtility,
@@ -52,6 +51,18 @@ export class FunctionModalComponent implements OnInit {
       this.addEditForm.patchValue(this.nzModalData);
       this.addEditForm.controls['id'].disable();
     }
+  }
+
+  initForm() {
+    this.addEditForm = this.fb.group({
+      id: [{ value: '', disabled: false }, Validators.required],
+      name: [{ value: '', disabled: false }, Validators.required],
+      url: ['', Validators.required],
+      sortOrder: [0],
+      parentId: ['', Validators.required],
+      icon: ['', Validators.required],
+      commandInFunction: [null, [Validators.required]]
+    });
   }
 
   //Return false to not close the dialog box
@@ -82,18 +93,6 @@ export class FunctionModalComponent implements OnInit {
 
   seledIcon(e: string): void {
     this.addEditForm.get('icon')?.setValue(e);
-  }
-
-  initForm() {
-    this.addEditForm = this.fb.group({
-      id: [{ value: '', disabled: false }, Validators.required],
-      name: [{ value: '', disabled: false }, Validators.required],
-      url: ['', Validators.required],
-      sortOrder: [0],
-      parentId: ['', Validators.required],
-      icon: ['', Validators.required],
-      commandInFunction: [null, [Validators.required]]
-    });
   }
 
   getParentIds(): Promise<void> {

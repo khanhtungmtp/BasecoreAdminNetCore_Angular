@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnIn
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActionCode } from '@app/_core/constants/actionCode';
-import { OptionsInterface } from '@app/_core/models/common/types';
+import { OptionsInterface } from '@app/_core/models/core/types';
 import { ModalBtnStatus } from '@app/_core/utilities/base-modal';
 import { AntTableComponent, AntTableConfig } from '@app/admin/shared/components/ant-table/ant-table.component';
 import { CardTableWrapComponent } from '@app/admin/shared/components/card-table-wrap/card-table-wrap.component';
@@ -71,8 +71,8 @@ export class UserManagerComponent implements OnInit {
   checkedCashArray: UserVM[] = [];
   ActionCode = ActionCode;
   isCollapse: boolean = true;
+  isSearch: boolean = false;
   isActiveOptions: OptionsInterface[] = [];
-  genderOptions: OptionsInterface[] = [];
   destroyRef = inject(DestroyRef);
 
   private dataService = inject(UserManagerService);
@@ -101,7 +101,8 @@ export class UserManagerComponent implements OnInit {
   }
 
   searchForm(): void {
-    this.getDataList(undefined, true);
+    this.isSearch = true;
+    this.getDataList();
   }
 
   selectedChecked(e: UserVM[]): void {
@@ -115,12 +116,12 @@ export class UserManagerComponent implements OnInit {
     this.getDataList();
   }
 
-  getDataList(e?: NzTableQueryParams, isSearch?: boolean): void {
+  getDataList(e?: NzTableQueryParams): void {
     this.tableConfig.loading = true;
 
     const _pagingParam: PaginationParam = {
       pageSize: e?.pageSize || this.pagination.pageSize,
-      pageNumber: isSearch ? 1 : e?.pageIndex || this.pagination.pageNumber
+      pageNumber: this.isSearch ? 1 : (e?.pageIndex || this.pagination.pageNumber),
     }
 
     const searchParamsValue = this.searchParams.value;
@@ -134,7 +135,7 @@ export class UserManagerComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(response => {
-        if (isSearch)
+        if (this.isSearch)
           this.message.success('Searched successfully');
         this.dataList = response.result;
         this.pagination = response.pagination;
@@ -153,6 +154,7 @@ export class UserManagerComponent implements OnInit {
 
   tableLoading(isLoading: boolean): void {
     this.tableConfig.loading = isLoading;
+    this.isSearch = isLoading;
     this.tableChangeDectction();
   }
 

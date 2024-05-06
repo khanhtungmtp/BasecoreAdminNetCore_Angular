@@ -32,7 +32,7 @@ export interface AntTableConfig {
   xScroll?: number; //List horizontal scroll bar
   yScroll?: number; //List vertical scroll bar
   virtualItemSize?: number; //The height of each column during virtual scrolling, the same as cdk itemSize
-  showCheckbox?: boolean; // 如果需要checkBox,则需要showCheckbox=true,并且使用app-ant-table组件时传入 [checkedCashArrayFromComment]="cashArray"，cashArray为业务组件中自己定义的数组，并且需要table中的data都有一个id属性
+  showCheckbox?: boolean; // If you need checkBox, you need showCheckbox=true, and when using the app-ant-table component, pass in [checkedCashArrayFromComment]="cashArray". CashArray is an array defined by yourself in the business component, and the data in the table needs to have one id attribute
   pageIndex: number; // Current page number, (bidirectionally bound to the page number in the page)
   pageSize: number; // The number of data items displayed on each page (two-way binding with pageSize in the page)
   total: number; // The total amount of data used to calculate paging (should be obtained from the backend interface)

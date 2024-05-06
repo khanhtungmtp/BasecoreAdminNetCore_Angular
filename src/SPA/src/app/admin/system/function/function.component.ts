@@ -26,6 +26,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FunctionModalService } from './function-modal/function-modal.service';
 import { ModalBtnStatus } from '@app/_core/utilities/base-modal';
+import { FunctionVM } from '@app/_core/models/system/functionvm';
 
 @Component({
   selector: 'app-function',
@@ -54,6 +55,7 @@ export class FunctionComponent implements OnInit {
   @ViewChild('operationTpl', { static: true }) operationTpl!: TemplateRef<NzSafeAny>;
   actionCode = ActionCode;
   filter: string = '';
+  isSearch: boolean = false;
   pagination: Pagination = <Pagination>{
     pageNumber: 1,
     pageSize: 10
@@ -61,10 +63,10 @@ export class FunctionComponent implements OnInit {
   tableConfig!: AntTableConfig;
   pageHeaderInfo: Partial<PageHeaderType> = {
     title: 'Function',
-    breadcrumb: ['Homepage', 'System', 'Function']
+    breadcrumb: ['Homepage', 'Function Manager', 'Manager']
   };
   checkedCashArray: NzSafeAny[] = [];
-  dataList: any = [];
+  dataList: FunctionVM[] = [];
 
   private modalSrv = inject(NzModalService);
   private message = inject(NzMessageService);
@@ -80,7 +82,7 @@ export class FunctionComponent implements OnInit {
   }
 
   search(): void {
-    this.message.success('Search success');
+    this.isSearch = true;
     this.getDataList();
   }
 
@@ -104,6 +106,7 @@ export class FunctionComponent implements OnInit {
 
   tableLoading(isLoading: boolean): void {
     this.tableConfig.loading = isLoading;
+    this.isSearch = isLoading;
     this.tableChangeDectction();
   }
 
@@ -112,7 +115,7 @@ export class FunctionComponent implements OnInit {
     this.tableConfig.loading = true;
     const _pagingParam: PaginationParam = {
       pageSize: e?.pageSize || this.pagination.pageSize,
-      pageNumber: this.filter === '' ? (e?.pageIndex || this.pagination.pageNumber) : 1,
+      pageNumber: this.isSearch ? 1 : (e?.pageIndex || this.pagination.pageNumber),
     }
     this.dataService.getFunctionsPaging(this.filter, _pagingParam).pipe(
       finalize(() => {
@@ -120,6 +123,8 @@ export class FunctionComponent implements OnInit {
       }),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe((response => {
+      if (this.isSearch)
+        this.message.success('Searched successfully');
       this.dataList = response.result;
       this.pagination = response.pagination;
       this.tableConfig.total = this.pagination.totalCount;
@@ -133,6 +138,7 @@ export class FunctionComponent implements OnInit {
   resetForm(): void {
     this.message.success('Reset success');
     this.filter = '';
+    this.tableConfig.pageSize = 10;
     this.getDataList();
   }
 
@@ -203,7 +209,7 @@ export class FunctionComponent implements OnInit {
     });
   }
 
-  deleteItemChecked(): void {
+  deleteRange(): void {
     if (this.checkedCashArray.length > 0) {
       this.modalSrv.confirm({
         nzTitle: this.translate.instant('system.message.confirmDeleteMsg'),

@@ -1,15 +1,16 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { OptionsInterface } from '@app/_core/models/core/types';
-import { ModalBtnStatus } from '@app/_core/utilities/base-modal';
+import { SystemLanguageVM } from '@app/_core/models/system/systemlanguagevm';
+import { Pagination, PaginationParam } from '@app/_core/utilities/pagination-utility';
 import { AntTableComponent, AntTableConfig } from '@app/admin/shared/components/ant-table/ant-table.component';
 import { CardTableWrapComponent } from '@app/admin/shared/components/card-table-wrap/card-table-wrap.component';
 import { PageHeaderComponent, PageHeaderType } from '@app/admin/shared/components/page-header/page-header.component';
-import { MapPipe, MapSet, MapKeyType } from '@app/admin/shared/pipes/map.pipe';
+import { WaterMarkComponent } from '@app/admin/shared/components/water-mark/water-mark.component';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { NzWaveModule } from 'ng-zorro-antd/core/wave';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzGridModule } from 'ng-zorro-antd/grid';
@@ -17,25 +18,21 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
+import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { finalize } from 'rxjs';
-import { RoleManagerModalService } from './role-manager-modal/role-manager-modal.service';
-import { Pagination, PaginationParam } from '@app/_core/utilities/pagination-utility';
-import { NzRadioModule } from 'ng-zorro-antd/radio';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { WaterMarkComponent } from '@app/admin/shared/components/water-mark/water-mark.component';
-import { RoleService } from '@app/_core/services/user-manager/role.service';
-import { RoleVM } from '@app/_core/models/user-manager/rolevm';
-import { Router } from '@angular/router';
-import { UrlRouteConstants } from '@app/_core/constants/url-route.constants';
+import { LanguagerModalService } from './language-modal/role-manager-modal.service';
+import { ModalBtnStatus } from '@app/_core/utilities/base-modal';
+import { MapKeyType, MapPipe, MapSet } from '@app/admin/shared/pipes/map.pipe';
+import { NzSafeAny } from 'ng-zorro-antd/core/types';
+import { SystemLanguageService } from '@app/_core/services/system/system-language.service';
+
 @Component({
-  selector: 'app-role-manager',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-language',
   standalone: true,
-  imports: [
-    TranslateModule,
+  imports: [TranslateModule,
     NzRadioModule,
     PageHeaderComponent,
     NzGridModule,
@@ -51,14 +48,12 @@ import { UrlRouteConstants } from '@app/_core/constants/url-route.constants';
     CardTableWrapComponent,
     AntTableComponent,
     NzSwitchModule,
-    WaterMarkComponent
-  ],
-  templateUrl: './role-manager.component.html'
+    WaterMarkComponent],
+  templateUrl: './language.component.html'
 })
-export class RoleManagerComponent implements OnInit {
+export class LanguageComponent implements OnInit {
   @ViewChild('operationTpl', { static: true }) operationTpl!: TemplateRef<any>;
   @ViewChild('isActiveFlag', { static: true }) isActiveFlag!: TemplateRef<NzSafeAny>;
-  searchParams!: FormGroup;
   filter: string = '';
   isSearch: boolean = false;
   pagination: Pagination = <Pagination>{
@@ -67,38 +62,62 @@ export class RoleManagerComponent implements OnInit {
   }
   tableConfig!: AntTableConfig;
   pageHeaderInfo: Partial<PageHeaderType> = {
-    title: 'Role Manager',
-    breadcrumb: ['Home', 'Role Manager', ' Manager']
+    title: 'Language Manager',
+    breadcrumb: ['Home', 'Language Manager', ' Manager']
   };
-  dataList: RoleVM[] = [];
-  checkedCashArray: RoleVM[] = [];
-  isCollapse: boolean = true;
+  dataList: SystemLanguageVM[] = [];
+  checkedCashArray: SystemLanguageVM[] = [];
   isActiveOptions: OptionsInterface[] = [];
-  private destroyRef = inject(DestroyRef);
-  private dataService = inject(RoleService);
+
+  private dataService = inject(SystemLanguageService);
   private modalSrv = inject(NzModalService);
   private cdr = inject(ChangeDetectorRef);
-  private modalService = inject(RoleManagerModalService);
+  private modalService = inject(LanguagerModalService);
   private message = inject(NzMessageService);
-  private fb = inject(FormBuilder);
   private translate = inject(TranslateService);
-  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     this.isActiveOptions = [...MapPipe.transformMapToArray(MapSet.isActive, MapKeyType.Boolean)];
-    this.initSearchParam();
     this.initTable();
   }
 
-  initSearchParam() {
-    this.searchParams = this.fb.group({
-      userName: [''],
-      email: [''],
-      phoneNumber: [''],
-      fullName: [''],
-      gender: [null],
-      isActive: [null]
-    });
+  private initTable(): void {
+    this.tableConfig = {
+      headers: [
+        {
+          title: 'Id',
+          field: 'id',
+        },
+        {
+          title: 'Name',
+          field: 'name'
+        },
+        {
+          title: 'Url Image',
+          field: 'urlImage'
+        },
+        {
+          title: 'Seq',
+          field: 'sortOrder'
+        },
+        {
+          title: 'Active',
+          field: 'isActive'
+        },
+        {
+          title: 'Operation',
+          tdTemplate: this.operationTpl,
+          width: 150,
+          fixed: true
+        }
+      ],
+      total: 0,
+      showCheckbox: true,
+      loading: true,
+      pageSize: 10,
+      pageIndex: 1
+    };
   }
 
   search(): void {
@@ -106,13 +125,8 @@ export class RoleManagerComponent implements OnInit {
     this.getDataList();
   }
 
-  selectedChecked(e: RoleVM[]): void {
-    this.checkedCashArray = [...e];
-  }
-
   resetForm(): void {
     this.message.success('Reset successfully');
-    this.searchParams.reset();
     this.tableConfig.pageSize = 10;
     this.getDataList();
   }
@@ -126,7 +140,7 @@ export class RoleManagerComponent implements OnInit {
     }
 
     this.dataService
-      .getRolesPaging(this.filter, _pagingParam)
+      .getLanguagesPaging(this.filter, _pagingParam)
       .pipe(
         finalize(() => {
           this.tableLoading(false);
@@ -144,6 +158,12 @@ export class RoleManagerComponent implements OnInit {
       });
   }
 
+  tableLoading(isLoading: boolean): void {
+    this.tableConfig.loading = isLoading;
+    this.isSearch = isLoading;
+    this.tableChangeDectction();
+  }
+
   // Trigger table change detection
   tableChangeDectction(): void {
     // Changing the reference triggers change detection.
@@ -151,14 +171,47 @@ export class RoleManagerComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  tableLoading(isLoading: boolean): void {
-    this.tableConfig.loading = isLoading;
-    this.tableChangeDectction();
+  reloadTable(): void {
+    this.message.info('Refresh successful');
+    this.getDataList();
+  }
+
+  //Modify several items on a page
+  changePageSize(e: number): void {
+    this.tableConfig.pageSize = e;
+  }
+
+  selectedChecked(e: SystemLanguageVM[]): void {
+    this.checkedCashArray = [...e];
+  }
+
+  deleteRow(id: string): void {
+    this.modalSrv.confirm({
+      nzTitle: this.translate.instant('system.message.confirmDeleteMsg'),
+      nzContent: this.translate.instant('system.message.confirmDeleteMsgContent'),
+      nzOnOk: () => {
+        this.tableLoading(true);
+        this.dataService
+          .delete(id)
+          .pipe(
+            finalize(() => {
+              this.tableLoading(false);
+            }),
+            takeUntilDestroyed(this.destroyRef)
+          )
+          .subscribe(() => {
+            if (this.dataList.length === 1) {
+              this.tableConfig.pageIndex--;
+            }
+            this.getDataList();
+          });
+      }
+    });
   }
 
   addModal(): void {
     this.modalService
-      .show({ nzTitle: 'New role' })
+      .show({ nzTitle: 'New language' })
       .pipe(
         finalize(() => {
           this.tableLoading(false);
@@ -174,24 +227,14 @@ export class RoleManagerComponent implements OnInit {
       });
   }
 
-  reloadTable(): void {
-    this.message.info('Refresh successful');
-    this.getDataList();
-  }
-
-  // detail
-  redirectDetail(id: string): void {
-    this.router.navigate([UrlRouteConstants.ROLE_DETAIL, id]);
-  }
-
-  // edit
+  // // edit
   editModal(id: string): void {
     this.dataService
       .getById(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(res => {
         this.modalService
-          .show({ nzTitle: 'Edit role' }, res)
+          .show({ nzTitle: 'Edit language' }, res)
           .pipe(
             finalize(() => {
               this.tableLoading(false);
@@ -242,64 +285,4 @@ export class RoleManagerComponent implements OnInit {
     }
   }
 
-  deleteRow(id: string): void {
-    this.modalSrv.confirm({
-      nzTitle: this.translate.instant('system.message.confirmDeleteMsg'),
-      nzContent: this.translate.instant('system.message.confirmDeleteMsgContent'),
-      nzOnOk: () => {
-        this.tableLoading(true);
-        this.dataService
-          .delete(id)
-          .pipe(
-            finalize(() => {
-              this.tableLoading(false);
-            }),
-            takeUntilDestroyed(this.destroyRef)
-          )
-          .subscribe(() => {
-            if (this.dataList.length === 1) {
-              this.tableConfig.pageIndex--;
-            }
-            this.getDataList();
-          });
-      }
-    });
-  }
-
-  //Modify several items on a page
-  changePageSize(e: number): void {
-    this.tableConfig.pageSize = e;
-  }
-
-  /*Expand*/
-  toggleCollapse(): void {
-    this.isCollapse = !this.isCollapse;
-  }
-
-  private initTable(): void {
-    this.tableConfig = {
-      showCheckbox: true,
-      headers: [
-        {
-          title: 'Id',
-          field: 'id',
-        },
-        {
-          title: 'Name',
-          field: 'name'
-        },
-        {
-          title: 'Operation',
-          tdTemplate: this.operationTpl,
-          width: 150,
-          fixed: true
-        }
-      ],
-      total: 0,
-      loading: true,
-      pageSize: 10,
-      pageIndex: 1
-    };
-  }
 }
-

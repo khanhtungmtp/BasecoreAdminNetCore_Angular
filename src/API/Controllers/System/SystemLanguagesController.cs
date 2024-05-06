@@ -29,7 +29,7 @@ public class SystemLanguagesController(I_SystemLanguage systemLanguageService) :
         return Ok(await _systemLanguageService.GetLanguagesAsync());
     }
 
-    // url: GET : http:localhost:6001/api/SystemLanguages/GetAllPaging
+    // url: GET : http:localhost:6001/api/SystemLanguages/list-paging
     [HttpGet("list-paging")]
     [AllowAnonymous]
     // [ClaimRequirement(FunctionCode.SYSTEM_LANGUAGE, CommandCode.VIEW)]
