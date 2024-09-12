@@ -6,6 +6,7 @@ using API.Helpers.Utilities;
 using API.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using ViewModels.System;
 using ViewModels.UserManager;
 
 namespace API.Controllers.UserManager;
@@ -21,7 +22,7 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
     [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.CREATE)]
     public async Task<IActionResult> CreateUser(UserCreateRequest request)
     {
-        var user = new User()
+        User? user = new()
         {
             Id = Guid.NewGuid().ToString(),
             UserName = request.UserName,
@@ -56,7 +57,7 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
     [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.UPDATE)]
     public async Task<IActionResult> PutUser(string id, [FromBody] UserPutRequest request)
     {
-        var user = await _userManager.FindByIdAsync(id);
+        User? user = await _userManager.FindByIdAsync(id);
         if (user is null)
             return NotFound(OperationResult.NotFound("User not found"));
 
@@ -64,8 +65,8 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
         if (!string.IsNullOrWhiteSpace(request.Password))
         {
             // Remove the current password and add the new one.
-            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var passwordResult = await _userManager.ResetPasswordAsync(user, resetToken, request.Password);
+            string? resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            IdentityResult? passwordResult = await _userManager.ResetPasswordAsync(user, resetToken, request.Password);
             if (!passwordResult.Succeeded)
                 return BadRequest(OperationResult.BadRequest(passwordResult.Errors));
         }
@@ -80,31 +81,31 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
         if (!string.IsNullOrWhiteSpace(request.Password))
         {
             // Remove the current password and add the new one.
-            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var passwordResult = await _userManager.ResetPasswordAsync(user, resetToken, request.Password);
+            string? resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            IdentityResult? passwordResult = await _userManager.ResetPasswordAsync(user, resetToken, request.Password);
             if (!passwordResult.Succeeded)
                 return BadRequest(OperationResult.BadRequest(passwordResult.Errors));
         }
-        var result = await _userManager.UpdateAsync(user);
+        IdentityResult? result = await _userManager.UpdateAsync(user);
         if (result.Succeeded)
         {
             // Update roles if specified
             if (request.Roles is not null && request.Roles.Count != 0)
             {
-                var currentRoles = await _userManager.GetRolesAsync(user);
-                var rolesToAdd = request.Roles.Except(currentRoles);
-                var rolesToRemove = currentRoles.Except(request.Roles);
+                IList<string>? currentRoles = await _userManager.GetRolesAsync(user);
+                IEnumerable<string>? rolesToAdd = request.Roles.Except(currentRoles);
+                IEnumerable<string>? rolesToRemove = currentRoles.Except(request.Roles);
 
-                foreach (var role in rolesToRemove)
+                foreach (string role in rolesToRemove)
                 {
-                    var removeResult = await _userManager.RemoveFromRoleAsync(user, role);
+                    IdentityResult? removeResult = await _userManager.RemoveFromRoleAsync(user, role);
                     if (!removeResult.Succeeded)
                     {
                         return BadRequest(OperationResult.BadRequest(removeResult.Errors));
                     }
                 }
 
-                foreach (var role in rolesToAdd)
+                foreach (string role in rolesToAdd)
                 {
                     if (!await _rolesManager.RoleExistsAsync(role))
                     {
@@ -117,7 +118,7 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
                         });
                     }
 
-                    var addResult = await _userManager.AddToRoleAsync(user, role);
+                    IdentityResult? addResult = await _userManager.AddToRoleAsync(user, role);
                     if (!addResult.Succeeded)
                     {
                         return BadRequest(OperationResult.BadRequest(addResult.Errors));
@@ -136,11 +137,11 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
     [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.UPDATE)]
     public async Task<IActionResult> UpdateStatus(string id, [FromBody] bool isActive)
     {
-        var user = await _userManager.FindByIdAsync(id);
+        User? user = await _userManager.FindByIdAsync(id);
         if (user is null)
             return NotFound(OperationResult.NotFound("User not found"));
         user.IsActive = isActive;
-        var result = await _userManager.UpdateAsync(user);
+        IdentityResult? result = await _userManager.UpdateAsync(user);
         if (result.Succeeded)
             return Ok(OperationResult<string>.Success(user.UserName ?? string.Empty, "Update user status successfully"));
         return BadRequest(OperationResult.BadRequest(result.Errors));
@@ -159,7 +160,7 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
     [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
     public async Task<IActionResult> GetById(string id)
     {
-        var user = await _userService.GetByIdAsync(id);
+        OperationResult<UserVM>? user = await _userService.GetByIdAsync(id);
         return HandleResult(user);
     }
 
@@ -168,10 +169,10 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
     [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.UPDATE)]
     public async Task<IActionResult> ChangePassword(string userId, [FromBody] UserPasswordChangeRequest request)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        User? user = await _userManager.FindByIdAsync(userId);
         if (user is null)
             return NotFound(OperationResult.NotFound("User not found"));
-        var result = await _userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
+        IdentityResult? result = await _userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
         if (result.Succeeded)
             return Ok(OperationResult.Success("Change password successfully"));
         return BadRequest(OperationResult.BadRequest(result.Errors));
@@ -182,14 +183,14 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
     [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.DELETE)]
     public async Task<IActionResult> DeleteUser(string id)
     {
-        var user = await _userManager.FindByIdAsync(id);
+        User? user = await _userManager.FindByIdAsync(id);
         if (user is null)
             return NotFound(OperationResult.NotFound("User not found"));
         if (user.UserName == SystemConstants.UserNameAdmin)
             return BadRequest(OperationResult.BadRequest("You can't delete admin user."));
         if (user.UserName == UserNameLogedIn)
             return BadRequest(OperationResult.BadRequest("You can't delete yourself."));
-        var result = await _userManager.DeleteAsync(user);
+        IdentityResult? result = await _userManager.DeleteAsync(user);
         if (result.Succeeded)
         {
             var userVM = new UserVM()
@@ -211,7 +212,7 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
     [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.DELETE)]
     public async Task<IActionResult> DeleteRangeFunction([FromBody] List<string> ids)
     {
-        var result = await _userService.DeleteRangeAsync(ids, IdLogedIn);
+        OperationResult? result = await _userService.DeleteRangeAsync(ids, IdLogedIn);
         return HandleResult(result);
     }
 
@@ -220,7 +221,7 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
     [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
     public async Task<IActionResult> GetMenuByUserPermission(string userId)
     {
-        var result = await _userService.GetMenuByUserPermission(userId);
+        OperationResult<List<FunctionTreeVM>>? result = await _userService.GetMenuByUserPermission(userId);
         return HandleResult(result);
     }
 
@@ -228,10 +229,10 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
     [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
     public async Task<IActionResult> GetUserRoles(string userId)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        User? user = await _userManager.FindByIdAsync(userId);
         if (user is null)
             return NotFound(OperationResult.NotFound($"Cannot found user with id: {userId}"));
-        var roles = await _userManager.GetRolesAsync(user);
+        IList<string>? roles = await _userManager.GetRolesAsync(user);
         return Ok(OperationResult<IList<string>>.Success(roles, "Get user roles successfully"));
     }
 
@@ -241,10 +242,10 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
     {
         if (request.RoleNames.Length == 0)
             return BadRequest(OperationResult.BadRequest("Role names cannot empty"));
-        var user = await _userManager.FindByIdAsync(userId);
+        User? user = await _userManager.FindByIdAsync(userId);
         if (user is null)
             return NotFound(OperationResult.NotFound($"Cannot found user with id: {userId}"));
-        var result = await _userManager.AddToRolesAsync(user, request.RoleNames);
+        IdentityResult? result = await _userManager.AddToRolesAsync(user, request.RoleNames);
         if (result.Succeeded)
             return Ok(OperationResult.Success("Add roles to user successfully"));
 
@@ -259,10 +260,10 @@ public class UsersController(UserManager<User> userManager, I_User userService, 
             return BadRequest(OperationResult.BadRequest("Role names cannot empty"));
         if (request.RoleNames.Length == 1 && request.RoleNames[0] == SystemConstants.Roles.Admin)
             return BadRequest(OperationResult.BadRequest($"Cannot remove {SystemConstants.Roles.Admin} role"));
-        var user = await _userManager.FindByIdAsync(userId);
+        User? user = await _userManager.FindByIdAsync(userId);
         if (user is null)
             return NotFound(OperationResult.NotFound($"Cannot found user with id: {userId}"));
-        var result = await _userManager.RemoveFromRolesAsync(user, request.RoleNames);
+        IdentityResult? result = await _userManager.RemoveFromRolesAsync(user, request.RoleNames);
         if (result.Succeeded)
             return Ok(OperationResult.Success("Remove roles from user successfully"));
 

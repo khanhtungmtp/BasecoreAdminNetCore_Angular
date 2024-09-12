@@ -1,4 +1,5 @@
 
+using System.Data.Common;
 using API._Repositories;
 using API._Services.Interfaces.System;
 using API.Data;
@@ -11,7 +12,7 @@ public class S_Sequence(IRepositoryAccessor repoStore, DataContext context) : Ba
 
     public async Task<int> GetNextSequenceValueAsync()
     {
-        var connection = _context.Database.GetDbConnection();
+        DbConnection? connection = _context.Database.GetDbConnection();
         try
         {
             await connection.OpenAsync();
@@ -19,7 +20,7 @@ public class S_Sequence(IRepositoryAccessor repoStore, DataContext context) : Ba
             command.CommandText = "SELECT NEXT VALUE FOR Forumsequence;";
 
             // Assuming the sequence returns INT type. Adjust the type according to your sequence's type.
-            var result = await command.ExecuteScalarAsync();
+            object? result = await command.ExecuteScalarAsync();
             return result != null ? Convert.ToInt32(result) : 0;
         }
         finally

@@ -21,12 +21,12 @@ public class S_CommandInFunction(IRepositoryAccessor repoStore) : BaseServices(r
     // PostCommandInFunction
     public async Task<OperationResult<CommandInFunctionResponseVM>> CreateAsync(string functionId, CommandAssignRequest request)
     {
-        foreach (var commandId in request.CommandIds)
+        foreach (string commandId in request.CommandIds)
         {
             if (await _repoStore.CommandInFunctions.FindAsync(commandId, functionId) is not null)
                 return OperationResult<CommandInFunctionResponseVM>.Conflict($"Command {commandId} already exists in function.");
 
-            var entity = new CommandInFunction()
+            CommandInFunction? entity = new()
             {
                 CommandId = commandId,
                 FunctionId = functionId
@@ -38,7 +38,7 @@ public class S_CommandInFunction(IRepositoryAccessor repoStore) : BaseServices(r
         if (request.AddToAllFunctions)
         {
             IQueryable<Function>? otherFunctions = _repoStore.Functions.FindAll(x => x.Id != functionId);
-            foreach (var function in otherFunctions)
+            foreach (Function function in otherFunctions)
             {
                 foreach (string? commandId in request.CommandIds)
                 {
@@ -63,9 +63,9 @@ public class S_CommandInFunction(IRepositoryAccessor repoStore) : BaseServices(r
 
     public async Task<OperationResult> DeleteAsync(string functionId, CommandAssignRequest request)
     {
-        foreach (var commandId in request.CommandIds)
+        foreach (string commandId in request.CommandIds)
         {
-            var entity = await _repoStore.CommandInFunctions.FindAsync(commandId, functionId);
+            CommandInFunction? entity = await _repoStore.CommandInFunctions.FindAsync(commandId, functionId);
             if (entity is null)
                 return OperationResult.NotFound($"This command {commandId} is not existed in function");
 

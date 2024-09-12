@@ -15,7 +15,7 @@ public class S_Votes(IRepositoryAccessor repoStore) : BaseServices(repoStore), I
             return OperationResult<int>.NotFound($"Cannot found forum with id {forumId}");
 
         int numberOfVotes = await _repoStore.Votes.CountAsync(x => x.ForumId == forumId);
-        var vote = await _repoStore.Votes.FindAsync(forumId, userId);
+        Vote? vote = await _repoStore.Votes.FindAsync(forumId, userId);
         if (vote is not null)
         {
             _repoStore.Votes.Remove(vote);
@@ -44,7 +44,7 @@ public class S_Votes(IRepositoryAccessor repoStore) : BaseServices(repoStore), I
 
     public async Task<OperationResult<string>> DeleteAsync(int forumId, string userId)
     {
-        var vote = await _repoStore.Votes.FindAsync(forumId, userId);
+        Vote? vote = await _repoStore.Votes.FindAsync(forumId, userId);
         if (vote is null)
             return OperationResult<string>.NotFound($"Cannot found vote with id {userId}");
 
@@ -66,7 +66,7 @@ public class S_Votes(IRepositoryAccessor repoStore) : BaseServices(repoStore), I
 
     public async Task<OperationResult<List<VoteVM>>> GetListAsync(int forumId)
     {
-        var votes = await _repoStore.Votes
+        List<VoteVM>? votes = await _repoStore.Votes
                 .FindAll(x => x.ForumId == forumId)
                 .Select(x => new VoteVM()
                 {

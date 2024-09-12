@@ -3,7 +3,6 @@ using API.Filters.Authorization;
 using API.Helpers.Base;
 using API.Helpers.Constants;
 using API.Helpers.Utilities;
-using API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -23,13 +22,13 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
     [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.CREATE)]
     public async Task<IActionResult> CreateRole(RoleCreateRequest request)
     {
-        var role = new IdentityRole()
+        IdentityRole? role = new()
         {
             Id = request.Id,
             Name = request.Name,
             NormalizedName = request.Name.ToUpper(),
         };
-        var result = await _rolesManager.CreateAsync(role);
+        IdentityResult? result = await _rolesManager.CreateAsync(role);
         if (result.Succeeded)
         {
             return Ok(OperationResult.Success("Create role successfully"));
@@ -43,7 +42,7 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
     [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.VIEW)]
     public async Task<IActionResult> GetAll()
     {
-        var listRoleVM = await _rolesManager.Roles.Select(x => new RoleVM() { Id = x.Id, Name = x.Name ?? string.Empty }).ToListAsync();
+        List<RoleVM>? listRoleVM = await _rolesManager.Roles.Select(x => new RoleVM() { Id = x.Id, Name = x.Name ?? string.Empty }).ToListAsync();
         return Ok(OperationResult<List<RoleVM>>.Success(listRoleVM, "Get Roles Successfully"));
     }
 
@@ -52,7 +51,7 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
     // [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.VIEW)]
     public async Task<IActionResult> GetAllPermissionTree()
     {
-        var role = await _roles.GetAllPermissionTree();
+        OperationResult<List<PermissionScreenVm>>? role = await _roles.GetAllPermissionTree();
         if (!role.Succeeded)
             return NotFound(role);
         return Ok(role);
@@ -64,15 +63,15 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
     [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.VIEW)]
     public async Task<IActionResult> GetPaging(string? filter, [FromQuery] PaginationParam pagination)
     {
-        var role = _rolesManager.Roles;
+        IQueryable<IdentityRole>? role = _rolesManager.Roles;
         if (role is null)
             return NotFound(OperationResult.NotFound("Role not found"));
         if (!string.IsNullOrWhiteSpace(filter))
         {
             role = role.Where(x => x.Id.Contains(filter) || x.Name != null && x.Name.Contains(filter));
         }
-        var listRoleVM = await role.Select(x => new RoleVM() { Id = x.Id, Name = x.Name ?? string.Empty }).ToListAsync();
-        var resultPaging = PagingResult<RoleVM>.Create(listRoleVM, pagination.PageNumber, pagination.PageSize);
+        List<RoleVM>? listRoleVM = await role.Select(x => new RoleVM() { Id = x.Id, Name = x.Name ?? string.Empty }).ToListAsync();
+        PagingResult<RoleVM>? resultPaging = PagingResult<RoleVM>.Create(listRoleVM, pagination.PageNumber, pagination.PageSize);
         return Ok(OperationResult<PagingResult<RoleVM>>.Success(resultPaging, "Get Roles Successfully"));
     }
 
@@ -81,10 +80,10 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
     [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.VIEW)]
     public async Task<IActionResult> GetById(string id)
     {
-        var role = await _rolesManager.FindByIdAsync(id);
+        IdentityRole? role = await _rolesManager.FindByIdAsync(id);
         if (role is null)
             return NotFound(OperationResult.NotFound("Role not found"));
-        var roleVM = new RoleVM()
+        RoleVM? roleVM = new()
         {
             Id = role.Id,
             Name = role.Name ?? string.Empty
@@ -99,12 +98,12 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
     {
         if (id != request.Id)
             return NotFound(OperationResult.NotFound("Role not found"));
-        var role = await _rolesManager.FindByIdAsync(id);
+        IdentityRole? role = await _rolesManager.FindByIdAsync(id);
         if (role is null)
             return NotFound(OperationResult.NotFound("Role not found"));
         role.Name = request.Name;
         role.NormalizedName = request.Name.ToUpper();
-        var result = await _rolesManager.UpdateAsync(role);
+        IdentityResult? result = await _rolesManager.UpdateAsync(role);
         if (result.Succeeded)
             return Ok(OperationResult<string>.Success(role.Name, "Update role Successfully"));
         return BadRequest(OperationResult.BadRequest(result.Errors));
@@ -115,10 +114,10 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
     [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.DELETE)]
     public async Task<IActionResult> DeleteRole(string id)
     {
-        var role = await _rolesManager.FindByIdAsync(id);
+        IdentityRole? role = await _rolesManager.FindByIdAsync(id);
         if (role is null)
             return NotFound(OperationResult.NotFound("Role not found"));
-        var result = await _rolesManager.DeleteAsync(role);
+        IdentityResult? result = await _rolesManager.DeleteAsync(role);
         if (result.Succeeded)
             return Ok(OperationResult<string>.Success(role.Name ?? string.Empty, "Delete role Successfully"));
 
@@ -131,7 +130,7 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
     [ClaimRequirement(FunctionCode.SYSTEM_PERMISSION, CommandCode.VIEW)]
     public async Task<IActionResult> GetPermissionByRoleId(string roleId)
     {
-        var role = await _roles.GetPermissionByRoleId(roleId);
+        OperationResult<List<PermissionVm>>? role = await _roles.GetPermissionByRoleId(roleId);
         if (!role.Succeeded)
             return NotFound(role);
         return Ok(role);
@@ -143,7 +142,7 @@ public class RolesController(RoleManager<IdentityRole> rolesManager, I_Roles rol
     [ClaimRequirement(FunctionCode.SYSTEM_PERMISSION, CommandCode.UPDATE)]
     public async Task<IActionResult> PutPermissionByRoleId(string roleId, [FromBody] List<PermissionVm> request)
     {
-        var role = await _roles.PutPermissionByRoleId(roleId, request);
+        OperationResult<string>? role = await _roles.PutPermissionByRoleId(roleId, request);
         if (!role.Succeeded)
             return NotFound(role);
         return Ok(role);

@@ -11,7 +11,7 @@ public class S_Reports(IRepositoryAccessor repoStore) : BaseServices(repoStore),
 {
     public async Task<OperationResult> CreateAsync(int forumId, ReportCreateRequest request)
     {
-        var report = new Report()
+        Report? report = new Report()
         {
             Content = request.Content,
             ForumId = forumId,
@@ -36,13 +36,13 @@ public class S_Reports(IRepositoryAccessor repoStore) : BaseServices(repoStore),
 
     public async Task<OperationResult<ReportVM>> FindByIdAsync(int reportId)
     {
-        var report = await _repoStore.Reports.FindAsync(reportId);
+        Report? report = await _repoStore.Reports.FindAsync(reportId);
         if (report is null)
             return OperationResult<ReportVM>.NotFound("Report not found.");
-        var user = await _repoStore.Users.FindAsync(report.ReportUserId);
+        User? user = await _repoStore.Users.FindAsync(report.ReportUserId);
         if (user is null)
             return OperationResult<ReportVM>.NotFound("User not found.");
-        var reportVm = new ReportVM()
+        ReportVM? reportVm = new()
         {
             Id = report.Id,
             Content = report.Content,
@@ -72,7 +72,7 @@ public class S_Reports(IRepositoryAccessor repoStore) : BaseServices(repoStore),
         {
             query = query.Where(x => x.r.Content.Contains(filter));
         }
-        var result = await query.Select(c => new ReportVM()
+        List<ReportVM>? result = await query.Select(c => new ReportVM()
         {
             Id = c.r.Id,
             Content = c.r.Content,
@@ -83,13 +83,13 @@ public class S_Reports(IRepositoryAccessor repoStore) : BaseServices(repoStore),
             ReportUserId = c.r.ReportUserId,
             ReportUserName = c.u.FullName
         }).ToListAsync();
-        var resultPaging = PagingResult<ReportVM>.Create(result, pagination.PageNumber, pagination.PageSize);
+        PagingResult<ReportVM>? resultPaging = PagingResult<ReportVM>.Create(result, pagination.PageNumber, pagination.PageSize);
         return OperationResult<PagingResult<ReportVM>>.Success(resultPaging, "Get function successfully.");
     }
 
     public async Task<OperationResult> DeleteAsync(int forumId, int reportId)
     {
-        var report = await _repoStore.Reports.FindAsync(reportId);
+        Report? report = await _repoStore.Reports.FindAsync(reportId);
         if (report is null)
             return OperationResult.NotFound($"Cannot found report with id {reportId}");
 

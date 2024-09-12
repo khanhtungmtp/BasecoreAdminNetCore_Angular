@@ -1,5 +1,6 @@
 using API._Services.Interfaces.System;
 using API.Filters.Authorization;
+using API.Helpers.Base;
 using API.Helpers.Constants;
 using API.Helpers.Utilities;
 using Microsoft.AspNetCore.Authorization;
@@ -17,7 +18,7 @@ public class SystemLanguagesController(I_SystemLanguage systemLanguageService) :
     [ClaimRequirement(FunctionCode.SYSTEM_LANGUAGE, CommandCode.CREATE)]
     public async Task<IActionResult> PostLanguage(SystemLanguageCreateRequest request)
     {
-        var result = await _systemLanguageService.CreateAsync(request);
+        OperationResult? result = await _systemLanguageService.CreateAsync(request);
         return HandleResult(result);
     }
 
@@ -44,7 +45,7 @@ public class SystemLanguagesController(I_SystemLanguage systemLanguageService) :
     [ClaimRequirement(FunctionCode.SYSTEM_LANGUAGE, CommandCode.VIEW)]
     public async Task<IActionResult> GetById(string languageCode)
     {
-        var result = await _systemLanguageService.FindByCodeAsync(languageCode);
+        OperationResult<SystemLanguageVM>? result = await _systemLanguageService.FindByCodeAsync(languageCode);
         return HandleResult(result);
     }
 
@@ -53,7 +54,7 @@ public class SystemLanguagesController(I_SystemLanguage systemLanguageService) :
     [ClaimRequirement(FunctionCode.SYSTEM_LANGUAGE, CommandCode.UPDATE)]
     public async Task<IActionResult> PutLanguage(string languageCode, [FromBody] SystemLanguageCreateRequest request)
     {
-        var result = await _systemLanguageService.PutAsync(languageCode, request);
+        OperationResult? result = await _systemLanguageService.PutAsync(languageCode, request);
         return HandleResult(result);
     }
 
@@ -62,7 +63,7 @@ public class SystemLanguagesController(I_SystemLanguage systemLanguageService) :
     [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.UPDATE)]
     public async Task<IActionResult> UpdateStatus(string languageCode, [FromBody] bool isActive)
     {
-        var result = await _systemLanguageService.PatchStatusAsync(languageCode, isActive);
+        OperationResult? result = await _systemLanguageService.PatchStatusAsync(languageCode, isActive);
         return HandleResult(result);
     }
 
@@ -71,7 +72,7 @@ public class SystemLanguagesController(I_SystemLanguage systemLanguageService) :
     [ClaimRequirement(FunctionCode.SYSTEM_LANGUAGE, CommandCode.DELETE)]
     public async Task<IActionResult> DeleteLanguage(string languageCode)
     {
-        var result = await _systemLanguageService.DeleteAsync(languageCode);
+        OperationResult<string>? result = await _systemLanguageService.DeleteAsync(languageCode);
         return HandleResult(result);
     }
 

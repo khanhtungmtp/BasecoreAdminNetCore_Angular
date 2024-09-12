@@ -12,10 +12,10 @@ public class S_SystemLanguage(IRepositoryAccessor repoStore) : BaseServices(repo
 {
     public async Task<OperationResult> CreateAsync(SystemLanguageCreateRequest request)
     {
-        var functionExists = await _repoStore.SystemLanguages.FindByIdAsync(request.Id);
+        SystemLanguage? functionExists = await _repoStore.SystemLanguages.FindByIdAsync(request.Id);
         if (functionExists is not null)
             return OperationResult.Conflict("System language is existed.");
-        var language = new SystemLanguage()
+        SystemLanguage? language = new SystemLanguage()
         {
             Id = request.Id,
             Name = request.Name,
@@ -46,18 +46,18 @@ public class S_SystemLanguage(IRepositoryAccessor repoStore) : BaseServices(repo
 
     public async Task<OperationResult<List<SystemLanguageVM>>> GetLanguagesAsync()
     {
-        var result = await _repoStore.SystemLanguages.FindAll(true).Select(x => new SystemLanguageVM() { Id = x.Id, Name = x.Name, UrlImage = x.UrlImage, IsActive = x.IsActive }).ToListAsync();
+        List<SystemLanguageVM>? result = await _repoStore.SystemLanguages.FindAll(true).Select(x => new SystemLanguageVM() { Id = x.Id, Name = x.Name, UrlImage = x.UrlImage, IsActive = x.IsActive }).ToListAsync();
         return OperationResult<List<SystemLanguageVM>>.Success(result, "Get languages successfully.");
     }
 
     public async Task<OperationResult<PagingResult<SystemLanguageVM>>> GetPagingAsync(string? filter, PaginationParam pagination)
     {
-        var query = _repoStore.SystemLanguages.FindAll(true);
+        IQueryable<SystemLanguage>? query = _repoStore.SystemLanguages.FindAll(true);
         if (!string.IsNullOrWhiteSpace(filter))
         {
             query = query.Where(x => x.Id.Contains(filter) || x.Name.Contains(filter));
         }
-        var listFunctionVM = await query.Select(x => new SystemLanguageVM()
+        List<SystemLanguageVM>? listFunctionVM = await query.Select(x => new SystemLanguageVM()
         {
             Id = x.Id,
             Name = x.Name,
@@ -65,7 +65,7 @@ public class S_SystemLanguage(IRepositoryAccessor repoStore) : BaseServices(repo
             IsActive = x.IsActive,
             SortOrder = x.SortOrder
         }).ToListAsync();
-        var resultPaging = PagingResult<SystemLanguageVM>.Create(listFunctionVM, pagination.PageNumber, pagination.PageSize);
+        PagingResult<SystemLanguageVM>? resultPaging = PagingResult<SystemLanguageVM>.Create(listFunctionVM, pagination.PageNumber, pagination.PageSize);
         return OperationResult<PagingResult<SystemLanguageVM>>.Success(resultPaging, "Get language successfully.");
     }
 

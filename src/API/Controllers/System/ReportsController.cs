@@ -1,4 +1,5 @@
 using API._Services.Interfaces.System;
+using API.Helpers.Base;
 using API.Helpers.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using ViewModels.System;
@@ -12,7 +13,7 @@ public class ReportsController(I_Reports reportService) : BaseController
     [HttpPost("{forumId}/reports")]
     public async Task<IActionResult> PostReport(int forumId, [FromBody] ReportCreateRequest request)
     {
-        var result = await _reportService.CreateAsync(forumId, request);
+        OperationResult? result = await _reportService.CreateAsync(forumId, request);
         return HandleResult(result);
     }
 
@@ -26,14 +27,14 @@ public class ReportsController(I_Reports reportService) : BaseController
     [HttpGet("{forumId}/reports/{reportId}")]
     public async Task<IActionResult> GetReportDetail(int reportId)
     {
-        var result = await _reportService.FindByIdAsync(reportId);
+        OperationResult<ReportVM>? result = await _reportService.FindByIdAsync(reportId);
         return Ok(result);
     }
 
     [HttpDelete("{forumId}/reports/{reportId}")]
     public async Task<IActionResult> DeleteReport(int forumId, int reportId)
     {
-        var result = await _reportService.DeleteAsync(forumId, reportId);
+        OperationResult? result = await _reportService.DeleteAsync(forumId, reportId);
         return HandleResult(result);
     }
 }

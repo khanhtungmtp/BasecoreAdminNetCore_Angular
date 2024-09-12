@@ -7,7 +7,6 @@ using API._Services.Interfaces.System;
 using API.Helpers.Utilities;
 using System.Net.Http.Headers;
 using Microsoft.EntityFrameworkCore;
-using API.Helpers.Constants;
 using ViewModels.System;
 
 namespace API._Services.Services.Forums;
@@ -29,7 +28,7 @@ public class S_Forums(IRepositoryAccessor repoStore, I_Sequence sequenceService,
         {
             foreach (var attachment in request.Attachments)
             {
-                var attachmentEntity = await SaveFile(fourm.Id, attachment);
+                Attachment? attachmentEntity = await SaveFile(fourm.Id, attachment);
                 _repoStore.Attachments.Add(attachmentEntity);
             }
         }
@@ -56,10 +55,10 @@ public class S_Forums(IRepositoryAccessor repoStore, I_Sequence sequenceService,
         {
             throw new InvalidOperationException("File content disposition is missing.");
         }
-        var originalFileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition)?.FileName?.Trim('"');
-        var fileName = $"{originalFileName?[..originalFileName.LastIndexOf('.')]}{Path.GetExtension(originalFileName)}";
+        string? originalFileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition)?.FileName?.Trim('"');
+        string? fileName = $"{originalFileName?[..originalFileName.LastIndexOf('.')]}{Path.GetExtension(originalFileName)}";
         await _storageService.SaveFileAsync(file.OpenReadStream(), fileName);
-        var attachmentEntity = new Attachment()
+        Attachment? attachmentEntity = new()
         {
             FileName = fileName,
             FilePath = _storageService.GetFileUrl(fileName),
@@ -76,8 +75,8 @@ public class S_Forums(IRepositoryAccessor repoStore, I_Sequence sequenceService,
         foreach (string? labelText in request.Labels)
         {
             if (labelText is null) continue;
-            var labelId = FunctionUtility.GenerateSlug(labelText.ToString());
-            var existingLabel = await _repoStore.Labels.FindAsync(labelId);
+            string? labelId = FunctionUtility.GenerateSlug(labelText.ToString());
+            Label? existingLabel = await _repoStore.Labels.FindAsync(labelId);
             if (existingLabel is null)
             {
                 var labelEntity = new Label()
@@ -225,7 +224,7 @@ public class S_Forums(IRepositoryAccessor repoStore, I_Sequence sequenceService,
         {
             query = query.Where(x => x.k.CategoryId == forumVM.CategoryId.Value);
         }
-        var result = await query.Select(u => new ForumQuickVM()
+        List<ForumQuickVM>? result = await query.Select(u => new ForumQuickVM()
         {
             Id = u.k.Id,
             CategoryId = u.k.CategoryId,
@@ -239,7 +238,7 @@ public class S_Forums(IRepositoryAccessor repoStore, I_Sequence sequenceService,
             NumberOfComments = u.k.NumberOfComments
 
         }).ToListAsync();
-        var resultsPaging = PagingResult<ForumQuickVM>.Create(result, pagination.PageNumber, pagination.PageSize);
+        PagingResult<ForumQuickVM>? resultsPaging = PagingResult<ForumQuickVM>.Create(result, pagination.PageNumber, pagination.PageSize);
         return OperationResult<PagingResult<ForumQuickVM>>.Success(resultsPaging, "Get forums successfully.");
     }
 
@@ -273,7 +272,7 @@ public class S_Forums(IRepositoryAccessor repoStore, I_Sequence sequenceService,
                          orderby k.ViewCount descending
                          select new { k, c };
 
-            var forumVms = await forums.Take(take)
+            List<ForumQuickVM>? forumVms = await forums.Take(take)
                 .Select(u => new ForumQuickVM()
                 {
                     Id = u.k.Id,
@@ -298,7 +297,7 @@ public class S_Forums(IRepositoryAccessor repoStore, I_Sequence sequenceService,
                     where lik.LabelId == labelId
                     select new { k, l, c };
 
-        var items = await query.Select(u => new ForumQuickVM()
+        List<ForumQuickVM>? items = await query.Select(u => new ForumQuickVM()
         {
             Id = u.k.Id,
             CategoryId = u.k.CategoryId,
@@ -311,7 +310,7 @@ public class S_Forums(IRepositoryAccessor repoStore, I_Sequence sequenceService,
             CreatedDate = u.k.CreatedDate,
             NumberOfComments = u.k.NumberOfComments
         }).ToListAsync();
-        var resultsPaging = PagingResult<ForumQuickVM>.Create(items, pagination.PageNumber, pagination.PageSize);
+        PagingResult<ForumQuickVM>? resultsPaging = PagingResult<ForumQuickVM>.Create(items, pagination.PageNumber, pagination.PageSize);
         return OperationResult<PagingResult<ForumQuickVM>>.Success(resultsPaging, "Get forums by tag id successfully.");
     }
 
@@ -321,7 +320,7 @@ public class S_Forums(IRepositoryAccessor repoStore, I_Sequence sequenceService,
         if (forum is null)
             return OperationResult<ForumVM>.NotFound($"Cannot found knowledge base with id: {id}");
 
-        var attachments = await _repoStore.Attachments.FindAll(true)
+        List<AttachmentVM>? attachments = await _repoStore.Attachments.FindAll(true)
             .Where(x => x.ForumId == id)
             .Select(x => new AttachmentVM()
             {
@@ -331,7 +330,7 @@ public class S_Forums(IRepositoryAccessor repoStore, I_Sequence sequenceService,
                 Id = x.Id,
                 FileType = x.FileType
             }).ToListAsync();
-        var forums = CreateForumVM(forum);
+        ForumVM? forums = CreateForumVM(forum);
         forums.Attachments = attachments;
         return OperationResult<ForumVM>.Success(forums, $"Get forum by id {id} successfully.");
 
@@ -349,7 +348,7 @@ public class S_Forums(IRepositoryAccessor repoStore, I_Sequence sequenceService,
         {
             foreach (var attachment in request.Attachments)
             {
-                var attachmentEntity = await SaveFile(forum.Id, attachment);
+                Attachment? attachmentEntity = await SaveFile(forum.Id, attachment);
                 _repoStore.Attachments.Add(attachmentEntity);
             }
         }

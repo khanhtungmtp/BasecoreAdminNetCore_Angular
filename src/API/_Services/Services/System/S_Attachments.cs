@@ -1,6 +1,7 @@
 using API._Repositories;
 using API._Services.Interfaces.System;
 using API.Helpers.Base;
+using API.Models;
 using Microsoft.EntityFrameworkCore;
 using ViewModels.System;
 
@@ -9,7 +10,7 @@ public class S_Attachments(IRepositoryAccessor repoStore) : BaseServices(repoSto
 {
     public async Task<OperationResult<List<AttachmentVM>>> GetListAsync(int forumId)
     {
-        var query = await _repoStore.Attachments.FindAll(true)
+        List<AttachmentVM>? query = await _repoStore.Attachments.FindAll(true)
                 .Where(x => x.ForumId == forumId)
                 .Select(c => new AttachmentVM()
                 {
@@ -28,7 +29,7 @@ public class S_Attachments(IRepositoryAccessor repoStore) : BaseServices(repoSto
 
     public async Task<OperationResult> DeleteAsync(int attachmentId)
     {
-        var attachment = await _repoStore.Attachments.FindAsync(attachmentId);
+        Attachment? attachment = await _repoStore.Attachments.FindAsync(attachmentId);
         if (attachment is null)
             return OperationResult.NotFound($"Cannot found attachment with id {attachmentId}");
 

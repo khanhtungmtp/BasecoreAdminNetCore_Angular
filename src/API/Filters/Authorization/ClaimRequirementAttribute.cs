@@ -20,10 +20,10 @@ public class ClaimRequirementAttribute(FunctionCode functionCode, CommandCode co
     public void OnAuthorization(AuthorizationFilterContext context)
     {
         // skip authorization if action is decorated with [AllowAnonymous] attribute
-        var allowAnonymous = context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any();
+        bool allowAnonymous = context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any();
         if (allowAnonymous)
             return;
-        var httpContext = context.HttpContext;
+        HttpContext? httpContext = context.HttpContext;
         string? trackId = Guid.NewGuid().ToString();
         string? userId = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -52,14 +52,14 @@ public class ClaimRequirementAttribute(FunctionCode functionCode, CommandCode co
 
     }
 
-    private List<Permission> GetUserPermissions(DataContext context, string userId, FunctionCode functionCode, CommandCode commandCode)
+    private static List<Permission> GetUserPermissions(DataContext context, string userId, FunctionCode functionCode, CommandCode commandCode)
     {
         List<string>? roleIds = context.UserRoles.Where(x => x.UserId == userId).Select(x => x.RoleId).ToList();
 
-        return context.Permissions.Where(p =>
+        return [.. context.Permissions.Where(p =>
             roleIds.Contains(p.RoleId) &&
             p.FunctionId == functionCode.ToString() &&
-            p.CommandId == commandCode.ToString()).ToList();
+            p.CommandId == commandCode.ToString())];
     }
 
     private static void Unauthorize(AuthorizationFilterContext context, string trackId, HttpContext httpContext, HttpStatusCode statusCode)

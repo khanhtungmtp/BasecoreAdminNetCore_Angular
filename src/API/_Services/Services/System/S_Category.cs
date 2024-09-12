@@ -11,7 +11,7 @@ public class S_Category(IRepositoryAccessor repoStore) : BaseServices(repoStore)
 {
     public async Task<OperationResult<string>> CreateAsync(CategoryCreateRequest request)
     {
-        var category = new Category()
+        Category? category = new()
         {
             Name = request.Name,
             ParentId = request.ParentId,
@@ -68,7 +68,7 @@ public class S_Category(IRepositoryAccessor repoStore) : BaseServices(repoStore)
 
     public async Task<OperationResult> PutAsync(int id, CategoryCreateRequest request)
     {
-        var category = await _repoStore.Categories.FindAsync(id);
+        Category? category = await _repoStore.Categories.FindAsync(id);
         if (category is null)
             return OperationResult.NotFound($"Cannot found category with id: {id}");
 
@@ -91,7 +91,7 @@ public class S_Category(IRepositoryAccessor repoStore) : BaseServices(repoStore)
 
     public async Task<OperationResult<string>> DeleteAsync(int id)
     {
-        var category = await _repoStore.Categories.FindAsync(id);
+        Category? category = await _repoStore.Categories.FindAsync(id);
         if (category is null)
             return OperationResult<string>.NotFound($"Cannot found category with id: {id}");
 

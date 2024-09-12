@@ -15,7 +15,7 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
         Function? functionExists = await _repoStore.Functions.FindByIdAsync(request.Id);
         if (functionExists is not null)
             return OperationResult<string>.Conflict("Function is existed.");
-        var function = new Function()
+        Function? function = new()
         {
             Id = request.Id,
             Name = request.Name,
@@ -35,7 +35,7 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
         Function? function = await _repoStore.Functions.FindByIdAsync(id);
         if (function is null)
             return OperationResult<FunctionVM>.NotFound("Function not found.");
-        var commands = await GetListCommandByIdAsync(id);
+        List<string>? commands = await GetListCommandByIdAsync(id);
         FunctionVM functionVM = new()
         {
             Id = function.Id,
@@ -71,8 +71,8 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
 
     public async Task<OperationResult<List<FunctionVM>>> GetParentIdsAsync()
     {
-        var query = _repoStore.Functions.FindAll(true);
-        var listFunctionVM = await query.Select(x => new FunctionVM()
+        IQueryable<Function>? query = _repoStore.Functions.FindAll(true);
+        List<FunctionVM>? listFunctionVM = await query.Select(x => new FunctionVM()
         {
             Id = x.Id,
             Name = x.Name,
@@ -85,12 +85,12 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
 
     public async Task<OperationResult<PagingResult<FunctionVM>>> GetPagingAsync(string? filter, PaginationParam pagination)
     {
-        var query = _repoStore.Functions.FindAll(true);
+        IQueryable<Function>? query = _repoStore.Functions.FindAll(true);
         if (!string.IsNullOrWhiteSpace(filter))
         {
             query = query.Where(x => x.Id.Contains(filter) || x.Name.Contains(filter));
         }
-        var listFunctionVM = await query.Select(x => new FunctionVM()
+        List<FunctionVM>? listFunctionVM = await query.Select(x => new FunctionVM()
         {
             Id = x.Id,
             Name = x.Name,
@@ -99,7 +99,7 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
             SortOrder = x.SortOrder,
             Icon = x.Icon
         }).ToListAsync();
-        var resultPaging = PagingResult<FunctionVM>.Create(listFunctionVM, pagination.PageNumber, pagination.PageSize);
+        PagingResult<FunctionVM>? resultPaging = PagingResult<FunctionVM>.Create(listFunctionVM, pagination.PageNumber, pagination.PageSize);
         return OperationResult<PagingResult<FunctionVM>>.Success(resultPaging, "Get function successfully.");
     }
 
@@ -154,8 +154,8 @@ public class S_Function(IRepositoryAccessor repoStore) : BaseServices(repoStore)
         // Kiểm tra xem các functions này có child functions không.
         foreach (var function in functionsToDelete)
         {
-            var childFunctions = await _repoStore.Functions.FindAll(x => x.ParentId == function.Id).ToListAsync();
-            if (childFunctions.Any())
+            List<Function>? childFunctions = await _repoStore.Functions.FindAll(x => x.ParentId == function.Id).ToListAsync();
+            if (childFunctions.Count != 0)
             {
                 // Nếu tồn tại child functions, trả về lỗi và không xóa.
                 return OperationResult.BadRequest($"Function {function.Id} has child functions. Please delete child functions first.");

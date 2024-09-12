@@ -20,10 +20,10 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
 
     public async Task<OperationResult<UserVM>> GetByIdAsync(string userId)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        User? user = await _userManager.FindByIdAsync(userId);
         if (user is null)
             return OperationResult<UserVM>.NotFound("User not found.");
-        var userVM = new UserVM()
+        UserVM? userVM = new UserVM()
         {
             Id = user.Id,
             FullName = user.FullName,
@@ -46,7 +46,7 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
                     orderby k.CreatedDate descending
                     select new { k, c };
 
-        var totalRecords = await query.Select(u => new ForumQuickVM()
+        List<ForumQuickVM>? totalRecords = await query.Select(u => new ForumQuickVM()
         {
             Id = u.k.Id,
             CategoryId = u.k.CategoryId,
@@ -65,19 +65,19 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
     public async Task<OperationResult<PagingResult<UserVM>>> GetPaging(PaginationParam pagination, UserSearchRequest userSearchRequest)
     {
         // Tạo mệnh đề predicate
-        var predicate = BuildUserSearchPredicate(userSearchRequest);
+        Expression<Func<User, bool>>? predicate = BuildUserSearchPredicate(userSearchRequest);
 
         // Thực hiện truy vấn
-        var usersQuery = await _userManager.Users.AsNoTracking().Where(predicate).ToListAsync();
+        List<User>? usersQuery = await _userManager.Users.AsNoTracking().Where(predicate).ToListAsync();
 
         // Tạo list UserVM từ pagedUsers và lấy roles cho mỗi user
-        var listUserVM = new List<UserVM>();
+        List<UserVM>? listUserVM = new();
 
         foreach (var user in usersQuery)
         {
-            var roles = await _userManager.GetRolesAsync(user); // Lấy roles dựa trên user hiện tại
+            IList<string>? roles = await _userManager.GetRolesAsync(user); // Lấy roles dựa trên user hiện tại
 
-            var userVM = new UserVM
+            UserVM? userVM = new UserVM
             {
                 Id = user.Id,
                 FullName = user.FullName,
@@ -94,7 +94,7 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
         }
 
         // Tạo đối tượng PagingResult<UserVM> từ listUserVM
-        var resultPaging = PagingResult<UserVM>.Create(listUserVM, pagination.PageNumber, pagination.PageSize);
+        PagingResult<UserVM>? resultPaging = PagingResult<UserVM>.Create(listUserVM, pagination.PageNumber, pagination.PageSize);
 
         // Trả về kết quả
         return OperationResult<PagingResult<UserVM>>.Success(resultPaging, "Get Users Successfully");
@@ -102,7 +102,7 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
 
     private Expression<Func<User, bool>> BuildUserSearchPredicate(UserSearchRequest userSearchRequest)
     {
-        var predicate = PredicateBuilder.New<User>(true);
+        ExpressionStarter<User>? predicate = PredicateBuilder.New<User>(true);
 
         if (!string.IsNullOrWhiteSpace(userSearchRequest.UserName))
         {
@@ -148,10 +148,10 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
 
     public async Task<OperationResult<List<FunctionTreeVM>>> GetMenuByUserPermission(string userId)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        User? user = await _userManager.FindByIdAsync(userId);
         if (user is null)
             return OperationResult<List<FunctionTreeVM>>.NotFound("User not found.");
-        var roles = await _userManager.GetRolesAsync(user);
+        IList<string>? roles = await _userManager.GetRolesAsync(user);
         IQueryable<FunctionTreeVM>? query = from f in _repoStore.Functions.FindAll(true)
                                         join p in _repoStore.Permissions.FindAll(true)
                                             on f.Id equals p.FunctionId
@@ -168,11 +168,11 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
                                             SortOrder = f.SortOrder,
                                             Icon = f.Icon
                                         };
-        var data = await query.Distinct()
+        List<FunctionTreeVM>? data = await query.Distinct()
             .OrderBy(x => x.ParentId)
             .ThenBy(x => x.SortOrder)
             .ToListAsync();
-        var dataTree = FunctionUtility.UnflatteringForLeftMenu(data);
+        List<FunctionTreeVM>? dataTree = FunctionUtility.UnflatteringForLeftMenu(data);
         return OperationResult<List<FunctionTreeVM>>.Success(dataTree, "Get data successfully.");
     }
 
@@ -183,7 +183,7 @@ public class S_User(IRepositoryAccessor repoStore, UserManager<User> userManager
         if (ids.Contains(idLogedIn))
             return OperationResult.BadRequest("Cannot delete the list of users. The list of ids contains the userid of the currently logged in user.");
 
-        var entitiesToDelete = await _repoStore.Users.FindAll(entity => ids.Contains(entity.Id)).ToListAsync();
+        List<User>? entitiesToDelete = await _repoStore.Users.FindAll(entity => ids.Contains(entity.Id)).ToListAsync();
 
         if (entitiesToDelete.Count == 0)
             return OperationResult.NotFound("List users empty.");

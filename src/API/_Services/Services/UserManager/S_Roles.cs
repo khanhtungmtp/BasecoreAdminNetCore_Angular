@@ -12,7 +12,7 @@ public class S_Roles(IRepositoryAccessor repoStore, RoleManager<IdentityRole> ro
     private readonly RoleManager<IdentityRole> _rolesManager = rolesManager;
     public async Task<OperationResult<List<PermissionScreenVm>>> GetAllPermissionTree()
     {
-        var data = await (
+        List<PermissionScreenVm>? data = await (
         from f in _repoStore.Functions.FindAll(true)
         join cif in _repoStore.CommandInFunctions.FindAll(true) on f.Id equals cif.FunctionId into functionCommands
         from sa in functionCommands.DefaultIfEmpty()
@@ -54,17 +54,17 @@ public class S_Roles(IRepositoryAccessor repoStore, RoleManager<IdentityRole> ro
             return OperationResult<string>.NotFound("No permission selected");
 
         // Assuming _repoStore.Permissions is a DbSet<Permission>
-        var currentPermissionsInDbQuery = _repoStore.Permissions.FindAll(p => p.RoleId == roleId);
+        IQueryable<Permission>? currentPermissionsInDbQuery = _repoStore.Permissions.FindAll(p => p.RoleId == roleId);
 
-        var currentPermissionsInDb = await currentPermissionsInDbQuery.ToListAsync();
+        List<Permission>? currentPermissionsInDb = await currentPermissionsInDbQuery.ToListAsync();
 
         foreach (var item in request)
         {
-            var permission = new Permission(item.FunctionId, roleId, item.CommandId);
+            Permission? permission = new Permission(item.FunctionId, roleId, item.CommandId);
 
             if (!item.Checked)
             {
-                var existingPermission = await currentPermissionsInDbQuery
+                Permission? existingPermission = await currentPermissionsInDbQuery
                     .FirstOrDefaultAsync(x => x.FunctionId == item.FunctionId && x.CommandId == item.CommandId);
 
                 if (existingPermission != null)
@@ -72,7 +72,7 @@ public class S_Roles(IRepositoryAccessor repoStore, RoleManager<IdentityRole> ro
             }
             else
             {
-                var exists = await currentPermissionsInDbQuery
+                bool exists = await currentPermissionsInDbQuery
                     .AnyAsync(x => x.FunctionId == item.FunctionId && x.CommandId == item.CommandId);
 
                 if (!exists)
@@ -91,7 +91,7 @@ public class S_Roles(IRepositoryAccessor repoStore, RoleManager<IdentityRole> ro
         public bool Equals(Permission? x, Permission? y)
         {
             // Check whether the compared objects reference the same data.
-            if (Object.ReferenceEquals(x, y)) return true;
+            if (ReferenceEquals(x, y)) return true;
 
             // Check whether any of the compared objects is null.
             if (x is null || y is null)

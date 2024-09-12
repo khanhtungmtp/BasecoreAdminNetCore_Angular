@@ -1,6 +1,7 @@
 using API._Repositories;
 using API._Services.Interfaces.System;
 using API.Helpers.Base;
+using API.Models;
 using Microsoft.EntityFrameworkCore;
 using ViewModels.System;
 
@@ -9,11 +10,11 @@ public class S_Labels(IRepositoryAccessor repoStore) : BaseServices(repoStore), 
 {
     public async Task<OperationResult<LabelVM>> FindByIdAsync(string id)
     {
-        var label = await _repoStore.Labels.FindAsync(id);
+        Label? label = await _repoStore.Labels.FindAsync(id);
         if (label is null)
             return OperationResult<LabelVM>.NotFound($"Label with id: {id} is not found");
 
-        var labelVm = new LabelVM()
+        LabelVM? labelVm = new()
         {
             Id = label.Id,
             Name = label.Name
@@ -33,7 +34,7 @@ public class S_Labels(IRepositoryAccessor repoStore) : BaseServices(repoStore), 
                             g.Key.Name,
                             Count = g.Count()
                         };
-            var labels = await query.OrderByDescending(x => x.Count).Take(take)
+            List<LabelVM>? labels = await query.OrderByDescending(x => x.Count).Take(take)
                 .Select(l => new LabelVM()
                 {
                     Id = l.Id,

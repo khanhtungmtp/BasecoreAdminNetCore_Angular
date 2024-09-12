@@ -35,7 +35,7 @@ public class S_Comments(IRepositoryAccessor repoStore) : BaseServices(repoStore)
             {
                 Comment? repliedComment = await _repoStore.Comments.FindAsync(comment.ReplyId.Value);
                 User? repledUser = await _repoStore.Users.FindAsync(repliedComment.OwnwerUserId);
-                var emailModel = new RepliedCommentVM()
+                RepliedCommentVM? emailModel = new()
                 {
                     CommentContent = request.Content,
                     ForumId = forumId,
@@ -56,13 +56,13 @@ public class S_Comments(IRepositoryAccessor repoStore) : BaseServices(repoStore)
 
     public async Task<OperationResult<CommentVM>> FindByIdAsync(int commentId)
     {
-        var comment = await _repoStore.Comments.FindAsync(commentId);
+        Comment? comment = await _repoStore.Comments.FindAsync(commentId);
         if (comment is null)
             return OperationResult<CommentVM>.NotFound($"Cannot found comment with id: {commentId}");
-        var user = await _repoStore.Users.FindAsync(comment.OwnwerUserId);
+        User? user = await _repoStore.Users.FindAsync(comment.OwnwerUserId);
         if (user is null)
             return OperationResult<CommentVM>.NotFound($"Cannot found user with id: {comment.OwnwerUserId}");
-        var commentVm = new CommentVM()
+        CommentVM? commentVm = new()
         {
             Id = comment.Id,
             Content = comment.Content,
@@ -90,7 +90,7 @@ public class S_Comments(IRepositoryAccessor repoStore) : BaseServices(repoStore)
         {
             query = query.Where(x => x.c.Content.Contains(filter));
         }
-        var result = await query.Select(c => new CommentVM()
+        List<CommentVM>? result = await query.Select(c => new CommentVM()
         {
             Id = c.c.Id,
             Content = c.c.Content,
@@ -100,14 +100,14 @@ public class S_Comments(IRepositoryAccessor repoStore) : BaseServices(repoStore)
             OwnerUserId = c.c.OwnwerUserId,
             OwnerName = c.u.FullName
         }).ToListAsync();
-        var resultsPaging = PagingResult<CommentVM>.Create(result, pagination.PageNumber, pagination.PageSize);
+        PagingResult<CommentVM>? resultsPaging = PagingResult<CommentVM>.Create(result, pagination.PageNumber, pagination.PageSize);
         return OperationResult<PagingResult<CommentVM>>.Success(resultsPaging, "Get forums successfully.");
 
     }
 
     public async Task<OperationResult> PutAsync(int commentId, CommentCreateRequest request)
     {
-        var comment = await _repoStore.Comments.FindAsync(commentId);
+        Comment? comment = await _repoStore.Comments.FindAsync(commentId);
         if (comment is null)
             return OperationResult.NotFound($"Cannot found comment with id: {commentId}");
         if (comment.OwnwerUserId != request.UserId)
@@ -125,7 +125,7 @@ public class S_Comments(IRepositoryAccessor repoStore) : BaseServices(repoStore)
 
     public async Task<OperationResult> DeleteAsync(int forumId, int commentId)
     {
-        var comment = await _repoStore.Comments.FindAsync(commentId);
+        Comment? comment = await _repoStore.Comments.FindAsync(commentId);
         if (comment is null)
             return OperationResult.NotFound($"Cannot found comment with id: {commentId}");
 
@@ -176,7 +176,7 @@ public class S_Comments(IRepositoryAccessor repoStore) : BaseServices(repoStore)
                     where c.ForumId == forumId
                     select new { c, u };
 
-        var flatComments = await query.Select(x => new CommentVM()
+        List<CommentVM>? flatComments = await query.Select(x => new CommentVM()
         {
             Id = x.c.Id,
             Content = x.c.Content,
@@ -187,8 +187,8 @@ public class S_Comments(IRepositoryAccessor repoStore) : BaseServices(repoStore)
             ReplyId = x.c.ReplyId
         }).ToListAsync();
 
-        var lookup = flatComments.ToLookup(c => c.ReplyId);
-        var rootCategories = flatComments.Where(x => x.ReplyId == null);
+        ILookup<int?, CommentVM>? lookup = flatComments.ToLookup(c => c.ReplyId);
+        IEnumerable<CommentVM>? rootCategories = flatComments.Where(x => x.ReplyId == null);
 
         foreach (var c in rootCategories)//only loop through root categories
         {

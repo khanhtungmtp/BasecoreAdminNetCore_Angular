@@ -1,5 +1,6 @@
 using API._Services.Interfaces.System;
 using API.Filters.Authorization;
+using API.Helpers.Base;
 using API.Helpers.Constants;
 using API.Helpers.Utilities;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +20,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.CREATE)]
     public async Task<IActionResult> PostFunction(FunctionCreateRequest request)
     {
-        var result = await _functionService.CreateAsync(request);
+        OperationResult<string>? result = await _functionService.CreateAsync(request);
         return HandleResult(result);
     }
 
@@ -45,7 +46,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.VIEW)]
     public async Task<IActionResult> GetById(string id)
     {
-        var result = await _functionService.FindByIdAsync(id);
+        OperationResult<FunctionVM>? result = await _functionService.FindByIdAsync(id);
         return HandleResult(result);
     }
 
@@ -54,7 +55,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.UPDATE)]
     public async Task<IActionResult> PutFunction(string id, [FromBody] FunctionCreateRequest request)
     {
-        var result = await _functionService.PutAsync(id, request);
+        OperationResult<string>? result = await _functionService.PutAsync(id, request);
         return HandleResult(result);
     }
 
@@ -63,7 +64,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.DELETE)]
     public async Task<IActionResult> DeleteFunction(string id)
     {
-        var result = await _functionService.DeleteAsync(id);
+        OperationResult<string>? result = await _functionService.DeleteAsync(id);
         return HandleResult(result);
     }
 
@@ -72,7 +73,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.DELETE)]
     public async Task<IActionResult> DeleteRangeFunction([FromBody] List<string> ids)
     {
-        var result = await _functionService.DeleteRangeAsync(ids);
+        OperationResult? result = await _functionService.DeleteRangeAsync(ids);
         return HandleResult(result);
     }
 
@@ -82,7 +83,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.VIEW)]
     public async Task<IActionResult> GetCommands()
     {
-        var result = await _commandInFunctionService.GetCommandsAsync();
+        OperationResult<List<CommandVM>>? result = await _commandInFunctionService.GetCommandsAsync();
         return HandleResult(result);
     }
 
@@ -92,7 +93,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.CREATE)]
     public async Task<IActionResult> PostCommandToFunction(string functionId, [FromBody] CommandAssignRequest request)
     {
-        var result = await _commandInFunctionService.CreateAsync(functionId, request);
+        OperationResult<CommandInFunctionResponseVM>? result = await _commandInFunctionService.CreateAsync(functionId, request);
         if (!result.Succeeded || result.Data is null)
         {
             if (result.StatusCode == 404)
@@ -109,7 +110,7 @@ public class FunctionsController(I_Function functionService, I_CommandInFunction
     [ClaimRequirement(FunctionCode.SYSTEM_FUNCTION, CommandCode.DELETE)]
     public async Task<IActionResult> DeleteCommandToFunction(string functionId, [FromBody] CommandAssignRequest request)
     {
-        var result = await _commandInFunctionService.DeleteAsync(functionId, request);
+        OperationResult? result = await _commandInFunctionService.DeleteAsync(functionId, request);
         return HandleResult(result);
     }
 
