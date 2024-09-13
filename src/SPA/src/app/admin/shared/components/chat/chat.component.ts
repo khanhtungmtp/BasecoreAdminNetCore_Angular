@@ -1,5 +1,7 @@
+import { NgClass, AsyncPipe } from '@angular/common';
 import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ElementRef, OnDestroy, Output, EventEmitter, ChangeDetectorRef, inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ThemeService } from '@app/_core/services/common/theme.service';
 import { fnGetRandomNum } from '@app/_core/utilities/tools';
 
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
@@ -17,7 +19,7 @@ import { NzTypographyModule } from 'ng-zorro-antd/typography';
   styleUrls: ['./chat.component.less'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [NzCardModule, NzTypographyModule, NzGridModule, NzAvatarModule, NzResultModule, NzIconModule, NzButtonModule, FormsModule, ReactiveFormsModule, NzInputModule]
+  imports: [NzCardModule, NzTypographyModule, NzGridModule, NzAvatarModule, NzResultModule, NzIconModule, NzButtonModule, FormsModule, ReactiveFormsModule, NzInputModule, NgClass, AsyncPipe]
 })
 export class ChatComponent implements OnInit, OnDestroy {
   @ViewChild('scrollMe') private myScrollContainer!: ElementRef;
@@ -98,6 +100,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     "Cultivating in seclusion"
   ];
 
+  readonly themesModel$ = inject(ThemeService).getStyleThemeMode();
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
 

@@ -10,17 +10,17 @@
     <ng-template #menuTpl
                  let-menus>
     <!-- Lặp qua mảng menu cấp độ cao nhất -->
-    @for (menu of leftMenu; track menu; let i = $index) {
+    @for (menu of leftMenu; track menu.url; let i = $index) {
     <ng-container>
       <!-- Kiểm tra nếu menu có menu con -->
       @if (menu.children && menu.children.length) {
       <ng-container>
         <li nz-submenu
             [nzPaddingLeft]="(themesMode !== 'top' || isOverMode) && !isCollapsed ? 16 : 0"
-            [nzTitle]="titleTpl"
+            [nzTitle]="menuTitleTpl"
             [(nzOpen)]="menu.open"
             (nzOpenChange)="changeOpen(menu, menus)">
-          <ng-template #titleTpl>
+          <ng-template #menuTitleTpl>
             @if (menu.icon) {
             <i nz-icon
                [nzType]="menu.icon"></i>
@@ -30,7 +30,7 @@
             <!-- Tạo một submenu với các menu con -->
           <ul>
             <!-- Lặp qua các menu con -->
-            @for (child of menu.children; track child;) {
+            @for (child of menu.children; track child.url;) {
               <li nz-menu-item
                   [nzPaddingLeft]="(themesMode !== 'top' || isOverMode) && !isCollapsed ? 32 : 0"
                   [nzSelected]="child.selected">
@@ -70,17 +70,17 @@
     nzMode="horizontal"
     nzTheme="dark">
     <!-- Lặp qua mảng menu cấp độ cao nhất -->
-    @for (menu of leftMenu; track menu; let i = $index) {
+    @for (menu of leftMenu; track menu.url; let i = $index) {
     <ng-container>
     <!-- Kiểm tra nếu menu có menu con -->
     @if (menu.children && menu.children.length) {
     <ng-container>
       <li nz-submenu
           [nzPaddingLeft]="(themesMode !== 'top' || isOverMode) && !isCollapsed ? 16 : 0"
-          [nzTitle]="titleTpl"
+          [nzTitle]="menuTitleTpl"
           [(nzOpen)]="menu.open"
           (nzOpenChange)="changeOpen(menu, leftMenu)">
-        <ng-template #titleTpl>
+        <ng-template #menuTitleTpl>
           @if (menu.icon) {
           <i nz-icon
              [nzType]="menu.icon"></i>
@@ -90,7 +90,7 @@
           <!-- Tạo một submenu với các menu con -->
         <ul>
           <!-- Lặp qua các menu con -->
-          @for (child of menu.children; track child;) {
+          @for (child of menu.children; track child.url;) {
             <li nz-menu-item
                 [nzPaddingLeft]="(themesMode !== 'top' || isOverMode) && !isCollapsed ? 32 : 0"
                 [nzSelected]="child.selected">

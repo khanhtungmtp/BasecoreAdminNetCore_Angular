@@ -1,16 +1,16 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
 
-import { IsNightKey, ThemeOptionsKey } from '@constants/app.constants';
-import { ThemeService } from '@services/common/theme.service';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 
 import { WindowService } from './window.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { StyleThemeModelKey, ThemeOptionsKey } from '@app/_core/constants/app.constants';
+import { ThemeService, StyleTheme } from './theme.service';
 
-type setThemeProp = 'setIsNightTheme' | 'setThemesMode';
-type getThemeProp = 'getIsNightTheme' | 'getThemesMode';
+type setThemeProp = 'setStyleThemeMode' | 'setThemesMode';
+type getThemeProp = 'getStyleThemeMode' | 'getThemesMode';
 
 interface InitThemeOption {
   storageKey: string;
@@ -19,7 +19,7 @@ interface InitThemeOption {
 }
 
 /*
- * Initialize theme
+ * 初始化theme
  * */
 @Injectable({
   providedIn: 'root'
@@ -28,11 +28,12 @@ export class InitThemeService {
   private themesService = inject(ThemeService);
   private windowServe = inject(WindowService);
   destroyRef = inject(DestroyRef);
+
   themeInitOption: InitThemeOption[] = [
     {
-      storageKey: IsNightKey,
-      setMethodName: 'setIsNightTheme',
-      getMethodName: 'getIsNightTheme'
+      storageKey: StyleThemeModelKey,
+      setMethodName: 'setStyleThemeMode',
+      getMethodName: 'getStyleThemeMode'
     },
     {
       storageKey: ThemeOptionsKey,
@@ -42,13 +43,24 @@ export class InitThemeService {
   ];
 
   initTheme(): Promise<void> {
+    // todo 有待优化
     return new Promise(resolve => {
       this.themeInitOption.forEach(item => {
         const hasCash = this.windowServe.getStorage(item.storageKey);
         if (hasCash) {
-          this.themesService[item.setMethodName](JSON.parse(hasCash));
+          if (item.setMethodName === 'setStyleThemeMode') {
+            this.themesService[item.setMethodName](hasCash as StyleTheme);
+          } else {
+            this.themesService[item.setMethodName](JSON.parse(hasCash));
+          }
         } else {
-          (this.themesService[item.getMethodName]() as Observable<NzSafeAny>).pipe(first(), takeUntilDestroyed(this.destroyRef)).subscribe(res => this.windowServe.setStorage(item.storageKey, JSON.stringify(res)));
+          (this.themesService[item.getMethodName]() as Observable<NzSafeAny>).pipe(first(), takeUntilDestroyed(this.destroyRef)).subscribe(res => {
+            if (item.setMethodName === 'setStyleThemeMode') {
+              this.windowServe.setStorage(item.storageKey, res);
+            } else {
+              this.windowServe.setStorage(item.storageKey, JSON.stringify(res));
+            }
+          });
         }
       });
       return resolve();

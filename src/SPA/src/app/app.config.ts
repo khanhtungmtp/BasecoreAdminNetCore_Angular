@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, ApplicationConfig, ErrorHandler, importProvidersFrom } from '@angular/core';
+import { APP_INITIALIZER, ApplicationConfig, ErrorHandler, importProvidersFrom, provideExperimentalZonelessChangeDetection } from '@angular/core';
 import { TitleStrategy, provideRouter, withComponentInputBinding, withHashLocation, withInMemoryScrolling, withPreloading } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -24,7 +24,6 @@ import { LoadAliIconCdnService } from '@services/common/load-ali-icon-cdn.servic
 import { SubLockedStatusService } from '@services/common/sub-locked-status.service';
 import { SubWindowWithService } from '@services/common/sub-window-with.service';
 import { TokenInterceptor } from './_core/services/auth/token.interceptor';
-import { CommonService } from './_core/services/common.service';
 import { LocalStorageConstants } from './_core/constants/local-storage.constants';
 const icons = [MenuFoldOutline, MenuUnfoldOutline, DashboardOutline, FormOutline, DollarCircleOutline];
 registerLocaleData(vi);
@@ -121,6 +120,7 @@ export const appConfig: ApplicationConfig = {
       // DI-based interceptors must be explicitly enabled.
       withInterceptorsFromDi(),
     ),
+    provideExperimentalZonelessChangeDetection(), // 开启 zoneless
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
     ...APPINIT_PROVIDES,

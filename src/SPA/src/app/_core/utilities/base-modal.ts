@@ -3,14 +3,14 @@ import { ComponentRef, DestroyRef, inject, Injectable, Injector, Renderer2, Rend
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, of } from 'rxjs';
 import { first, tap } from 'rxjs/operators';
-
 import _ from 'lodash';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
-import { ModalButtonOptions, ModalOptions, NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
-import { ModalFullStatusStoreService } from '../services/common/modal-full-status-store.service';
+import { ModalOptions, NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { GLOBAL_TPL_MODAL_ACTION_TOKEN } from '@app/admin/tpl/global-modal-btn-tpl/global-modal-btn-tpl-token';
 import { GlobalModalBtnTplComponentToken } from '@app/admin/tpl/global-modal-btn-tpl/global-modal-btn-tpl.component';
+import { ModalFullStatusStoreService } from '../services/common/modal-full-status-store.service';
 import { fnGetUUID } from './tools';
+import { throwModalGetCurrentFnError, throwModalRefError } from './errors';
 
 interface ModalZIndex {
   zIndex: number;
@@ -22,19 +22,23 @@ export const enum ModalBtnStatus {
   Ok
 }
 
+export interface ModalResponse {
+  status: ModalBtnStatus;
+  modalValue: NzSafeAny;
+}
+
 // Component instances need to inherit this class
 export abstract class BasicConfirmModalComponent {
-  protected constructor(protected modalRef: NzModalRef) { }
-
-  protected abstract getCurrentValue(): NzSafeAny;
+  modalRef: NzModalRef<NzSafeAny, ModalResponse | boolean> = inject(NzModalRef);
+  abstract getCurrentValue(): NzSafeAny;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ModalWrapService {
-  protected bsModalService = inject(NzModalService);
-  private btnTpl!: TemplateRef<any>;
+  protected bsModalService: NzModalService;
+  private btnTpl!: TemplateRef<NzSafeAny>;
   private renderer: Renderer2;
   destroyRef = inject(DestroyRef);
 
@@ -70,13 +74,15 @@ export class ModalWrapService {
     return `NZ-MODAL-WRAP-CLS-${fnGetUUID()}`;
   }
 
-  private cancelCallback(modalButtonOptions: ModalButtonOptions): void {
+  private cancelCallback<T extends BasicConfirmModalComponent>(modalContentCompInstance: T): void {
+    this.modalCompVerification(modalContentCompInstance);
     this.modalFullStatusStoreService.setModalFullStatusStore(false);
-    return modalButtonOptions['modalRef'].destroy({ status: ModalBtnStatus.Cancel, value: null });
+    return modalContentCompInstance.modalRef.destroy({ status: ModalBtnStatus.Cancel, modalValue: null });
   }
 
-  private confirmCallback(modalButtonOptions: ModalButtonOptions): void {
-    (modalButtonOptions['modalRef'].componentInstance as NzSafeAny)
+  private confirmCallback<T extends BasicConfirmModalComponent>(modalContentCompInstance: T): void {
+    this.modalCompVerification(modalContentCompInstance);
+    modalContentCompInstance.modalRef.componentInstance
       .getCurrentValue()
       .pipe(
         tap(modalValue => {
@@ -84,7 +90,7 @@ export class ModalWrapService {
           if (!modalValue) {
             return of(false);
           } else {
-            return modalButtonOptions['modalRef'].destroy({ status: ModalBtnStatus.Ok, modalValue });
+            return modalContentCompInstance.modalRef.destroy({ status: ModalBtnStatus.Ok, modalValue });
           }
         }),
         takeUntilDestroyed(this.destroyRef)
@@ -92,14 +98,24 @@ export class ModalWrapService {
       .subscribe();
   }
 
+  modalCompVerification(modalContentCompInstance: BasicConfirmModalComponent): void {
+    if (!modalContentCompInstance.modalRef) {
+      throwModalRefError();
+    }
+    if (!modalContentCompInstance.modalRef.componentInstance.getCurrentValue) {
+      throwModalGetCurrentFnError();
+    }
+  }
+
+
   getZIndex(element: HTMLElement): number {
     return +getComputedStyle(element, null).zIndex;
   }
 
   /**
-   *Get the maximum value of all dialog boxes and determine whether it needs to be modified
+   * Get the maximum value of all dialog boxes and determine whether they need to be modified
    *
-   * @param wrapElement The z-index container to be modified
+   * @param wrapElement 待修改z-index 容器
    */
   getModalMaxZIndex(wrapElement: HTMLElement): ModalZIndex {
     return this.bsModalService.openModals.reduce<ModalZIndex>(
@@ -119,7 +135,7 @@ export class ModalWrapService {
     );
   }
 
-  // When the dialog box is in the dialog box, set the z-index of the current dialog box to the maximum
+  // When the dialog panel is on, set the z-index of the current dialog to the maximum
   protected setMaxZIndex(wrapElement: HTMLElement): void {
     wrapElement.addEventListener(
       'mousedown',
@@ -155,44 +171,44 @@ export class ModalWrapService {
     wrapElement.style.pointerEvents = 'none';
   }
 
-  // Create dialog configuration items
-  createModalConfig<T>(component: Type<NzSafeAny>, modalOptions: ModalOptions = {}, params: T, wrapCls: string): ModalOptions {
-    const defaultOptions: ModalOptions = {
+  // Create dialog box configuration items
+  createModalConfig<T extends BasicConfirmModalComponent, U>(component: Type<T>, modalOptions: ModalOptions = {}, params?: U, wrapCls: string = ''): ModalOptions {
+    const defaultOptions: ModalOptions<NzSafeAny, U> = {
       nzTitle: '',
       nzContent: component,
       nzCloseIcon: modalOptions.nzCloseIcon || this.btnTpl,
       nzMaskClosable: false,
       nzFooter: [
         {
-          label: 'Save changes',
+          label: 'Confirm',
           type: 'primary',
           show: true,
-          onClick: this.confirmCallback.bind(this)
+          onClick: this.confirmCallback.bind(this)<T>
         },
         {
           label: 'Cancel',
           type: 'default',
           show: true,
-          onClick: this.cancelCallback.bind(this)
+          onClick: this.cancelCallback.bind(this)<T>
         }
       ],
       nzOnCancel: () => {
-        return new Promise(resolve => {
-          resolve({ status: ModalBtnStatus.Cancel, value: null });
+        return new Promise<ModalResponse>(resolve => {
+          resolve({ status: ModalBtnStatus.Cancel, modalValue: null });
         });
       },
       nzClosable: true,
       nzWidth: 720,
-      nzData: params // The properties in the parameters will be passed into the nzContent instance
+      nzData: params // The attributes in the parameters will be passed into the nzContent instance
     };
     const newOptions = _.merge(defaultOptions, modalOptions);
     newOptions.nzWrapClassName = `${newOptions.nzWrapClassName || ''} ${wrapCls}`;
     return newOptions;
   }
 
-  show<T>(component: Type<NzSafeAny>, modalOptions: ModalOptions = {}, params?: T): Observable<NzSafeAny> {
+  show<T extends BasicConfirmModalComponent, U>(component: Type<T>, modalOptions: ModalOptions = {}, params?: U): Observable<NzSafeAny> {
     const wrapCls = this.getRandomCls();
-    const newOptions = this.createModalConfig(component, modalOptions, params, wrapCls);
+    const newOptions = this.createModalConfig<T, U>(component, modalOptions, params, wrapCls);
     const modalRef = this.bsModalService.create(newOptions);
     let drag: DragRef | null;
     modalRef.afterOpen.pipe(first(), takeUntilDestroyed(this.destroyRef)).subscribe(() => {

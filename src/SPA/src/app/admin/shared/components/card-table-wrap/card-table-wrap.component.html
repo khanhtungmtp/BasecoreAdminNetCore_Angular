@@ -54,7 +54,7 @@
 </ng-template>
 <nz-dropdown-menu #tableSizeMenu>
   <ul nz-menu>
-    @for (item of tableSizeOptions; track item) {
+    @for (item of tableSizeOptions; track $index) {
       <li nz-menu-item [nzSelected]="item.selected" (click)="tableSizeMenuClick(item)">
         <span>{{ item.sizeName }}</span>
       </li>
@@ -63,7 +63,7 @@
 </nz-dropdown-menu>
 <ng-template #contentTemplate>
   <ul cdkDropList style="min-width: 315px" (cdkDropListDropped)="dropTableConfig($event)">
-    @for (item of tableHeaders; track item) {
+    @for (item of tableHeaders; track $index) {
       <li class="flex space-between" cdkDrag style="padding: 4px 16px 8px 0">
         <div>
           <i class="m-r-8 hand-model-move" cdkDragHandle nz-icon nzTheme="outline" nzType="drag"></i>

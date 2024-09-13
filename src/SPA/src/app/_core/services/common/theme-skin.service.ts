@@ -1,34 +1,33 @@
 import { DOCUMENT } from '@angular/common';
 import { DestroyRef, inject, Injectable } from '@angular/core';
-import { first } from 'rxjs/operators';
-
-import { ThemeService } from '@services/common/theme.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ThemeService, StyleTheme } from './theme.service';
 
-const enum ThemeType {
-  dark = 'dark',
-  default = 'default'
-}
 /*
- * Switch theme service
+ * 切换主题服务
  * */
 @Injectable({
   providedIn: 'root'
 })
 export class ThemeSkinService {
-  currentTheme!: ThemeType;
   private readonly doc = inject(DOCUMENT);
   private readonly themesService = inject(ThemeService);
+  private currentStyleThemeModel!: StyleTheme; // 已经在构造函数中初始化了,当前主题风格的模式，阿里云、默认、紧凑、暗黑
   destroyRef = inject(DestroyRef);
 
-  reverseTheme(theme: ThemeType): ThemeType {
-    return theme === ThemeType.dark ? ThemeType.default : ThemeType.dark;
+  constructor() {
+    this.themesService
+      .getStyleThemeMode()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(currentStyleTheme => {
+        this.currentStyleThemeModel = currentStyleTheme;
+      });
   }
 
-  removeUnusedTheme(theme: ThemeType): void {
-    this.doc.documentElement.classList.remove(theme);
+  removeUnusedTheme(theme: StyleTheme): void {
     const removedThemeStyle = this.doc.getElementById(theme);
     if (removedThemeStyle) {
+      this.doc.documentElement.classList.remove(theme);
       this.doc.head.removeChild(removedThemeStyle);
     }
   }
@@ -46,15 +45,7 @@ export class ThemeSkinService {
   }
 
   public loadTheme(isFirstLoad = true): Promise<Event> {
-    if (isFirstLoad) {
-      this.themesService
-        .getIsNightTheme()
-        .pipe(first(), takeUntilDestroyed(this.destroyRef))
-        .subscribe(res => {
-          this.currentTheme = res ? ThemeType.dark : ThemeType.default;
-        });
-    }
-    const theme = this.currentTheme;
+    const theme = this.currentStyleThemeModel;
     if (isFirstLoad) {
       this.doc.documentElement.classList.add(theme);
     }
@@ -64,7 +55,14 @@ export class ThemeSkinService {
           if (!isFirstLoad) {
             this.doc.documentElement.classList.add(theme);
           }
-          this.removeUnusedTheme(this.reverseTheme(theme));
+          (['default', 'aliyun', 'compact', 'dark'] as StyleTheme[])
+            .filter(item => item !== this.currentStyleThemeModel)
+            .forEach(item => {
+              setTimeout(() => {
+                this.removeUnusedTheme(<StyleTheme>item);
+              }, 1);
+            });
+
           resolve(e);
         },
         e => reject(e)
@@ -73,7 +71,6 @@ export class ThemeSkinService {
   }
 
   public toggleTheme(): Promise<Event> {
-    this.currentTheme = this.reverseTheme(this.currentTheme);
     return this.loadTheme(false);
   }
 }

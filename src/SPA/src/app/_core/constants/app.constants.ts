@@ -6,8 +6,11 @@ export const TokenPre = 'Bearer ';
 export const TokenKey = 'Authorization';
 // Is it a dark mode key?
 export const IsNightKey = 'IsNightKey';
+export const IsCompact = 'IsCompact';
 // theme setting key
 export const ThemeOptionsKey = 'ThemeOptionsKey';
+export const StyleThemeKey = 'StyleThemeKey';
+export const StyleThemeModelKey = 'StyleThemeModelKey';
 // Used to record whether it is loaded for the first time
 export const IsFirstLogin = 'IsFirstLogin';
 // Lock screen key

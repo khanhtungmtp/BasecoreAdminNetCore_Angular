@@ -84,6 +84,12 @@ export class DriverService {
       doneBtnText: 'Finish',
       nextBtnText: 'Next step',
       prevBtnText: 'Previous',
+      onHighlightStarted: () => {
+        this.doc.body.style.cssText = 'overflow:hidden';
+      },
+      onDestroyed: () => {
+        this.doc.body.style.cssText = 'overflow:auto';
+      },
       steps
     });
 

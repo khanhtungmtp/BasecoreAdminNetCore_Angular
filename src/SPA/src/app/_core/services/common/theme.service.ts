@@ -1,31 +1,38 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-
 import { Theme, ThemeMode } from '@app/admin/layouts/setting-drawer/setting-drawer.component';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface SettingInterface {
   theme: Theme['key']; // Theme mode (dark mode, light mode)
-  color: string; // theme color
-  mode: ThemeMode['key']; // Menu modes (side mode, top mode, mixed mode)
-  colorWeak: boolean; // color blindness
-  greyTheme: boolean; // gray mode
-  fixedHead: boolean; // fixed head
-  splitNav: boolean; // Whether to split the menu (valid only when the menu mode is mixed mode)
-  fixedLeftNav: boolean; // Fixed left menu
-  isShowTab: boolean; // Whether to display multiple tabs
-  fixedTab: boolean; // Fixed tabs
-  hasTopArea: boolean; // Whether to display the top area
-  hasFooterArea: boolean; // Whether to display the bottom area
-  hasNavArea: boolean; // Is there a menu
-  hasNavHeadArea: boolean; // Does the menu have a menu header?
+  color: string; // Màu chủ đề
+  mode: ThemeMode['key']; // Chế độ menu (bên cạnh, trên cùng, kết hợp)
+  colorWeak: boolean; // Mù màu
+  greyTheme: boolean; // Chủ đề xám
+  fixedHead: boolean; // Đầu cố định
+  splitNav: boolean; // Phân chia menu (chỉ có hiệu lực khi chế độ menu là kết hợp)
+  fixedLeftNav: boolean; // Menu bên trái cố định
+  isShowTab: boolean; // Hiển thị tab nhiều trang
+  fixedTab: boolean; // Tab cố định
+  hasTopArea: boolean; // Có vùng trên cùng
+  hasFooterArea: boolean; // Có vùng dưới cùng
+  hasNavArea: boolean; // Có menu
+  hasNavHeadArea: boolean; // Menu có đầu menu
 }
+
+export type StyleTheme = 'default' | 'dark' | 'aliyun' | 'compact'; // Chủ đề mặc định, chủ đề tối, chủ đề Alibaba Cloud, chủ đề gọn nhẹ
+
+// Theme style
+export type StyleThemeInterface = {
+  [key in StyleTheme]: boolean;
+};
 
 @Injectable({
   providedIn: 'root'
 })
 export class ThemeService {
-  private isNightTheme$ = new BehaviorSubject<boolean>(false);
-  private isOverModeTheme$ = new BehaviorSubject<boolean>(false);
+  private isNightTheme$ = new BehaviorSubject<boolean>(false);// Dark theme observable
+  private isCompactTheme$ = new BehaviorSubject<boolean>(false); // Compact theme
+  private isOverModeTheme$ = new BehaviorSubject<boolean>(false); // over mode, tức là kéo chiều rộng của trình duyệt cho đến khi thanh menu biến mất
   private themesMode$ = new BehaviorSubject<SettingInterface>({
     theme: 'dark',
     color: '#1890FF',
@@ -42,10 +49,10 @@ export class ThemeService {
     hasNavArea: true,
     hasNavHeadArea: true
   });
+  private styleThemeMode$ = new BehaviorSubject<StyleTheme>('default'); // Theme style, dark, default, compact, Alibaba Cloud
+  private isCollapsed$ = new BehaviorSubject<boolean>(false); // Chế độ thu gọn Menu, kéo trình duyệt vào menu và tự động rút gọn thành biểu tượng
 
-  private isCollapsed$ = new BehaviorSubject<boolean>(false);
-
-  // Get theme parameters
+// Get the theme parameters
   setThemesMode(mode: SettingInterface): void {
     this.themesMode$.next(mode);
   }
@@ -54,7 +61,17 @@ export class ThemeService {
     return this.themesMode$.asObservable();
   }
 
-  // Whether the theme is a dark theme
+  // Get the theme mode
+  setStyleThemeMode(mode: StyleTheme): void {
+    this.setIsNightTheme(mode === 'dark');
+    this.setIsCompactTheme(mode === 'compact');
+    this.styleThemeMode$.next(mode);
+  }
+
+  getStyleThemeMode(): Observable<StyleTheme> {
+    return this.styleThemeMode$.asObservable();
+  }
+// Is the theme a dark theme?
   setIsNightTheme(isNight: boolean): void {
     this.isNightTheme$.next(isNight);
   }
@@ -63,7 +80,16 @@ export class ThemeService {
     return this.isNightTheme$.asObservable();
   }
 
-  // Whether the theme overrides the sidebar
+// Is the theme a compact theme?
+  setIsCompactTheme(isNight: boolean): void {
+    this.isCompactTheme$.next(isNight);
+  }
+
+  getIsCompactTheme(): Observable<boolean> {
+    return this.isCompactTheme$.asObservable();
+  }
+
+// Liệu chủ đề có nằm ngoài thanh bên hay không
   setIsOverMode(isNight: boolean): void {
     this.isOverModeTheme$.next(isNight);
   }
@@ -72,7 +98,7 @@ export class ThemeService {
     return this.isOverModeTheme$.asObservable();
   }
 
-  // Whether the menu is collapsed
+// Menu có bị thu gọn hay không
   setIsCollapsed(isCollapsed: boolean): void {
     this.isCollapsed$.next(isCollapsed);
   }

@@ -6,7 +6,7 @@
 
 @layout-trigger-height: 40px;
 
-// If there is a style variable common to all themes, the base style file and introduce it in each theme style customization file:
+// If there are style variables common to all themes, the base style file is imported into each theme style customization file:
 * {
   box-sizing: border-box;
 }
@@ -428,6 +428,14 @@ h6 {
   font-size: 28px !important;
 }
 
+.b-r-8{
+  border-radius: 8px;
+}
+
+.b-r-12{
+  border-radius: 12px;
+}
+
 .animate-bg-0 {
   transition: background-color 0s !important;
 }
@@ -494,15 +502,6 @@ h6 {
   .hand-model;
 
   margin-right: 5px;
-}
-
-.operate-custom {
-  font-size: 18px;
-  margin-right: 5px;
-}
-
-.oprerate-delete{
-  color: red;
 }
 
 .center-row {
@@ -604,18 +603,13 @@ h6 {
   }
 }
 
-/* Override zorro style */
+/* 覆盖zorro样式 */
 
-//Add scroll bar to dialog box
+// 对话框增加滚动条
 .ant-modal-body {
   max-height: 600px;
   overflow: auto;
 }
-
-.ant-modal-close-x {
-    width: 56px!important;
-    height: 56px!important;
-  }
 
 .fullscreen-modal {
   overflow: hidden;
@@ -657,11 +651,10 @@ input[nz-input] {
   .animate-bg-0;
 }
 
-// The built-in cdk-overlay style in version 16.2.2 of the zorro update log is affected.
-//Deleting this style will cause the drag modal example demo to pop up 2 dialog boxes at the same time. Click on different dialog boxes, and z-index will not take effect.
+// zorro更新日志中16.2.2版本的中内置 cdk-overlay 样式影响，删除这段样式会导致拖拽modal的示例demo，同时弹出2个对话框，点击不同的对话框，z-index不生效
 .cdk-global-overlay-wrapper {
-  z-index: unset;
   position: unset;
+  z-index: unset;
   display: unset;
 }
 
@@ -702,19 +695,26 @@ input[nz-input] {
   background: linear-gradient(to right, #8514f5, #f637e3, #fa2c05);
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  @media screen and (max-width: 430px) {
+    background:none;
+    -webkit-text-fill-color: white;
+  }
 }
 
 @keyframes textGradientAnimation {
   0% {
-    background-position: 0% 50%;
+    background-position: 0 50%;
   }
+
   33% {
     background-position: 100% 50%;
   }
+
   66% {
     background-position: 200% 50%;
   }
+
   100% {
-    background-position: 0% 50%;
+    background-position: 0 50%;
   }
 }

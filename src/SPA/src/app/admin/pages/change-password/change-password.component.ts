@@ -15,6 +15,7 @@ import { UserManagerService } from '@app/_core/services/user-manager/user-manage
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { UserPasswordChangeRequest } from '@app/_core/models/user-manager/userpasswordchangerequest';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { BasicConfirmModalComponent } from '@app/_core/utilities/base-modal';
 
 @Component({
   selector: 'app-change-password',
@@ -23,23 +24,21 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
   standalone: true,
   imports: [TranslateModule, NzAlertModule, FormsModule, NzFormModule, ReactiveFormsModule, NzGridModule, NzInputModule, NzButtonModule, PasswordStrengthMeterComponent, NzIconModule]
 })
-export class ChangePasswordComponent {
+export class ChangePasswordComponent extends BasicConfirmModalComponent{
   passwordVisible: boolean = false;
   errorMessage: string = '';
   compirePasswordVisible: boolean = false;
   readonly nzModalData: any = inject(NZ_MODAL_DATA);
-  constructor(
-    private modalRef: NzModalRef,
-    private translate: TranslateService,
-    private userManagerService: UserManagerService,
-    private cdr: ChangeDetectorRef,
-    private fb: NonNullableFormBuilder
-  ) { }
+  private fb = inject(NonNullableFormBuilder);
+  private cdr = inject(ChangeDetectorRef);
+  private userManagerService = inject(UserManagerService);
+  private translate = inject(TranslateService);
+  override modalRef = inject(NzModalRef);
   get newPassword(): string {
     return this.validateForm.controls.newPassword.value!;
   }
 
-  protected getCurrentValue(): Observable<any> {
+  override getCurrentValue(): Observable<any> {
     if (!fnCheckForm(this.validateForm)) {
       return of(false);
     }

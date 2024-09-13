@@ -52,9 +52,7 @@ export class SearchRouteComponent extends BasicConfirmModalComponent implements 
   menuNavList: FunctionTreeVM[] = [];
   destroyRef = inject(DestroyRef);
 
-  constructor(protected override modalRef: NzModalRef) {
-    super(modalRef);
-  }
+  override modalRef = inject(NzModalRef);
 
   changeSelAnswerIndex(dir: 'up' | 'down'): number | null {
     const index = this.resultListShow.findIndex(item => item.selItem);
@@ -160,6 +158,7 @@ export class SearchRouteComponent extends BasicConfirmModalComponent implements 
             }
           });
           if (this.resultListShow.length > 0) {
+            this.resultListShow.map(item => (item.selItem = false));
             this.resultListShow[0].selItem = true;
           }
           this.resultListShow = [...this.resultListShow];
@@ -199,5 +198,5 @@ export class SearchRouteComponent extends BasicConfirmModalComponent implements 
     this.resultListFactory();
   }
 
-  protected getCurrentValue(): NzSafeAny { }
+  override getCurrentValue(): NzSafeAny { }
 }

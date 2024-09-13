@@ -5,12 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { first } from 'rxjs/operators';
 
-import { IsNightKey, ThemeOptionsKey } from '@constants/app.constants';
+import { IsNightKey, StyleThemeModelKey, ThemeOptionsKey } from '@constants/app.constants';
 import { SimpleReuseStrategy } from '@services/common/reuse-strategy';
 import { TabService } from '@services/common/tab.service';
 import { ThemeSkinService } from '@services/common/theme-skin.service';
 import { WindowService } from '@services/common/window.service';
-import { SettingInterface, ThemeService } from '@services/common/theme.service';
+import { SettingInterface, StyleTheme, StyleThemeInterface, ThemeService } from '@services/common/theme.service';
 import { fnFormatToHump } from '@utilities/tools';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzConfigService } from 'ng-zorro-antd/core/config';
@@ -18,7 +18,6 @@ import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzListModule } from 'ng-zorro-antd/list';
-import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -44,7 +43,8 @@ interface Color extends NormalModel {
 export interface ThemeMode extends NormalModel {
   key: 'side' | 'top' | 'mixin';
 }
-
+type ExcludedKeys = 'theme' | 'color' | 'mode';
+type SettingKey = Exclude<keyof SettingInterface, ExcludedKeys>;
 @Component({
   selector: 'app-setting-drawer',
   templateUrl: './setting-drawer.component.html',
@@ -64,6 +64,12 @@ export class SettingDrawerComponent implements OnInit {
   private rd2 = inject(Renderer2);
   destroyRef = inject(DestroyRef);
   themesOptions$ = this.themesService.getThemesMode();
+  _currentStyleTheme: StyleThemeInterface = {
+    default: false,
+    dark: false,
+    compact: false,
+    aliyun: false
+  };
   isNightTheme$ = this.themesService.getIsNightTheme();
   _isNightTheme = false;
   _themesOptions: SettingInterface = {
@@ -192,6 +198,22 @@ export class SettingDrawerComponent implements OnInit {
     this.themeSkinService.toggleTheme().then();
   }
 
+    // 修改主题
+    changeStyleTheme(styleTheme: StyleTheme): void {
+      // 让每个主题都变成未选中
+      Object.keys(this._currentStyleTheme).forEach(item => {
+        this._currentStyleTheme[item as StyleTheme] = false;
+      });
+      // 当前选中的主题变为选中状态
+      this._currentStyleTheme[styleTheme] = true;
+      // 存储主题模式状态
+      this.themesService.setStyleThemeMode(styleTheme);
+      // 持久化
+      this.windowServe.setStorage(StyleThemeModelKey, styleTheme);
+      // 切换主题
+      this.themeSkinService.toggleTheme().then();
+    }
+
   // Select one isChecked to be true and the others to be false
   selOne(item: NormalModel, itemArray: NormalModel[]): void {
     itemArray.forEach(_item => (_item.isChecked = false));
@@ -238,6 +260,27 @@ export class SettingDrawerComponent implements OnInit {
       }
     }
   }
+
+    // 修改主题配置项
+    changeThemeOptions(isTrue: boolean, type: SettingKey): void {
+      // 非固定头部时，设置标签也不固定
+      if (type === 'fixedHead' && !isTrue) {
+        this._themesOptions['fixedTab'] = false;
+      }
+      this._themesOptions[type] = isTrue;
+      this.setThemeOptions();
+
+      // 如果不展示多标签，则要清空tab,以及已经被缓存的所有组件
+      if (type === 'isShowTab') {
+        if (!isTrue) {
+          SimpleReuseStrategy.deleteAllRouteSnapshot(this.activatedRoute.snapshot).then(() => {
+            this.tabService.clearTabs();
+          });
+        } else {
+          this.tabService.refresh();
+        }
+      }
+    }
 
   // Modify special themes, color weak themes, gray themes
   changeSpecialTheme(e: boolean, themeType: SpecialTheme): void {
