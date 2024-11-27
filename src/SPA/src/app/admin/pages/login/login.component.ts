@@ -59,16 +59,21 @@ export class LoginComponent extends InjectBase implements OnInit {
     this.spinnerService.show();
     this.authService.login(param).subscribe({
       next: (res) => {
-        this.notification.success(this.translate.instant('system.caption.success'), this.translate.instant('system.message.logedIn'));
         this.spinnerService.hide();
+        if(res.token ==''){
+          this.notification.error(this.translate.instant('system.caption.error'), this.translate.instant('system.message.logInFailed'));
+          return;
+        }
+        this.notification.success(this.translate.instant('system.caption.success'), this.translate.instant('system.message.logedIn'));
         if (this.returnUrl)
           this.router.navigateByUrl(this.returnUrl);
         else
           this.router.navigate([UrlRouteConstants.DASHBOARD]);
       },
-      // error: (err) => {
-      //   throw err;
-      // },
+      error: (err) => {
+        this.spinnerService.hide();
+        throw err;
+      },
     });
 
   }

@@ -3,25 +3,33 @@
 "compounds": [
     {
         "name": "API & SPA (Live Watch)",
-        "configurations": ["API Launch", "SPA Launch"],
+        "configurations": [
+            ".NET Core Watch",
+            "SPA Launch"
+        ],
         "stopAll": true
     }
 ],
 "configurations": [
     {
         "name": "SPA Launch",
-        "type": "msedge",
+        "type": "chrome",
         "request": "launch",
         "preLaunchTask": "npm: start",
-        "url": "http://localhost:8200",
+        "url": "http://localhost:4200",
         "webRoot": "${workspaceFolder}/src/SPA",
-        "sourceMapPathOverrides": {
-            "webpack:/*": "${webRoot}/*",
-            "/./*": "${webRoot}/*",
-            "/src/*": "${webRoot}/*",
-            "/*": "*",
-            "/./~/*": "${webRoot}/node_modules/*"
-        }
+    },
+    {
+        "name": ".NET Core Watch",
+        "type": "dotnetwatchattach",
+        "request": "launch",
+        "args": {
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        "task": "watch",
+        "program": "API.exe"
     },
     {
         "name": "API Launch",

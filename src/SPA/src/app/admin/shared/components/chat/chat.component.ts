@@ -22,6 +22,7 @@ import { NzTypographyModule } from 'ng-zorro-antd/typography';
   imports: [NzCardModule, NzTypographyModule, NzGridModule, NzAvatarModule, NzResultModule, NzIconModule, NzButtonModule, FormsModule, ReactiveFormsModule, NzInputModule, NgClass, AsyncPipe]
 })
 export class ChatComponent implements OnInit, OnDestroy {
+  baseImage: string = "../../../../assets/imgs/";
   @ViewChild('scrollMe') private myScrollContainer!: ElementRef;
   @Output() readonly changeShows = new EventEmitter<boolean>();
   validateForm!: FormGroup;

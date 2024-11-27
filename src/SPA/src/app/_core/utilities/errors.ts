@@ -1,5 +1,6 @@
 // General error handling
 export const throwAthError = (errorMsg: string): never => {
+  console.log('errorMsg: ', errorMsg);
   throw new Error(errorMsg);
 };
 

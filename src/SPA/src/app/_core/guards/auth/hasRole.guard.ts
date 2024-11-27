@@ -1,32 +1,71 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { UrlRouteConstants } from '@app/_core/constants/url-route.constants';
-import { AuthService } from '@app/_core/services/auth/auth.service';
+import { LocalStorageConstants } from '@constants/local-storage.constants';
+import { FunctionUtility } from '@utilities/function-utility';
+import { PermissionService } from '@services/auth/permission.service';
+import { AuthResponse } from '@app/_core/models/auth/auth-response';
 
-export const hasRoleGuardFn: CanActivateFn = (route, state) => {
-  const authService = inject(AuthService);
+const getLocalStorageItem = <T>(key: string): T => JSON.parse(localStorage.getItem(key) as string);
+const navigateToUnauthorized = (router: Router, functionUtility: FunctionUtility) => {
+  functionUtility.snotifySuccessError(false, 'System.Message.Unauthorized');
+  router.navigate(['/dashboard']);
+};
+
+const navigateToLogin = (router: Router, functionUtility: FunctionUtility, returnUrl: string) => {
+  functionUtility.snotifySuccessError(false, 'System.Message.Unauthorized');
+  router.navigate(['/login'], { queryParams: { returnUrl } });
+};
+
+
+export const hasRoleGuardFn: CanActivateFn = async (route, state) => {
+  const isResetPassword = getLocalStorageItem<boolean>(LocalStorageConstants.IS_RESET_PASSWORD);
+  const loggedInUser = getLocalStorageItem<AuthResponse>(LocalStorageConstants.USER);
+  const permissions = getLocalStorageItem<string[]>(LocalStorageConstants.PERMISSIONS);
   const router = inject(Router);
-  let actionCode = route.data["actionCode"] as string;
-  var loggedInUser = authService.getUserProfile();
-  if (loggedInUser != null && Object.keys(loggedInUser).length > 0) {
-    var listPermission = loggedInUser.permissions;
-    if (listPermission != null && listPermission.length > 0 && listPermission.filter(x => x == actionCode).length > 0)
-      return true;
-    else {
-      router.navigate([UrlRouteConstants.ACCESS_DENIED], {
-        queryParams: {
-          returnUrl: state.url
-        }
-      });
-      return false;
-    }
-  }
-  else {
-    router.navigate([UrlRouteConstants.LOGIN], {
-      queryParams: {
-        returnUrl: state.url
+  const functionUtility = inject(FunctionUtility);
+  const permissionsService = inject(PermissionService);
+  const programCode = route.data["programCode"] as string;
+  const acceptActions: string[] = ['add', 'edit', 'rehire'];
+  const url = state?.url.split('/'); // Lấy URL hiện tại
+  const action = url[url.length - 1];
+  const acceptAction = acceptActions.includes(action);
+  if (loggedInUser && Object.keys(loggedInUser).length > 0) {
+    // case reset password
+    if (isResetPassword) {
+      // const roleOfUser = loggedInUser.permissions || [];
+      // const userProgram = roleOfUser.find(x => x === 'BAS107');
+      // const parent = userProgram?.subsys.toLowerCase();
+      // const child = userProgram?.program_Code.toLowerCase();
+
+      if (programCode !== 'bas107') {
+        functionUtility.snotifySuccessError(false, 'System.Message.PleaseChangePassword');
+        // router.navigate([`/${parent}/${child}`]);
+        return false;
       }
-    });
+      return true;
+    }
+
+    // else all case check permission main
+    if (permissions) {
+      const hasBasicPermission: boolean = permissions.some(permission => permission.startsWith(programCode));
+      const hasSpecificPermission: boolean = permissions.includes(`${programCode}:${action}`);
+      // permission main
+      if (hasBasicPermission && !acceptAction) {
+        permissionsService.setCurrentProgramCode(programCode);
+        return true;
+      }
+      // permission form
+      if (acceptAction && hasSpecificPermission) {
+        permissionsService.setCurrentProgramCode(programCode);
+        return true;
+      }
+    }
+
+    navigateToUnauthorized(router, functionUtility);
+    return false;
+
+  } else {
+    navigateToLogin(router, functionUtility, state.url);
     return false;
   }
 };

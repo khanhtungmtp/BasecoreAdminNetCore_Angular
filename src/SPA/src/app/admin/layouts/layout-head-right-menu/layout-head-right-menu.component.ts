@@ -24,6 +24,7 @@ import { SystemLanguageVM } from '@app/_core/models/system/systemlanguagevm';
 import { LangConstants } from '@app/_core/constants/lang-constants';
 import { AuthService } from '@app/_core/services/auth/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { UserForLoggedIn } from '@app/_core/models/auth/auth';
 
 @Component({
   selector: 'app-layout-head-right-menu',
@@ -38,6 +39,7 @@ export class LayoutHeadRightMenuComponent implements OnInit {
   currentLang: string = '';
   currentImageLange: string = '';
   baseImage: string = "../../../../assets/images/lang/";
+  account:UserForLoggedIn= JSON.parse(localStorage.getItem(LocalStorageConstants.USER) ?? "{}") || null;
   private changePasswordModalService = inject(ChangePasswordService);
   private authService = inject(AuthService);
   private lockWidgetService = inject(LockWidgetService);

@@ -130,7 +130,7 @@ export class BaseHttpService {
   }
 
   private handleError(error: any) {
-    console.log('An error occurred baseServices:', error);
+      console.log('An error occurred baseServices:', error);
 
     // Tiếp tục truyền lỗi tới global error handler
     return throwError(() => error);

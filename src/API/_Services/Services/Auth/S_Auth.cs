@@ -34,12 +34,12 @@ public class S_Auth : BaseServices, I_Auth
         User? user = _repoStore.Users.FirstOrDefault(u => u.UserName == request.UserName);
 
         if (user is null)
-            return OperationResult<AuthResponse>.BadRequest("Wrong username or password");
+            return OperationResult<AuthResponse>.Success(new AuthResponse(),"Wrong username or password");
 
         bool isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
 
         if (!isPasswordValid)
-            return OperationResult<AuthResponse>.BadRequest("Wrong username or password");
+           return OperationResult<AuthResponse>.Success(new AuthResponse(),"Wrong username or password");
 
         string? token = GenerateToken(user);
         string? refreshToken = GenerateRefreshToken();

@@ -19,7 +19,7 @@ export class TokenInterceptor implements HttpInterceptor {
       refreshToken: this.authService.getRefreshToken()!,
     }
 
-    if (tokenResponse) {
+    if (tokenResponse.token != null) {
       try {
         request = request.clone({
           setHeaders: {

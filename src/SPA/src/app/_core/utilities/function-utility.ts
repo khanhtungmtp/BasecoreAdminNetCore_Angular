@@ -1,10 +1,9 @@
 import { HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { LocalStorageConstants } from "@constants/local-storage.constants";
-import { RoleInfomation } from "@models/auth/auth";
 import { Pagination } from "./pagination-utility";
 import { NzNotificationCustomService } from "@services/nz-notificationCustom.service";
 import { NzSpinnerCustomService } from "@services/common/nz-spinner.service";
+import { TranslateService } from "@ngx-translate/core";
 interface TreeNode {
   id: string;
   parentId: string | null;
@@ -20,7 +19,8 @@ export class FunctionUtility {
 
   constructor(
     private snotify: NzNotificationCustomService,
-    private spinnerService: NzSpinnerCustomService
+    private spinnerService: NzSpinnerCustomService,
+    private translateService:TranslateService
   ) { }
 
   /**
@@ -321,8 +321,30 @@ export class FunctionUtility {
     return str;
   }
 
+  getLocalStorageItem = <T>(key: string): T | null => {
+    try {
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) as T : null;
+    } catch (error) {
+      console.error(`Error parsing localStorage item with key "${key}":`, error);
+      return null;
+    }
+  };
 
+  snotifySuccessError(isSuccessError: boolean, message: string) {
+    this.snotify[isSuccessError ? 'success' : 'error'](
+      this.translateService.instant(`system.caption.${isSuccessError ? 'success' : 'error'}`),
+      this.translateService.instant(`${message}`)
+    );
+  }
 
+  snotifySystemError() {
+    this.spinnerService.hide();
+    this.snotify.error(
+      this.translateService.instant('system.caption.error'),
+      this.translateService.instant('system.message.systemError')
+    );
+  }
 
 }
 
