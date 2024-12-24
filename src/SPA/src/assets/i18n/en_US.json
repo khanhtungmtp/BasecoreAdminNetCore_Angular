@@ -45,7 +45,8 @@
       "queryErrorMsg": "Query error",
       "deleteItem": "Delete Item",
       "messageContentDelete": "Would you like to delete ",
-      "requiredFields": "Required fields"
+      "requiredFields": "Required fields",
+      "pleaseChangePassword": "This account is the default password, please change it to a new one to continue to use the system"
     },
     "caption": {
       "success": "Success!",

@@ -5,30 +5,30 @@ import { FunctionUtility } from '@utilities/function-utility';
 import { PermissionService } from '@services/auth/permission.service';
 import { AuthResponse } from '@app/_core/models/auth/auth-response';
 
-const getLocalStorageItem = <T>(key: string): T => JSON.parse(localStorage.getItem(key) as string);
 const navigateToUnauthorized = (router: Router, functionUtility: FunctionUtility) => {
-  functionUtility.snotifySuccessError(false, 'System.Message.Unauthorized');
-  router.navigate(['/dashboard']);
+  functionUtility.snotifySuccessError(false, 'system.message.unauthorized');
+  router.navigate(['/admin/dashboard']);
 };
 
 const navigateToLogin = (router: Router, functionUtility: FunctionUtility, returnUrl: string) => {
-  functionUtility.snotifySuccessError(false, 'System.Message.Unauthorized');
-  router.navigate(['/login'], { queryParams: { returnUrl } });
+  functionUtility.snotifySuccessError(false, 'system.message.unauthorized');
+  router.navigate(['/admin/login'], { queryParams: { returnUrl } });
 };
 
 
 export const hasRoleGuardFn: CanActivateFn = async (route, state) => {
-  const isResetPassword = getLocalStorageItem<boolean>(LocalStorageConstants.IS_RESET_PASSWORD);
-  const loggedInUser = getLocalStorageItem<AuthResponse>(LocalStorageConstants.USER);
-  const permissions = getLocalStorageItem<string[]>(LocalStorageConstants.PERMISSIONS);
   const router = inject(Router);
   const functionUtility = inject(FunctionUtility);
   const permissionsService = inject(PermissionService);
+
+  const isResetPassword: boolean = functionUtility.getLocalStorageItem<boolean>(LocalStorageConstants.IS_RESET_PASSWORD);
+  const loggedInUser: AuthResponse = functionUtility.getLoggedInUser();
+  const permissions: string[] = loggedInUser.permissions || [];
   const programCode = route.data["programCode"] as string;
   const acceptActions: string[] = ['add', 'edit', 'rehire'];
-  const url = state?.url.split('/'); // Lấy URL hiện tại
-  const action = url[url.length - 1];
-  const acceptAction = acceptActions.includes(action);
+  const url: string[] = state?.url.split('/'); // Lấy URL hiện tại
+  const action: string = url[url.length - 1];
+  const acceptAction: boolean = acceptActions.includes(action);
   if (loggedInUser && Object.keys(loggedInUser).length > 0) {
     // case reset password
     if (isResetPassword) {
@@ -38,7 +38,7 @@ export const hasRoleGuardFn: CanActivateFn = async (route, state) => {
       // const child = userProgram?.program_Code.toLowerCase();
 
       if (programCode !== 'bas107') {
-        functionUtility.snotifySuccessError(false, 'System.Message.PleaseChangePassword');
+        functionUtility.snotifySuccessError(false, 'system.message.pleaseChangePassword');
         // router.navigate([`/${parent}/${child}`]);
         return false;
       }

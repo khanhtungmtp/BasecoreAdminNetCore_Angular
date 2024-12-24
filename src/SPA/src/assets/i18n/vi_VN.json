@@ -44,7 +44,8 @@
       "invalidValue": "Dữ liệu chưa hợp lệ",
       "deleteItem": "Xoá dòng dữ liệu",
       "messageContentDelete": "Bạn có muốn xoá ",
-      "requiredFields": "Trường bắt buộc"
+      "requiredFields": "Trường bắt buộc",
+      "pleaseChangePassword": "Bạn đang sử dụng mật khẩu mặc định, vui lòng thay đổi mật khẩu"
     },
     "caption": {
       "success": "Thành công!",

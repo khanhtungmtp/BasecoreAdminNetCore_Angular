@@ -7,32 +7,34 @@ export const SYSTEM_ROUTES: Routes = [
     canActivate: [hasRoleGuardFn],
     data: {
       title: 'Function',
-      actionCode: ActionCode.FunctionView,
+      programCode: ActionCode.FunctionView,
     },
     loadChildren: () => import('./function/function.routes')
   },
   {
     path: 'language',
-    // canActivate: [hasRoleGuardFn],
+    canActivate: [hasRoleGuardFn],
     data: {
       title: 'Language',
-      actionCode: ActionCode.LanguageView,
+      programCode: ActionCode.LanguageView,
     },
     loadChildren: () => import('./language/language.routes')
   },
   {
     path: 'user-manager',
+    canActivate: [hasRoleGuardFn],
     data: {
       title: 'User manager',
-      actionCode: ActionCode.UserManagerView,
+      programCode: ActionCode.UserManagerView,
     },
     loadChildren: () => import('./user-manager/user-manager.routes')
   },
   {
     path: 'role',
+    canActivate: [hasRoleGuardFn],
     data: {
       title: 'Role manager',
-      actionCode: ActionCode.RoleManagerView,
+      programCode: ActionCode.RoleManagerView,
     },
     loadChildren: () => import('./role-manager/role-manager.routes')
   },

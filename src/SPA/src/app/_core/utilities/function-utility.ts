@@ -4,6 +4,8 @@ import { Pagination } from "./pagination-utility";
 import { NzNotificationCustomService } from "@services/nz-notificationCustom.service";
 import { NzSpinnerCustomService } from "@services/common/nz-spinner.service";
 import { TranslateService } from "@ngx-translate/core";
+import { AuthResponse } from "../models/auth/auth-response";
+import { LocalStorageConstants } from "../constants/local-storage.constants";
 interface TreeNode {
   id: string;
   parentId: string | null;
@@ -321,15 +323,16 @@ export class FunctionUtility {
     return str;
   }
 
-  getLocalStorageItem = <T>(key: string): T | null => {
-    try {
-      const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) as T : null;
-    } catch (error) {
-      console.error(`Error parsing localStorage item with key "${key}":`, error);
-      return null;
-    }
-  };
+  getLocalStorageItem = <T>(key: string): T => JSON.parse(localStorage.getItem(key) as string);
+
+  getLoggedInUser(): AuthResponse {
+    return this.getLocalStorageItem<AuthResponse>(LocalStorageConstants.USER);
+  }
+
+  getProgramLoggedInUser(): string[] {
+    const user = this.getLocalStorageItem<AuthResponse>(LocalStorageConstants.USER);
+    return user?.permissions || [];
+  }
 
   snotifySuccessError(isSuccessError: boolean, message: string) {
     this.snotify[isSuccessError ? 'success' : 'error'](

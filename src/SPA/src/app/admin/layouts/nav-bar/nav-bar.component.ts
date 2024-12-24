@@ -1,7 +1,7 @@
 import { NgTemplateOutlet, AsyncPipe } from '@angular/common';
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input, inject, DestroyRef, booleanAttribute } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, NavigationEnd, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 
@@ -25,7 +25,7 @@ import { FunctionTreeVM } from '@app/_core/models/system/functionvm';
   templateUrl: './nav-bar.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [NzMenuModule, NzNoAnimationModule, NgTemplateOutlet, NzButtonModule, NzIconModule, RouterLink, AsyncPipe]
+  imports: [NzMenuModule, NzNoAnimationModule, NgTemplateOutlet, NzButtonModule, NzIconModule, AsyncPipe]
 })
 export class NavBarComponent implements OnInit {
   @Input({ transform: booleanAttribute })
