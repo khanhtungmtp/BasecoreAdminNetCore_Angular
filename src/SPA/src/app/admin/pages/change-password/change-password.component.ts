@@ -18,11 +18,10 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { BasicConfirmModalComponent } from '@app/_core/utilities/base-modal';
 
 @Component({
-  selector: 'app-change-password',
-  templateUrl: './change-password.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
-  imports: [TranslateModule, NzAlertModule, FormsModule, NzFormModule, ReactiveFormsModule, NzGridModule, NzInputModule, NzButtonModule, PasswordStrengthMeterComponent, NzIconModule]
+    selector: 'app-change-password',
+    templateUrl: './change-password.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [TranslateModule, NzAlertModule, FormsModule, NzFormModule, ReactiveFormsModule, NzGridModule, NzInputModule, NzButtonModule, PasswordStrengthMeterComponent, NzIconModule]
 })
 export class ChangePasswordComponent extends BasicConfirmModalComponent{
   passwordVisible: boolean = false;

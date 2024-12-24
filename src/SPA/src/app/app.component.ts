@@ -13,10 +13,9 @@ import { LockScreenStoreService } from './_core/services/common/lock-screen-stor
 import { LockScreenComponent } from './admin/shared/components/lock-screen/lock-screen.component';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [LockScreenComponent, NzBackTopModule, RouterOutlet, NzSpinModule, AsyncPipe],
-  template: `
+    selector: 'app-root',
+    imports: [LockScreenComponent, NzBackTopModule, RouterOutlet, NzSpinModule, AsyncPipe],
+    template: `
    @if ((lockedState$ | async)!.locked) {
       <app-lock-screen></app-lock-screen>
     }
@@ -32,9 +31,9 @@ import { LockScreenComponent } from './admin/shared/components/lock-screen/lock-
       </div>
     }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [fadeRouteAnimation],
-  styles: ``
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    animations: [fadeRouteAnimation],
+    styles: ``
 })
 export class AppComponent implements OnInit, AfterViewInit {
   private preloader = inject(PreloaderService);

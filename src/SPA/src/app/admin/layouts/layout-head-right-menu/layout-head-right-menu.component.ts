@@ -27,12 +27,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UserForLoggedIn } from '@app/_core/models/auth/auth';
 
 @Component({
-  selector: 'app-layout-head-right-menu',
-  templateUrl: './layout-head-right-menu.component.html',
-  styleUrls: ['./layout-head-right-menu.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
-  imports: [NgTemplateOutlet, ScreenLessHiddenDirective, NzToolTipModule, NzAvatarModule, NzIconModule, NzButtonModule, ToggleFullscreenDirective, NzDropDownModule, NzBadgeModule, NzMenuModule, HomeNoticeComponent, TranslateModule]
+    selector: 'app-layout-head-right-menu',
+    templateUrl: './layout-head-right-menu.component.html',
+    styleUrls: ['./layout-head-right-menu.component.less'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [NgTemplateOutlet, ScreenLessHiddenDirective, NzToolTipModule, NzAvatarModule, NzIconModule, NzButtonModule, ToggleFullscreenDirective, NzDropDownModule, NzBadgeModule, NzMenuModule, HomeNoticeComponent, TranslateModule]
 })
 export class LayoutHeadRightMenuComponent implements OnInit {
   listLanguage: SystemLanguageVM[] = [];

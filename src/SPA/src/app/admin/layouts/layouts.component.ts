@@ -1,4 +1,4 @@
-import { AsyncPipe, NgClass, NgOptimizedImage, NgStyle, NgTemplateOutlet } from '@angular/common';
+import { NgClass, NgStyle, NgTemplateOutlet } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -37,7 +37,6 @@ export interface IBreadcrumb {
   styleUrls: ['./layouts.component.less'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [fadeRouteAnimation],
-  standalone: true,
   imports: [
     TopProgressBarComponent,
     NzLayoutModule,
@@ -49,7 +48,6 @@ export interface IBreadcrumb {
     NzMenuModule,
     NzButtonModule,
     NzIconModule,
-    AsyncPipe,
     SideNavComponent,
     NgTemplateOutlet,
     ToolBarComponent,
@@ -60,8 +58,6 @@ export interface IBreadcrumb {
     TabComponent,
     RouterOutlet,
     NavDrawerComponent,
-    AsyncPipe,
-    NgOptimizedImage,
     NzModalModule
   ]
 })

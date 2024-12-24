@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, ApplicationConfig, ErrorHandler, importProvidersFrom, provideExperimentalZonelessChangeDetection } from '@angular/core';
+import { ApplicationConfig, ErrorHandler, importProvidersFrom, provideExperimentalZonelessChangeDetection, inject, provideAppInitializer } from '@angular/core';
 import { TitleStrategy, provideRouter, withComponentInputBinding, withHashLocation, withInMemoryScrolling, withPreloading } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -63,35 +63,27 @@ const APPINIT_PROVIDES = [
   //   multi: true
   // },
   // Initialized lock screen service
-  {
-    provide: APP_INITIALIZER,
-    useFactory: InitLockedStatusServiceFactory,
-    deps: [SubLockedStatusService],
-    multi: true
-  },
+  provideAppInitializer(() => {
+        const initializerFn = (InitLockedStatusServiceFactory)(inject(SubLockedStatusService));
+        return initializerFn();
+      }),
   // Initialization theme
-  {
-    provide: APP_INITIALIZER,
-    useFactory: InitThemeServiceFactory,
-    deps: [InitThemeService],
-    multi: true
-  },
+  provideAppInitializer(() => {
+        const initializerFn = (InitThemeServiceFactory)(inject(InitThemeService));
+        return initializerFn();
+      }),
   // Initialization supervision listening screen width service
-  {
-    provide: APP_INITIALIZER,
-    useFactory: SubWindowWithServiceFactory,
-    deps: [SubWindowWithService],
-    multi: true
-  },
+  provideAppInitializer(() => {
+        const initializerFn = (SubWindowWithServiceFactory)(inject(SubWindowWithService));
+        return initializerFn();
+      }),
   // Initialize the dark mode is also the CSS of the Default mode
-  {
-    provide: APP_INITIALIZER,
-    useFactory: (themeService: ThemeSkinService) => () => {
+  provideAppInitializer(() => {
+        const initializerFn = ((themeService: ThemeSkinService) => () => {
       return themeService.loadTheme();
-    },
-    deps: [ThemeSkinService],
-    multi: true
-  }
+    })(inject(ThemeSkinService));
+        return initializerFn();
+      })
 ];
 
 export const appConfig: ApplicationConfig = {

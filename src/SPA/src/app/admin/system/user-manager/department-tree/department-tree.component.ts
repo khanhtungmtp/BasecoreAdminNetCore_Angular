@@ -11,13 +11,12 @@ import { FlatTreeControl } from '@angular/cdk/tree';
 import { DepartmentTreeSearchService } from './department-tree-search.service';
 import { DepartmentTreeService, FlatNode } from './department-tree.service';
 @Component({
-  selector: 'app-department-tree',
-  templateUrl: './department-tree.component.html',
-  styleUrl: './department-tree.component.less',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [DepartmentTreeService, DepartmentTreeSearchService],
-  standalone: true,
-  imports: [NzCardModule, NzButtonModule, NzInputModule, FormsModule, NzIconModule, NzTreeViewModule, NzHighlightModule]
+    selector: 'app-department-tree',
+    templateUrl: './department-tree.component.html',
+    styleUrl: './department-tree.component.less',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [DepartmentTreeService, DepartmentTreeSearchService],
+    imports: [NzCardModule, NzButtonModule, NzInputModule, FormsModule, NzIconModule, NzTreeViewModule, NzHighlightModule]
 })
 export class DepartmentTreeComponent implements OnInit {
   selectListSelection: SelectionModel<FlatNode>;

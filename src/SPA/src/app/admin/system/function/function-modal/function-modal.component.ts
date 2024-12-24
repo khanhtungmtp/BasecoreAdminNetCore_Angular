@@ -20,11 +20,10 @@ import { OptionsInterface } from '@app/_core/models/core/types';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
-  selector: 'app-function-modal',
-  standalone: true,
-  imports: [IconSelComponent, NzModalModule, NzAlertModule, ReactiveFormsModule, NzTreeSelectModule, NzFormModule,
-    NzInputModule, NzButtonModule, NzSelectModule, NzInputNumberModule],
-  templateUrl: './function-modal.component.html'
+    selector: 'app-function-modal',
+    imports: [IconSelComponent, NzModalModule, NzAlertModule, ReactiveFormsModule, NzTreeSelectModule, NzFormModule,
+        NzInputModule, NzButtonModule, NzSelectModule, NzInputNumberModule],
+    templateUrl: './function-modal.component.html'
 })
 export class FunctionModalComponent implements OnInit {
   nodes: any[] = [];

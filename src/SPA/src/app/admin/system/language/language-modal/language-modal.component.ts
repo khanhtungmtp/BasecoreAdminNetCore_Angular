@@ -1,11 +1,9 @@
 import { ChangeDetectorRef, Component, DestroyRef, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SystemLanguageVM } from '@app/_core/models/system/systemlanguagevm';
-import { FunctionService } from '@app/_core/services/system/function.service';
 import { SystemLanguageService } from '@app/_core/services/system/system-language.service';
 import { FunctionUtility } from '@app/_core/utilities/function-utility';
 import { fnCheckForm } from '@app/_core/utilities/tools';
-import { IconSelComponent } from '@app/admin/shared/biz-components/icon-sel/icon-sel.component';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
@@ -20,8 +18,7 @@ import { Observable, of, catchError } from 'rxjs';
 
 @Component({
   selector: 'app-language-modal',
-  standalone: true,
-  imports: [IconSelComponent, NzModalModule, NzAlertModule, ReactiveFormsModule, NzTreeSelectModule, NzSwitchModule,
+  imports: [NzModalModule, NzAlertModule, ReactiveFormsModule, NzTreeSelectModule, NzSwitchModule,
     NzFormModule, NzInputModule, NzButtonModule, NzSelectModule, NzInputNumberModule],
   templateUrl: './language-modal.component.html'
 })

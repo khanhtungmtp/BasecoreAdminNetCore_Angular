@@ -20,12 +20,11 @@ import { MouseHoverShowDirective } from '@app/admin/shared/directives/mouse-hove
 import { FunctionTreeVM } from '@app/_core/models/system/functionvm';
 
 @Component({
-  selector: 'app-tab',
-  templateUrl: './tab.component.html',
-  styleUrls: ['./tab.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
-  imports: [NzCardModule, NzTabsModule, NzDropDownModule, NzMenuModule, NzButtonModule, NgClass, NgStyle, MouseHoverShowDirective, NzIconModule, AsyncPipe]
+    selector: 'app-tab',
+    templateUrl: './tab.component.html',
+    styleUrls: ['./tab.component.less'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [NzCardModule, NzTabsModule, NzDropDownModule, NzMenuModule, NzButtonModule, NgClass, NgStyle, MouseHoverShowDirective, NzIconModule, AsyncPipe]
 })
 export class TabComponent implements OnInit {
   private tabService = inject(TabService);

@@ -29,27 +29,26 @@ import { ModalBtnStatus } from '@app/_core/utilities/base-modal';
 import { FunctionVM } from '@app/_core/models/system/functionvm';
 
 @Component({
-  selector: 'app-function',
-  templateUrl: './function.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
-  imports: [
-    TranslateModule,
-    PageHeaderComponent,
-    NzCardModule,
-    WaterMarkComponent,
-    FormsModule,
-    NzFormModule,
-    NzGridModule,
-    NzInputModule,
-    NzButtonModule,
-    NzWaveModule,
-    NzIconModule,
-    CardTableWrapComponent,
-    AntTableComponent,
-    NzBadgeModule,
-    HasRoleDirective
-  ]
+    selector: 'app-function',
+    templateUrl: './function.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        TranslateModule,
+        PageHeaderComponent,
+        NzCardModule,
+        WaterMarkComponent,
+        FormsModule,
+        NzFormModule,
+        NzGridModule,
+        NzInputModule,
+        NzButtonModule,
+        NzWaveModule,
+        NzIconModule,
+        CardTableWrapComponent,
+        AntTableComponent,
+        NzBadgeModule,
+        HasRoleDirective
+    ]
 })
 export class FunctionComponent implements OnInit {
   @ViewChild('operationTpl', { static: true }) operationTpl!: TemplateRef<NzSafeAny>;

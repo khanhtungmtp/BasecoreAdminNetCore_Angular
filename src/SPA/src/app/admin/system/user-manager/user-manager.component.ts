@@ -30,29 +30,28 @@ import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { WaterMarkComponent } from '@app/admin/shared/components/water-mark/water-mark.component';
 @Component({
-  selector: 'app-user-manager',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
-  imports: [
-    TranslateModule,
-    NzRadioModule,
-    PageHeaderComponent,
-    NzGridModule,
-    NzCardModule,
-    FormsModule,
-    ReactiveFormsModule,
-    NzFormModule,
-    NzInputModule,
-    NzSelectModule,
-    NzButtonModule,
-    NzWaveModule,
-    NzIconModule,
-    CardTableWrapComponent,
-    AntTableComponent,
-    NzSwitchModule,
-    WaterMarkComponent
-  ],
-  templateUrl: './user-manager.component.html'
+    selector: 'app-user-manager',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        TranslateModule,
+        NzRadioModule,
+        PageHeaderComponent,
+        NzGridModule,
+        NzCardModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NzFormModule,
+        NzInputModule,
+        NzSelectModule,
+        NzButtonModule,
+        NzWaveModule,
+        NzIconModule,
+        CardTableWrapComponent,
+        AntTableComponent,
+        NzSwitchModule,
+        WaterMarkComponent
+    ],
+    templateUrl: './user-manager.component.html'
 })
 export class UserManagerComponent implements OnInit {
   @ViewChild('operationTpl', { static: true }) operationTpl!: TemplateRef<any>;

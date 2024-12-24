@@ -38,14 +38,13 @@ export interface TreeNodeInterface {
 }
 
 @Component({
-  selector: 'app-role-manager-detail',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None,
-  standalone: true,
-  imports: [PageHeaderComponent, NzTreeModule, FooterSubmitComponent, NzIconModule, NzCardModule, NzTableModule, NzButtonModule,
-    FormsModule, WaterMarkComponent, NzCollapseModule, NzCheckboxModule, NzCardModule, NzTreeViewModule],
-  templateUrl: './role-manager-detail.component.html',
-  styleUrl: './role-manager-detail.component.less'
+    selector: 'app-role-manager-detail',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    encapsulation: ViewEncapsulation.None,
+    imports: [PageHeaderComponent, NzTreeModule, FooterSubmitComponent, NzIconModule, NzCardModule, NzTableModule, NzButtonModule,
+        FormsModule, WaterMarkComponent, NzCollapseModule, NzCheckboxModule, NzCardModule, NzTreeViewModule],
+    templateUrl: './role-manager-detail.component.html',
+    styleUrl: './role-manager-detail.component.less'
 })
 export class RoleManagerDetailComponent implements OnInit {
   @Input() roleId: string = '';

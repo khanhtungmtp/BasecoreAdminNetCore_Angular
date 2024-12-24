@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
@@ -13,14 +13,14 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^18.2.4",
-    "@angular/common": "^18.2.4",
-    "@angular/compiler": "^18.2.4",
-    "@angular/core": "^18.2.4",
-    "@angular/forms": "^18.2.4",
-    "@angular/platform-browser": "^18.2.4",
-    "@angular/platform-browser-dynamic": "^18.2.4",
-    "@angular/router": "^18.2.4",
+    "@angular/animations": "^19.0.5",
+    "@angular/common": "^19.0.5",
+    "@angular/compiler": "^19.0.5",
+    "@angular/core": "^19.0.5",
+    "@angular/forms": "^19.0.5",
+    "@angular/platform-browser": "^19.0.5",
+    "@angular/platform-browser-dynamic": "^19.0.5",
+    "@angular/router": "^19.0.5",
     "@auth0/angular-jwt": "^5.2.0",
     "@ngx-translate/core": "^15.0.0",
     "@ngx-translate/http-loader": "^8.0.0",
@@ -38,12 +38,12 @@
     "screenfull": "^6.0.2",
     "tslib": "^2.3.0",
     "uuid": "^9.0.1",
-    "zone.js": "~0.14.10"
+    "zone.js": "~0.15.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^18.2.4",
-    "@angular/cli": "^18.2.4",
-    "@angular/compiler-cli": "^18.2.4",
+    "@angular-devkit/build-angular": "^19.0.6",
+    "@angular/cli": "^19.0.6",
+    "@angular/compiler-cli": "^19.0.5",
     "@types/jasmine": "~5.1.0",
     "@types/uuid": "^9.0.8",
     "jasmine-core": "~5.1.0",
@@ -53,6 +53,6 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "patch-package": "^8.0.0",
-    "typescript": "~5.4.2"
+    "typescript": "~5.6.3"
   }
 }

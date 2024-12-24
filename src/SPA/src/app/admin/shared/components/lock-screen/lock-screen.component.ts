@@ -24,12 +24,11 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '@app/_core/services/auth/auth.service';
 
 @Component({
-  selector: 'app-lock-screen',
-  templateUrl: './lock-screen.component.html',
-  styleUrls: ['./lock-screen.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
-  imports: [NzIconModule, NzButtonModule, TranslateModule, NzGridModule, NzAvatarModule, FormsModule, NzFormModule, ReactiveFormsModule, NzInputModule, ChangNumberToChinesePipe, AsyncPipe, DatePipe]
+    selector: 'app-lock-screen',
+    templateUrl: './lock-screen.component.html',
+    styleUrls: ['./lock-screen.component.less'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [NzIconModule, NzButtonModule, TranslateModule, NzGridModule, NzAvatarModule, FormsModule, NzFormModule, ReactiveFormsModule, NzInputModule, ChangNumberToChinesePipe, AsyncPipe, DatePipe]
 })
 export class LockScreenComponent implements OnInit {
   public showUnlock = false;

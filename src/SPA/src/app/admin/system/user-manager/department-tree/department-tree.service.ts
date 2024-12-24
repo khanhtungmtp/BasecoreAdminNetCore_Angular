@@ -6,8 +6,8 @@ import { BehaviorSubject } from 'rxjs';
 
 import { NzTreeFlatDataSource, NzTreeFlattener } from 'ng-zorro-antd/tree-view';
 import { DepartmentService } from '@app/_core/services/system/department.service';
-import { SearchCommonVO } from '@app/_core/models/common/types';
 import { fnFlatDataHasParentToTree } from '@app/_core/utilities/treeTableTools';
+import { SearchCommonVO } from '@app/_core/models/core/types';
 
 interface TreeNode {
   id: number;

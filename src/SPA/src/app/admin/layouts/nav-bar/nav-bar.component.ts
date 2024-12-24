@@ -21,11 +21,10 @@ import { UserForLogged } from '@app/_core/models/auth/auth';
 import { FunctionTreeVM } from '@app/_core/models/system/functionvm';
 
 @Component({
-  selector: 'app-nav-bar',
-  templateUrl: './nav-bar.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
-  imports: [NzMenuModule, NzNoAnimationModule, NgTemplateOutlet, NzButtonModule, NzIconModule, AsyncPipe]
+    selector: 'app-nav-bar',
+    templateUrl: './nav-bar.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [NzMenuModule, NzNoAnimationModule, NgTemplateOutlet, NzButtonModule, NzIconModule, AsyncPipe]
 })
 export class NavBarComponent implements OnInit {
   @Input({ transform: booleanAttribute })

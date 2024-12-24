@@ -17,12 +17,10 @@ import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
 import { Observable, catchError, of } from 'rxjs';
 
 @Component({
-  selector: 'app-role-manager-modal',
-  templateUrl: './role-manager-modal.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
-  imports: [FormsModule, NzAlertModule, NzDatePickerModule, NzFormModule, ReactiveFormsModule, NzGridModule, NzInputModule, NzRadioModule, NzSwitchModule, NzTreeSelectModule, NzSelectModule, NzModalModule]
-
+    selector: 'app-role-manager-modal',
+    templateUrl: './role-manager-modal.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [FormsModule, NzAlertModule, NzDatePickerModule, NzFormModule, ReactiveFormsModule, NzGridModule, NzInputModule, NzRadioModule, NzSwitchModule, NzTreeSelectModule, NzSelectModule, NzModalModule]
 })
 export class RoleManagerModalComponent implements OnInit {
   addEditForm!: FormGroup;

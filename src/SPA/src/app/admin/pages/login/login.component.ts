@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { FormGroup, FormBuilder, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { UrlRouteConstants } from '@constants/url-route.constants';
 import { AuthService } from '@services/auth/auth.service';
@@ -19,11 +18,10 @@ import { fnCheckForm } from '@app/_core/utilities/tools';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
-  imports: [TranslateModule, FormsModule, NzFormModule, ReactiveFormsModule, NzAlertModule, NzTabsModule, NzGridModule, NzButtonModule, NzInputModule, NzWaveModule, NzCheckboxModule, NzIconModule, RouterLink, NzNotificationModule, TranslateModule],
+  imports: [TranslateModule, FormsModule, NzFormModule, ReactiveFormsModule, NzAlertModule, NzTabsModule, NzGridModule, NzButtonModule, NzInputModule, NzWaveModule, NzCheckboxModule, NzIconModule, NzNotificationModule, TranslateModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent extends InjectBase implements OnInit {
   validateForm!: FormGroup;

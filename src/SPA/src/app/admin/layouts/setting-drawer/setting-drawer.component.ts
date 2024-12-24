@@ -46,12 +46,11 @@ export interface ThemeMode extends NormalModel {
 type ExcludedKeys = 'theme' | 'color' | 'mode';
 type SettingKey = Exclude<keyof SettingInterface, ExcludedKeys>;
 @Component({
-  selector: 'app-setting-drawer',
-  templateUrl: './setting-drawer.component.html',
-  styleUrls: ['./setting-drawer.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
-  imports: [CdkDrag, NzIconModule, NzButtonModule, NzDrawerModule, NzToolTipModule, NzDividerModule, NzListModule, NzSwitchModule, FormsModule]
+    selector: 'app-setting-drawer',
+    templateUrl: './setting-drawer.component.html',
+    styleUrls: ['./setting-drawer.component.less'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CdkDrag, NzIconModule, NzButtonModule, NzDrawerModule, NzToolTipModule, NzDividerModule, NzListModule, NzSwitchModule, FormsModule]
 })
 export class SettingDrawerComponent implements OnInit {
   private themesService = inject(ThemeService);

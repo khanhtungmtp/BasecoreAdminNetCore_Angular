@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, Input, OnInit, Output, TemplateRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Input, OnInit, TemplateRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { ThemeService } from '@app/_core/services/common/theme.service';
 
@@ -20,7 +20,6 @@ export interface PageHeaderType {
   templateUrl: './page-header.component.html',
   styleUrls: ['./page-header.component.less'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [NzPageHeaderModule, NzBreadCrumbModule, NzOutletModule]
 })
 export class PageHeaderComponent implements OnInit {

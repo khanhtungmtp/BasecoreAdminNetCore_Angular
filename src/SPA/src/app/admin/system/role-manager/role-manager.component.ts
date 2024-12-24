@@ -31,29 +31,28 @@ import { RoleVM } from '@app/_core/models/user-manager/rolevm';
 import { Router } from '@angular/router';
 import { UrlRouteConstants } from '@app/_core/constants/url-route.constants';
 @Component({
-  selector: 'app-role-manager',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
-  imports: [
-    TranslateModule,
-    NzRadioModule,
-    PageHeaderComponent,
-    NzGridModule,
-    NzCardModule,
-    FormsModule,
-    ReactiveFormsModule,
-    NzFormModule,
-    NzInputModule,
-    NzSelectModule,
-    NzButtonModule,
-    NzWaveModule,
-    NzIconModule,
-    CardTableWrapComponent,
-    AntTableComponent,
-    NzSwitchModule,
-    WaterMarkComponent
-  ],
-  templateUrl: './role-manager.component.html'
+    selector: 'app-role-manager',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        TranslateModule,
+        NzRadioModule,
+        PageHeaderComponent,
+        NzGridModule,
+        NzCardModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NzFormModule,
+        NzInputModule,
+        NzSelectModule,
+        NzButtonModule,
+        NzWaveModule,
+        NzIconModule,
+        CardTableWrapComponent,
+        AntTableComponent,
+        NzSwitchModule,
+        WaterMarkComponent
+    ],
+    templateUrl: './role-manager.component.html'
 })
 export class RoleManagerComponent implements OnInit {
   @ViewChild('operationTpl', { static: true }) operationTpl!: TemplateRef<any>;

@@ -1,7 +1,6 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router } from '@angular/router';
 
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
@@ -15,7 +14,6 @@ import { ThemeService } from '@app/_core/services/common/theme.service';
   templateUrl: './nav-drawer.component.html',
   styleUrls: ['./nav-drawer.component.less'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [NzDrawerModule, NzLayoutModule, SideNavComponent, AsyncPipe]
 })
 export class NavDrawerComponent implements OnInit {

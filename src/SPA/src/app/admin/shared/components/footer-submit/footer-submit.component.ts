@@ -12,12 +12,11 @@ import { ThemeService } from '@app/_core/services/common/theme.service';
 import { FunctionTreeVM } from '@app/_core/models/system/functionvm';
 
 @Component({
-  selector: 'app-footer-submit',
-  templateUrl: './footer-submit.component.html',
-  styleUrls: ['./footer-submit.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
-  imports: [NzCardModule, NgTemplateOutlet]
+    selector: 'app-footer-submit',
+    templateUrl: './footer-submit.component.html',
+    styleUrls: ['./footer-submit.component.less'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [NzCardModule, NgTemplateOutlet]
 })
 export class FooterSubmitComponent implements OnInit {
   private splitNavStoreService = inject(SplitNavStoreService);

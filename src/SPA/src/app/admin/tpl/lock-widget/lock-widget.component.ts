@@ -20,12 +20,11 @@ import { fnCheckForm, fnEncrypt } from '@app/_core/utilities/tools';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-lock-widget',
-  templateUrl: './lock-widget.component.html',
-  styleUrls: ['./lock-widget.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
-  imports: [NzAvatarModule, FormsModule, TranslateModule, NzFormModule, ReactiveFormsModule, NzGridModule, NzButtonModule, NzInputModule, NzIconModule, NzWaveModule]
+    selector: 'app-lock-widget',
+    templateUrl: './lock-widget.component.html',
+    styleUrls: ['./lock-widget.component.less'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [NzAvatarModule, FormsModule, TranslateModule, NzFormModule, ReactiveFormsModule, NzGridModule, NzButtonModule, NzInputModule, NzIconModule, NzWaveModule]
 })
 export class LockWidgetComponent extends BasicConfirmModalComponent implements OnInit {
   private fb = inject(NonNullableFormBuilder);

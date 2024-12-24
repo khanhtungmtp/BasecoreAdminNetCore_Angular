@@ -30,26 +30,25 @@ import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { SystemLanguageService } from '@app/_core/services/system/system-language.service';
 
 @Component({
-  selector: 'app-language',
-  standalone: true,
-  imports: [TranslateModule,
-    NzRadioModule,
-    PageHeaderComponent,
-    NzGridModule,
-    NzCardModule,
-    FormsModule,
-    ReactiveFormsModule,
-    NzFormModule,
-    NzInputModule,
-    NzSelectModule,
-    NzButtonModule,
-    NzWaveModule,
-    NzIconModule,
-    CardTableWrapComponent,
-    AntTableComponent,
-    NzSwitchModule,
-    WaterMarkComponent],
-  templateUrl: './language.component.html'
+    selector: 'app-language',
+    imports: [TranslateModule,
+        NzRadioModule,
+        PageHeaderComponent,
+        NzGridModule,
+        NzCardModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NzFormModule,
+        NzInputModule,
+        NzSelectModule,
+        NzButtonModule,
+        NzWaveModule,
+        NzIconModule,
+        CardTableWrapComponent,
+        AntTableComponent,
+        NzSwitchModule,
+        WaterMarkComponent],
+    templateUrl: './language.component.html'
 })
 export class LanguageComponent implements OnInit {
   @ViewChild('operationTpl', { static: true }) operationTpl!: TemplateRef<any>;
